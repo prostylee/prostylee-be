@@ -1,0 +1,76 @@
+buildscript {
+	ext {
+		lombokVersion = "1.18.16"
+		mapstructProcessorVersion = "1.4.1.Final"
+		springdocVersion = "1.4.8"
+		googleDriveVersion = "1.23.0"
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+}
+
+group = 'vn.prostylee'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20200713.1'
+	implementation 'mysql:mysql-connector-java:8.0.20'
+
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+	testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	implementation "org.springdoc:springdoc-openapi-ui:${springdocVersion}"
+	implementation "org.springdoc:springdoc-openapi-security:${springdocVersion}"
+	implementation "org.springdoc:springdoc-openapi-data-rest:${springdocVersion}"
+
+	implementation 'org.apache.commons:commons-lang3:3.10'
+	implementation 'org.apache.commons:commons-collections4:4.1'
+	implementation 'org.apache.commons:commons-text:1.9'
+	implementation 'commons-fileupload:commons-fileupload:1.4'
+
+	implementation 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
+
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'com.auth0:auth0:1.16.0'
+
+	compile 'org.modelmapper:modelmapper:2.3.0'
+	implementation "org.mapstruct:mapstruct:${mapstructProcessorVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
+
+	compile 'org.apache.commons:commons-text:1.8'
+	compile 'commons-fileupload:commons-fileupload:1.4'
+	compile "com.google.apis:google-api-services-drive:v3-rev110-${googleDriveVersion}"
+
+	compile 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
+
+	implementation 'com.google.firebase:firebase-admin:7.0.1'
+
+	// For dev only
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// For testing only
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+	useJUnitPlatform()
+}

@@ -1,0 +1,228 @@
+server:
+  servlet:
+    contextPath: /
+
+
+services:
+  firebase:
+    database-url: https://prostylee-9c568.firebaseio.com/
+    admin-sdk: google/prostylee-9c568-firebase-adminsdk-rh0b8-f2d09f23d5.json
+
+  email:
+    receive-contact: stylee.common@gmail.com
+    reply-to: support@prostylee.vn
+    send-from: support@prostylee.vn
+
+  drive:
+    app-name: prostylee
+    folder-id: 1NpC9-lZe4LgjvR89-w3YGsexbVniPTad
+    service-account-credential: classpath:google/prostylee-1605631821116-5a787decf53b.json
+
+  local-storage:
+    local-folder:
+      location: prostylee-files
+    temp-folder:
+      location: prostylee-temp
+      timeToLiveInHours: 720
+
+app:
+  order-code:
+    length: 8
+
+  push-notification:
+    url: https://exp.host/--/api/v2/push/send
+
+  ## App Monitoring config
+  monitor:
+    create-event:
+      ### Enable/ Disable monitor on create event
+      enable: true
+
+      ### entities will be monitor and publish a create event
+      ### Each entity separated by a comma, for example com.prostylee.entity.Account,com.stylee.entity.Role
+      entities: vn.prostylee.auth.entity.Account
+
+    performance:
+      ### Enable/ Disable monitor on the time executing each methods
+      enable: true
+
+    trace:
+      ### Enable log trace, must also change the setting: logging.level.root=TRACE to enable this feature
+      enable: true
+
+    user-access:
+      ### Enable/ Disable monitor on each method save / delete of user
+      enable: true
+
+  ## Security config
+  security:
+    reset-password-policies:
+      expiredInMinutes: 10
+      length: 8
+
+    ## JWT Authentication config
+    jwt:
+      # The access token will be expired in 4 hours
+      accessTokenExpirationInMs: 14400000
+
+      # The access token will be expired in 7 days
+      refreshTokenExpirationInMs: 604800000
+
+      # The issuer
+      tokenIssuer: http://prostylee.vn/
+
+      # The token signing key
+      tokenSigningKey: ProStylee-JWT-Secret-Key
+
+    max-age: 36000
+    allowed-origins:
+      - https://${CORS_DOMAIN}
+      - http://localhost:4200
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - Authorization
+      - Origin
+      - Content-Type
+      - Accept
+      - Accept-Encoding
+      - Accept-Language
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Headers
+      - Access-Control-Request-Method
+      - X-Requested-With
+      - X-Auth-Token
+      - X-Xsrf-Token
+      - Cache-Control
+      - Id-Token
+    allowed-public-apis:
+      - /ping/**
+      - /v1/public/*
+      - /v1/auth/**
+      - /v1/auth/**/**
+      - /v1/masters/**
+      - /v1/supports/**
+
+
+spring:
+  profiles:
+    active: dev
+
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    password: ENC(LIutR+3yZgTVvs2yu+IzPQ==)
+    url: jdbc:log4jdbc:mysql://localhost:3306/prostylee?useUnicode=true&characterEncoding=utf8
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+
+  ## Upload file config
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 64KB
+      max-file-size: 4MB
+      max-request-size: 100MB
+
+  ## Email config
+  mail:
+    ### Gmail SMTP Server
+    host: smtp.gmail.com
+    port: 587
+    username: stylee.common@gmail.com
+    password: ENC(Gh1K+Paii8f4Bujro1UUFMcNnqLkkmTYso119r5j1oU=)
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: false
+            required: true
+        transport:
+          protocol: smtp
+
+    ### AWS SES
+#    host: email-smtp.us-west-2.amazonaws.com
+#    username: username
+#    password: password
+#    properties:
+#      mail:
+#        debug: true
+#        smtp:
+#          auth: true
+#          port: 25
+#          starttls:
+#            enable: true
+#            required: true
+#        transport:
+#          protocol: smtp
+
+
+# Swagger config
+# @See https://springdoc.org/springdoc-properties.html
+springdoc:
+  api-docs:
+    # /api-docs endpoint custom path
+    # http://localhost:8090/{context-path}/v3/api-docs/
+    # http://localhost:8090/{context-path}/v3/api-docs.yaml
+    path: /v3/api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  group-configs:
+    -   group: Business API v1
+        packages-to-scan: vn.prostylee
+        paths-to-match: /v1/**
+  swagger-ui:
+    # swagger-ui custom path
+    # http://localhost:8090/{context-path}/swagger-ui.html
+    path: /swagger-ui.html
+
+### Api information
+swagger:
+  api:
+    basePackage: vn.prostylee
+    contact:
+      email: support@prostylee.vn
+      name: ProStylee System
+      url: https://prostylee.vn
+    description: ProStylee Documents with Swagger OpenAPI Specification v3
+    license: https://prostylee.vn
+    licenseUrl: https://prostylee.vn/license
+    termsOfServiceUrl: https://prostylee.vn
+    title: ProStylee API Documents
+    version: v1
+
+# encrypting and checking a password
+# Can be set from:
+# - CLI: java -Djasypt.encryptor.password=SECRET_KEY Application
+# - Java code: System.setProperty("jasypt.encryptor.password", "SECRET_KEY");
+# - Environment:
+#   + Window: set JASYPT_ENCRYPTOR_PASSWORD=secretkey
+#   + Linux: export JASYPT_ENCRYPTOR_PASSWORD=secretkey
+# Reference: http://www.jasypt.org/cli.html
+jasypt:
+  encryptor:
+    password: pro-stylee.2020@secret
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
