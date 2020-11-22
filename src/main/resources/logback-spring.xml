@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOG_DIR" value="./logs"/>
+	<property name="APP_NAME" value="prostylee-app"/>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+	    <layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%black(%d{yyyy-MMM-dd HH:mm:ss a}) ${APP_NAME} %highlight(%-5level) [%blue(%t)] %yellow(%logger{36}): %msg%n%throwable
+			</Pattern>
+	    </layout>
+	</appender>
+
+	<appender name="SQL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/${APP_NAME}-sql.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>utf-8</charset>
+			<Pattern>%d{yyyy-MMM-dd HH:mm:ss a} ${APP_NAME} %-5level [%thread] %logger{36}: %msg%n%throwable</Pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- Log everyday in a file -->
+			<fileNamePattern>${LOG_DIR}/archived/${APP_NAME}-sql.%d{MM-dd-yyyy}.%i.log.gz</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- Maximum file size of each log file, if exceed this limit, the app will create new file -->
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- Max history in days -->
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/${APP_NAME}.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>utf-8</charset>
+			<Pattern>%d{yyyy-MMM-dd HH:mm:ss a} ${APP_NAME} %-5level [%thread] %logger{36}: %msg%n%throwable</Pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- Log everyday in a file -->
+			<fileNamePattern>${LOG_DIR}/archived/${APP_NAME}.%d{MM-dd-yyyy}.%i.log.gz</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- Maximum file size of each log file, if exceed this limit, the app will create new file -->
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- Max history in days -->
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/${APP_NAME}-error.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>utf-8</charset>
+			<Pattern>%d{yyyy-MMM-dd HH:mm:ss a} ${APP_NAME} %-5level [%thread] %logger{36}: %msg%n%throwable</Pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- Log everyday in a file -->
+			<fileNamePattern>${LOG_DIR}/archived/${APP_NAME}.%d{MM-dd-yyyy}-error.%i.log.gz</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- Maximum file size of each log file, if exceed this limit, the app will create new file -->
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- Max history in days -->
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<!-- For dev -->
+	<springProfile name="!prod">
+		<!-- configuration to be enabled when the "production" profile is not active -->
+		<!-- LOG everything at INFO level -->
+		<root level="debug">
+			<appender-ref ref="APP_FILE"/>
+			<appender-ref ref="STDOUT"/>
+		</root>
+
+		<!-- LOG by package -->
+		<logger name="com.prostylee" level="info" additivity="false">
+			<appender-ref ref="APP_FILE"/>
+			<appender-ref ref="STDOUT"/>
+		</logger>
+         <!-- log4jdbc-log4j2 -->
+		<logger name="log4jdbc.log4j2" level="info" additivity="info">
+			<appender-ref ref="SQL_FILE"/>
+			<appender-ref ref="STDOUT"/>
+		</logger>
+	    <logger name="jdbc.sqlonly" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+			<appender-ref ref="STDOUT"/>
+	    </logger>
+	    <logger name="jdbc.sqltiming" additivity="false" level="trace">
+			<appender-ref ref="SQL_FILE" />
+            <appender-ref ref="STDOUT"/>
+	    </logger>
+	    <logger name="jdbc.audit" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+			<appender-ref ref="STDOUT"/>
+	    </logger>
+	    <logger name="jdbc.resultset" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+			<appender-ref ref="STDOUT"/>
+	    </logger>
+	    <logger name="jdbc.resultsettable" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+			<appender-ref ref="STDOUT"/>
+	    </logger>
+	    <logger name="jdbc.connection" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+			<appender-ref ref="STDOUT"/>
+	    </logger>
+    </springProfile>
+
+	<!-- For prod -->
+	<springProfile name="prod,production,default">
+		<!-- configuration to be enabled when the "production" profile is active -->
+		<!-- LOG everything at INFO level -->
+		<root level="error">
+			<appender-ref ref="APP_FILE"/>
+		</root>
+
+		<!-- LOG by package -->
+		<logger name="com.prostylee" level="info" additivity="false">
+			<appender-ref ref="APP_FILE"/>
+		</logger>
+
+		<!-- log4jdbc-log4j2 -->
+		<logger name="log4jdbc.log4j2" level="info" additivity="info">
+			<appender-ref ref="SQL_FILE"/>
+		</logger>
+		<logger name="jdbc.sqlonly" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+		<logger name="jdbc.sqltiming" additivity="false" level="trace">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+		<logger name="jdbc.audit" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+		<logger name="jdbc.resultset" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+		<logger name="jdbc.resultsettable" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+		<logger name="jdbc.connection" additivity="false" level="off">
+			<appender-ref ref="SQL_FILE" />
+		</logger>
+	</springProfile>
+    
+</configuration>
