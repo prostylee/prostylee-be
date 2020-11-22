@@ -12,7 +12,7 @@ For building and running the application you need:
 
 ## Running the application locally
 
-### Run PostgreSQL
+### Run MySQL
 
 Open terminal at folder `src/main/docker`
 Run the following command:
@@ -29,6 +29,18 @@ Or run the following command in a terminal:
 
 ```shell
 ./gradlew bootRun
+```
+
+### Test app
+
+```shell
+http://localhost:8090/api/ping
+```
+
+### API documentation
+
+```shell
+http://localhost:8090/api/swagger-ui/index.html
 ```
 
 ## Deploying the application to AWS
