@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration.monitor;
+package vn.prostylee.core.configuration.logging;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.aop.Advisor;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
         matchIfMissing = true)
 @Configuration
 @Aspect
-public class LogTraceConfig {
+public class LogTraceAdvice {
 
     /**
      * Change the setting: logging.level.root=TRACE to enable this feature

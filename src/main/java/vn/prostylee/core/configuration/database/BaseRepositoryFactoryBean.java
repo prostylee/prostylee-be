@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration;
+package vn.prostylee.core.configuration.database;
 
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 import org.springframework.data.jpa.repository.JpaRepository;

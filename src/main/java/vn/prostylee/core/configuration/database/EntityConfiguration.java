@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration;
+package vn.prostylee.core.configuration.database;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
