@@ -1,6 +1,5 @@
 package vn.prostylee.auth.dto.response;
 
-import vn.prostylee.auth.constant.Auth;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +15,5 @@ public class JwtAuthenticationToken {
 
     private String refreshToken;
 
-    private String tokenType = Auth.BEARER_PREFIX;
+    private String tokenType;
 }

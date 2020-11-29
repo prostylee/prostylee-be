@@ -24,7 +24,7 @@ public class NotificationRequest {
 
     private Map<String, Object> data;
 
-    private Boolean markAsRead = false;
+    private Boolean markAsRead;
 
-    private Long accountId;
+    private Long userId;
 }

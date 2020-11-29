@@ -2,9 +2,9 @@ package vn.prostylee.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import vn.prostylee.auth.dto.response.FeatureResponse;
-import vn.prostylee.auth.entity.Account;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.Role;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.utils.BeanUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +40,14 @@ public class AuthUserDetails implements UserDetails {
 
     private List<GrantedAuthority> authorities;
 
-    public AuthUserDetails(Account account, Collection<Feature> features) {
-        log.info("account " + account);
-        this.id = account.getId();
-        this.fullName = account.getFullName();
-        this.username = account.getUsername();
-        this.password = account.getPassword();
-        this.phoneNumber = account.getPhoneNumber();
-        this.gender = account.getGender();
-        this.roles = account.getRoles();
+    public AuthUserDetails(User user, Collection<Feature> features) {
+        this.id = user.getId();
+        this.fullName = user.getFullName();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.phoneNumber = user.getPhoneNumber();
+        this.gender = user.getGender();
+        this.roles = user.getRoles();
         this.authorities = createAuthorities(roles);
         this.features = BeanUtil.listCopyProperties(features, FeatureResponse.class);
     }

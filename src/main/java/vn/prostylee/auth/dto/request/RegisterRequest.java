@@ -2,7 +2,7 @@ package vn.prostylee.auth.dto.request;
 
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringExclude;
-import vn.prostylee.auth.service.AccountService;
+import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.validator.Gender;
 import vn.prostylee.core.validator.Unique;
 
@@ -22,7 +22,7 @@ public class RegisterRequest {
     private String phoneNumber;
 
 
-    @Unique(service = AccountService.class, serviceQualifier = "accountService")
+    @Unique(service = UserService.class, serviceQualifier = "userService")
     @NotBlank
     @Email
     @Size(min = 4, max = 256)
@@ -35,8 +35,6 @@ public class RegisterRequest {
 
     @Gender
     private Character gender;
-
-    private String language;
 
     private Boolean active;
 

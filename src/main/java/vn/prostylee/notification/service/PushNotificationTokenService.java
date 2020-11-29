@@ -9,7 +9,7 @@ public interface PushNotificationTokenService {
 
     boolean subscribe(SubscribePushNotificationRequest request);
 
-    List<UserToken> getTokensByAccountId(Long accountId);
+    List<UserToken> getTokensByUserId(Long userId);
 
-    List<UserToken> getTokensByRoles(String... roles);
+    List<UserToken> getTokensByStoreId(Long storeId);
 }

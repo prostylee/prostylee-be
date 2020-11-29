@@ -1,11 +1,11 @@
 package vn.prostylee.auth.service;
 
 import vn.prostylee.auth.dto.request.UserProfileRequest;
-import vn.prostylee.auth.dto.response.AccountResponse;
+import vn.prostylee.auth.dto.response.UserResponse;
 
 public interface UserProfileService {
 
-    AccountResponse getProfile();
+    UserResponse getProfile();
 
-    AccountResponse updateProfile(UserProfileRequest request);
+    UserResponse updateProfile(UserProfileRequest request);
 }

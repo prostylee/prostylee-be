@@ -3,7 +3,6 @@ package vn.prostylee.notification.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.UserToken;
-import vn.prostylee.auth.entity.Account;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.notification.dto.request.SubscribePushNotificationRequest;
@@ -32,23 +31,20 @@ public class PushNotificationTokenServiceImpl implements PushNotificationTokenSe
     @Override
     public boolean subscribe(SubscribePushNotificationRequest request) {
         if (!pushNotificationTokenRepository.findByToken(request.getToken()).isPresent()) {
-            Account account = new Account();
-            account.setId(authenticatedProvider.getUserId().get());
-
             PushNotificationToken pushNotificationToken = BeanUtil.copyProperties(request, PushNotificationToken.class);
-            pushNotificationToken.setAccount(account);
+            pushNotificationToken.setUserId(authenticatedProvider.getUserId().get());
             pushNotificationTokenRepository.save(pushNotificationToken);
         }
         return true;
     }
 
     @Override
-    public List<UserToken> getTokensByAccountId(Long accountId) {
-        return pushNotificationTokenRepository.getTokensByAccountId(accountId);
+    public List<UserToken> getTokensByUserId(Long userId) {
+        return pushNotificationTokenRepository.getTokensByUserId(userId);
     }
 
     @Override
-    public List<UserToken> getTokensByRoles(String...roles) {
-        return pushNotificationTokenRepository.getTokensByRoleCodes(Arrays.asList(roles));
+    public List<UserToken> getTokensByStoreId(Long storeId) {
+        return pushNotificationTokenRepository.getTokensByStoreId(storeId);
     }
 }

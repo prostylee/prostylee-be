@@ -1,5 +1,5 @@
 package vn.prostylee.notification.repository;
-// Generated May 31, 2020, 11:28:53 PM by Hibernate Tools 5.2.12.Final
+// Generated Nov 28, 2020, 9:47:00 PM by Hibernate Tools 5.2.12.Final
 
 import vn.prostylee.notification.entity.EmailTemplate;
 import vn.prostylee.core.repository.BaseRepository;
@@ -15,5 +15,5 @@ import java.util.Optional;
 @Repository
 public interface EmailTemplateRepository extends BaseRepository<EmailTemplate, Long> {
 
-    Optional<EmailTemplate> findByTypeAndLanguage(String type, String language);
+    Optional<EmailTemplate> findByType(String type);
 }

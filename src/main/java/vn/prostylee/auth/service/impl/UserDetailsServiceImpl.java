@@ -1,11 +1,11 @@
 package vn.prostylee.auth.service.impl;
 
-import vn.prostylee.auth.constant.Auth;
+import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.dto.AuthUserDetails;
-import vn.prostylee.auth.entity.Account;
 import vn.prostylee.auth.entity.Feature;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.auth.repository.custom.CustomAccountRepository;
+import vn.prostylee.auth.repository.custom.CustomUserRepository;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +21,17 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	private final CustomAccountRepository userRepository;
+	private final CustomUserRepository userRepository;
 
 	@Autowired
-	public UserDetailsServiceImpl(@Qualifier("customAccountRepository") CustomAccountRepository userRepository) {
+	public UserDetailsServiceImpl(@Qualifier("customUserRepository") CustomUserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String email) {
-		Account account = userRepository.findByActivatedUsername(email).orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
-		return this.getUserDetails(account);
+		User user = userRepository.findByActivatedUsername(email).orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
+		return this.getUserDetails(user);
 	}
 
 	/**
@@ -40,24 +40,24 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	 * @param id The id of user
 	 */
 	public UserDetails loadUserById(Long id) {
-		Account account = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("User with id [" + id + "] is not exists"));
-		return this.getUserDetails(account);
+		User user = userRepository.findOneActive(id).orElseThrow(() -> new ResourceNotFoundException("User with id [" + id + "] is not exists"));
+		return this.getUserDetails(user);
 	}
 
 	/**
 	 * Get user detail if user is valid
 	 */
-	private UserDetails getUserDetails(Account account) {
-		if (StringUtils.isBlank(account.getPassword())) {
-			String pwd = EncrytedPasswordUtils.encryptPassword(Auth.GOOGLE_PASSWORD_TOKEN);
-			account.setPassword(pwd);
+	private UserDetails getUserDetails(User user) {
+		if (StringUtils.isBlank(user.getPassword())) {
+			String pwd = EncrytedPasswordUtils.encryptPassword(AuthConstants.GOOGLE_PASSWORD_TOKEN);
+			user.setPassword(pwd);
 		}
-		return new AuthUserDetails(account, this.getFeatures(account));
+		return new AuthUserDetails(user, this.getFeatures(user));
 	}
 
-	private List<Feature> getFeatures(Account account) {
+	private List<Feature> getFeatures(User user) {
 		List<Feature> features = new ArrayList<>();
-		account.getRoles().forEach(role -> features.addAll(role.getFeatures()));
+		user.getRoles().forEach(role -> features.addAll(role.getFeatures()));
 		return features;
 	}
 }

@@ -28,6 +28,6 @@ public class MailTemplateConfig {
 	/**
 	 * Determinate whether the mail content is an HTML, by default is false (just a PLAIN TEXT)
 	 */
-	private Boolean mailIsHtml = false;
+	private Boolean mailIsHtml;
 
 }

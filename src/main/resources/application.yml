@@ -39,8 +39,8 @@ app:
       enable: true
 
       ### entities will be monitor and publish a create event
-      ### Each entity separated by a comma, for example com.prostylee.entity.Account,com.stylee.entity.Role
-      entities: vn.prostylee.auth.entity.Account
+      ### Each entity separated by a comma, for example com.prostylee.entity.User,com.stylee.entity.Role
+      entities: vn.prostylee.auth.entity.User
 
     performance:
       ### Enable/ Disable monitor on the time executing each methods
