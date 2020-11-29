@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+
+	<property name="APP_NAME" value="prostylee-app"/>
+	<property name="LOG_PATTERN" value="%black(%d{yyyy-MMM-dd HH:mm:ss a}) ${APP_NAME} %highlight(%-5level) [%blue(%t)] %yellow(%logger{36}): %msg%n%throwable"/>
+	<springProperty scope="context" name="LOG_DIR" source="app.log.dir" defaultValue="./logs" />
+
+	<include resource="appLog-console.xml" />
+	<include resource="appLog-file.xml" />
+	<include resource="appLog-file-sql.xml" />
+	<include resource="appLog-file-error.xml" />
+	<include optional="true" resource="appLog-f${LOG_CUSTOM_TYPE:-custom}.xml" />
+
+</included>

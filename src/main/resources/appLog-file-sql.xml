@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<springProperty scope="context" name="logFileSuffix" source="app.log.file.sql-suffix" defaultValue="sql.log" />
+
+	<appender name="FILE_SQL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/${APP_NAME}.${logFileSuffix}</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>utf-8</charset>
+			<Pattern>%d{yyyy-MMM-dd HH:mm:ss a} ${APP_NAME} %-5level [%thread] %logger{36}: %msg%n%throwable</Pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- Log everyday in a file -->
+			<fileNamePattern>${LOG_DIR}/archived/${APP_NAME}.%d{MM-dd-yyyy}.%i.${logFileSuffix}.gz</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- Maximum file size of each log file, if exceed this limit, the app will create new file -->
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- Max history in days -->
+			<maxHistory>90</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="ASYNC_FILE_SQL" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>1024</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="FILE_SQL" />
+	</appender>
+    
+</included>
