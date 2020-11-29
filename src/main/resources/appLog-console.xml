@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<Pattern>${LOG_PATTERN}</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>1024</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="CONSOLE" />
+	</appender>
+    
+</included>

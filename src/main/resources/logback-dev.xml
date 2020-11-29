@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<!-- LOG everything at DEBUG level -->
+	<root level="DEBUG">
+		<appender-ref ref="CONSOLE"/>
+	</root>
+
+	<logger name="com.google.ads.googleads.lib.request.summary" level="INFO"/>
+	<logger name="com.google.ads.googleads.lib.request.detail" level="INFO"/>
+	<logger name="io.grpc.netty.shaded.io.netty" level="INFO"/>
+	<logger name="com.springframework" level="INFO" />
+	<logger name="com.apache" level="INFO" />
+	<logger name="com.netflix" level="INFO" />
+
+	<!-- LOG by package -->
+	<logger name="vn.prostylee" level="DEBUG" additivity="false">
+		<appender-ref ref="FILE_DEFAULT"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+
+	<!-- log4jdbc-log4j2 -->
+	<logger name="log4jdbc.log4j2" level="info" additivity="false">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.sqlonly" additivity="false" level="off">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.sqltiming" additivity="false" level="trace">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.audit" additivity="false" level="off">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.resultset" additivity="false" level="off">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.resultsettable" additivity="false" level="off">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+	<logger name="jdbc.connection" additivity="false" level="off">
+		<appender-ref ref="FILE_SQL"/>
+		<appender-ref ref="CONSOLE"/>
+	</logger>
+    
+</included>
