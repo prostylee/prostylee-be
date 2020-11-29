@@ -1,5 +1,5 @@
 package vn.prostylee.notification.repository;
-// Generated May 31, 2020, 11:28:53 PM by Hibernate Tools 5.2.12.Final
+// Generated Nov 28, 2020, 9:47:00 PM by Hibernate Tools 5.2.12.Final
 
 import vn.prostylee.notification.entity.Notification;
 import vn.prostylee.core.repository.BaseRepository;
@@ -18,14 +18,14 @@ import java.time.LocalDateTime;
 @Repository
 public interface NotificationRepository extends BaseRepository<Notification, Long> {
 
-    void deleteAllByAccountId(Long accountId);
+    void deleteAllByUserId(Long userId);
 
     @Modifying
     @Query("UPDATE Notification e " +
-            "SET e.markAsRead = true, e.updatedAt = :updatedAt, e.updatedBy = :accountId " +
-            "WHERE e.account.id = :accountId AND (e.markAsRead is null OR e.markAsRead = false)")
-    void markAllAsReadByAccountId(@Param("accountId") Long accountId, @Param("updatedAt") LocalDateTime updatedAt);
+            "SET e.markAsRead = true, e.updatedAt = :updatedAt, e.updatedBy = :userId " +
+            "WHERE e.userId = :userId AND (e.markAsRead is null OR e.markAsRead = false)")
+    void markAllAsReadByUserId(@Param("userId") Long userId, @Param("updatedAt") LocalDateTime updatedAt);
 
-    @Query("SELECT count(e.id) FROM Notification e WHERE e.account.id = :accountId AND (e.markAsRead is null OR e.markAsRead = false)")
-    int countUnreadNotification(@Param("accountId") Long accountId);
+    @Query("SELECT count(e.id) FROM Notification e WHERE e.userId = :userId AND (e.markAsRead is null OR e.markAsRead = false)")
+    int countUnreadNotification(@Param("userId") Long userId);
 }

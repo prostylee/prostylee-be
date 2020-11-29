@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.UserToken;
-import vn.prostylee.auth.entity.Account;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
@@ -48,10 +48,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<NotificationResponse> findAll(BaseFilter baseFilter) {
         Specification<Notification> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Notification> additionalSpec = (root, query, cb) -> {
-            Join<Notification, Account> account = root.join("account");
-            return cb.equal(account.get("id"), authenticatedProvider.getUserId().get());
-        };
+        Specification<Notification> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserId().get());
         searchable = searchable.and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<Notification> page = notificationRepository.findAll(searchable, pageable);
@@ -70,14 +67,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationResponse save(NotificationRequest request) {
-        Account account = new Account();
-        account.setId(request.getAccountId());
-
         Notification notification = BeanUtil.copyProperties(request, Notification.class);
         if (request.getData() != null) {
             notification.setAdditionalData(JsonUtils.toJson(request.getData()));
         }
-        notification.setAccount(account);
+        notification.setUserId(request.getUserId());
         Notification savedNotification = notificationRepository.save(notification);
         return BeanUtil.copyProperties(savedNotification, NotificationResponse.class);
     }
@@ -114,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public boolean markAllAsRead() {
         Long userId = authenticatedProvider.getUserId().get();
-        notificationRepository.markAllAsReadByAccountId(userId, LocalDateTime.now());
+        notificationRepository.markAllAsReadByUserId(userId, LocalDateTime.now());
         return true;
     }
 
@@ -130,7 +124,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public boolean deleteAll() {
         Long userId = authenticatedProvider.getUserId().get();
-        notificationRepository.deleteAllByAccountId(userId);
+        notificationRepository.deleteAllByUserId(userId);
         return true;
     }
 

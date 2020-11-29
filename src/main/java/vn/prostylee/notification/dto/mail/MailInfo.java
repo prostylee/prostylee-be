@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@AllArgsConstructor
 public class MailInfo extends SimpleMailInfo {
 
 	private String from;

@@ -1,14 +1,13 @@
 package vn.prostylee.notification.repository;
 
-// Generated May 31, 2020, 11:28:53 PM by Hibernate Tools 5.2.12.Final
+// Generated Nov 28, 2020, 9:47:00 PM by Hibernate Tools 5.2.12.Final
 
-import vn.prostylee.auth.dto.UserToken;
-import vn.prostylee.auth.entity.Account;
-import vn.prostylee.notification.entity.PushNotificationToken;
-import vn.prostylee.core.repository.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import vn.prostylee.auth.dto.UserToken;
+import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.notification.entity.PushNotificationToken;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,15 +22,15 @@ public interface PushNotificationTokenRepository extends BaseRepository<PushNoti
 
     Optional<PushNotificationToken> findByToken(String token);
 
-    List<PushNotificationToken> getAllByAccount(Account account);
+    List<PushNotificationToken> getAllByUserId(Long userId);
 
-    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.account.id, t.token) " +
-            "FROM PushNotificationToken t INNER JOIN t.account a ON a.id = t.account.id " +
-            "WHERE t.account.id = :accountId AND (a.allowNotification is null OR a.allowNotification = true)")
-    List<UserToken> getTokensByAccountId(@Param("accountId") Long accountId);
+    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.userId, t.token) " +
+            "FROM PushNotificationToken t " +
+            "WHERE t.userId = :userId ")
+    List<UserToken> getTokensByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.account.id, t.token) " +
-            "FROM PushNotificationToken t INNER JOIN t.account a ON a.id = t.account.id INNER JOIN a.roles r " +
-            "WHERE r.code IN (:roleCodes) AND (a.allowNotification is null OR a.allowNotification = true)")
-    List<UserToken> getTokensByRoleCodes(@Param("roleCodes") List<String> roles);
+    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.userId, t.token) " +
+            "FROM PushNotificationToken t " +
+            "WHERE t.storeId = :storeId ")
+    List<UserToken> getTokensByStoreId(@Param("storeId") Long storeId);
 }

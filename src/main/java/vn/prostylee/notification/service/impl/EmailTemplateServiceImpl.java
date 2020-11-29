@@ -55,11 +55,8 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
-    public EmailTemplateResponse findByTypeAndLanguage(String type, String language) {
-        if (StringUtils.isBlank(language)) {
-            language = LocaleConstant.VIETNAMESE;
-        }
-        EmailTemplate emailTemplate = emailTemplateRepository.findByTypeAndLanguage(type, language).orElseThrow(
+    public EmailTemplateResponse findByType(String type) {
+        EmailTemplate emailTemplate = emailTemplateRepository.findByType(type).orElseThrow(
                 () -> new ResourceNotFoundException("Email template is not found with type [" + type + "]"));
         return convertToResponse(emailTemplate);
     }

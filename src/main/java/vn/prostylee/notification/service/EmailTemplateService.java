@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface EmailTemplateService {
+
     List<EmailTemplateResponse> findAll();
 
     EmailTemplateResponse findById(Long id);
 
     EmailTemplateResponse update(Long id, EmailTemplateRequest s);
 
-    EmailTemplateResponse findByTypeAndLanguage(String type, String language);
+    EmailTemplateResponse findByType(String type);
 
     String dryRun(Long id, Map<String, Object> data);
 }
