@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<!-- LOG everything at INFO level -->
+	<root level="INFO">
+		<appender-ref ref="FILE_DEFAULT"/>
+		<appender-ref ref="CONSOLE"/>
+	</root>
+
+	<!-- LOG by package -->
+	<logger name="vn.prostylee" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE_DEFAULT"/>
+		<appender-ref ref="ASYNC_CONSOLE"/>
+	</logger>
+
+	<logger name="vn.prostylee" level="ERROR" additivity="false">
+		<appender-ref ref="ASYNC_FILE_ERROR"/>
+		<appender-ref ref="ASYNC_CONSOLE"/>
+	</logger>
+
+</included>

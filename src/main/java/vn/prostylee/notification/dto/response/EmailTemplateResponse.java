@@ -18,8 +18,6 @@ public class EmailTemplateResponse {
 
     private String keyword;
 
-    private String language;
-
     private Long originalId;
 
     private LocalDateTime createdAt;

@@ -1,10 +1,12 @@
 package vn.prostylee.core.configuration.async;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import vn.prostylee.core.configuration.properties.ThreadExecutor;
 
 import java.util.concurrent.Executor;
 
@@ -18,17 +20,21 @@ import java.util.concurrent.Executor;
  * The reasons are simple – the method needs to be public so that it can be proxied. <br />
  * And self-invocation doesn't work because it bypasses the proxy and calls the underlying method directly.
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig extends AsyncConfigurerSupport {
 
+    private static final String THREAD_NAME_PREFIX = "ProStylee-Async-";
+    private final ThreadExecutor threadExecutor;
+
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
-        executor.setQueueCapacity(1000);
-        executor.setThreadNamePrefix("ProStylee-Async-");
+        executor.setCorePoolSize(threadExecutor.getCorePoolSize());
+        executor.setMaxPoolSize(threadExecutor.getMaxPoolSize());
+        executor.setQueueCapacity(threadExecutor.getQueueCapacity());
+        executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
         executor.initialize();
         return executor;
     }

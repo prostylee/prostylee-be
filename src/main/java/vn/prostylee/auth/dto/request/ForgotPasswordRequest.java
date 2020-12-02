@@ -9,6 +9,4 @@ public class ForgotPasswordRequest {
 
     @NotNull
     private String email;
-
-    private String language;
 }

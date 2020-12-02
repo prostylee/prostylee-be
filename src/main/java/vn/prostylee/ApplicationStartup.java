@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.constant.Gender;
-import vn.prostylee.auth.dto.request.AccountRequest;
+import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.repository.RoleRepository;
-import vn.prostylee.auth.service.AccountService;
+import vn.prostylee.auth.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -28,7 +28,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
      * This event is executed as late as conceivably possible to indicate that
      * the application is ready to service requests.
      */
-    private final AccountService accountService;
+    private final UserService userService;
     private final RoleRepository roleRepository;
 
     @Override
@@ -46,7 +46,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
                     .build();
             Role saved = roleRepository.save(role);
 
-            AccountRequest accountRequest = AccountRequest.builder()
+            UserRequest userRequest = UserRequest.builder()
                     .username("superadmin1@gmail.com")
                     .password("1234")
                     .active(true)
@@ -57,7 +57,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
                     .allowNotification(true)
                     .roles(Collections.singletonList(saved.getCode()))
                     .build();
-            accountService.save(accountRequest);
+            userService.save(userRequest);
 
         }
     }

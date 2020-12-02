@@ -13,19 +13,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
-import vn.prostylee.auth.constant.Auth;
+import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.constant.Scope;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.request.*;
-import vn.prostylee.auth.dto.response.AccountTempResponse;
+import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
-import vn.prostylee.auth.entity.Account;
 import vn.prostylee.auth.entity.Feature;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.exception.InvalidJwtToken;
-import vn.prostylee.auth.repository.custom.CustomAccountRepository;
-import vn.prostylee.auth.service.AccountService;
-import vn.prostylee.auth.service.AccountTempService;
+import vn.prostylee.auth.repository.custom.CustomUserRepository;
+import vn.prostylee.auth.service.UserService;
+import vn.prostylee.auth.service.UserTempService;
 import vn.prostylee.auth.service.AuthService;
 import vn.prostylee.auth.token.AccessToken;
 import vn.prostylee.auth.token.factory.JwtTokenFactory;
@@ -60,8 +60,8 @@ public class AuthServiceImpl implements AuthService {
     private TokenVerifier tokenVerifier;
 
     @Autowired
-    @Qualifier("customAccountRepository")
-    private CustomAccountRepository userRepository;
+    @Qualifier("customUserRepository")
+    private CustomUserRepository userRepository;
 
     @Autowired
     private SecurityProperties securityProperties;
@@ -70,8 +70,8 @@ public class AuthServiceImpl implements AuthService {
     private TokenParser tokenParser;
 
     @Autowired
-    @Qualifier("accountService")
-    private AccountService accountService;
+    @Qualifier("userService")
+    private UserService userService;
 
     @Autowired
     private EmailService emailService;
@@ -80,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
     private EmailTemplateService emailTemplateService;
 
     @Autowired
-    private AccountTempService accountTempService;
+    private UserTempService userTempService;
 
     @Autowired
     private AuthenticatedProvider authenticatedProvider;
@@ -108,13 +108,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthenticationToken register(RegisterRequest registerRequest) {
-        AccountRequest accountRequest = BeanUtil.copyProperties(registerRequest, AccountRequest.class);
-        accountRequest.setRoles(Collections.singletonList(AuthRole.BUYER.name()));
-        accountRequest.setActive(registerRequest.getActive() == null ? Boolean.TRUE : registerRequest.getActive());
-        accountRequest.setEmail(registerRequest.getUsername());
-        accountService.save(accountRequest);
+        UserRequest userRequest = BeanUtil.copyProperties(registerRequest, UserRequest.class);
+        userRequest.setRoles(Collections.singletonList(AuthRole.BUYER.name()));
+        userRequest.setActive(registerRequest.getActive() == null ? Boolean.TRUE : registerRequest.getActive());
+        userRequest.setEmail(registerRequest.getUsername());
+        userService.save(userRequest);
 
-        this.sendEmailWelcome(accountRequest.getEmail(), registerRequest);
+        this.sendEmailWelcome(userRequest.getEmail(), registerRequest);
 
         LoginRequest loginRequest = LoginRequest.builder()
                 .username(registerRequest.getUsername())
@@ -125,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
 
     private void sendEmailWelcome(String email, RegisterRequest registerRequest) {
         try {
-            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByTypeAndLanguage(EmailTemplateType.WELCOME.name(), registerRequest.getLanguage());
+            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(EmailTemplateType.WELCOME.name());
             MailTemplateConfig config = MailTemplateConfig.builder()
                     .mailContent(emailTemplateResponse.getContent())
                     .mailSubject(emailTemplateResponse.getTitle())
@@ -145,7 +145,7 @@ public class AuthServiceImpl implements AuthService {
         JwtAuthenticationToken token = JwtAuthenticationToken.builder()
                 .accessToken(accessToken.getToken())
                 .refreshToken(tokenFactory.createRefreshToken(userDetail).getToken())
-                .tokenType(Auth.BEARER_PREFIX)
+                .tokenType(AuthConstants.BEARER_PREFIX)
                 .build();
         return token;
     }
@@ -154,14 +154,14 @@ public class AuthServiceImpl implements AuthService {
     public JwtAuthenticationToken refreshToken(RefreshTokenRequest request) {
         if (tokenVerifier.verify(request.getRefreshToken()) && checkRefreshTokenScope(request.getRefreshToken())) {
             Long userId = tokenParser.getUserIdFromJWT(request.getRefreshToken(), securityProperties.getJwt().getTokenSigningKey());
-            Account account = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User is not exists by getting with id " + userId));
-            AuthUserDetails userDetail = new AuthUserDetails(account, this.getFeatures(account));
+            User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User is not exists by getting with id " + userId));
+            AuthUserDetails userDetail = new AuthUserDetails(user, this.getFeatures(user));
             AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
 
             return JwtAuthenticationToken.builder()
                     .accessToken(accessToken.getToken())
                     .refreshToken(request.getRefreshToken())
-                    .tokenType(Auth.BEARER_PREFIX)
+                    .tokenType(AuthConstants.BEARER_PREFIX)
                     .build();
         }
         throw new InvalidJwtToken("The refresh token is invalid");
@@ -172,35 +172,35 @@ public class AuthServiceImpl implements AuthService {
         userRepository.findActivatedUserByEmail(request.getEmail()).orElseThrow(() ->
                 new ResourceNotFoundException("User is not exists by getting with email " + request.getEmail()));
 
-        EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByTypeAndLanguage(EmailTemplateType.FORGOT_PASSWORD.name(), request.getLanguage());
+        EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(EmailTemplateType.FORGOT_PASSWORD.name());
         MailTemplateConfig config = MailTemplateConfig.builder()
                 .mailContent(emailTemplateResponse.getContent())
                 .mailSubject(emailTemplateResponse.getTitle())
                 .mailIsHtml(true)
                 .build();
 
-        AccountTempResponse accountTempResponse = accountTempService.createAccountTemp(request.getEmail());
+        UserTempResponse userTempResponse = userTempService.createUserTemp(request.getEmail());
 
         MailInfo mailInfo = new MailInfo();
         mailInfo.addTo(request.getEmail());
-        emailService.sendAsync(mailInfo, config, accountTempResponse);
+        emailService.sendAsync(mailInfo, config, userTempResponse);
         return true;
     }
 
     @Override
     public JwtAuthenticationToken changePassword(ChangePasswordRequest request) {
         String email = request.getEmail();
-        final Account account = userRepository.findActivatedUserByEmail(email).orElseThrow(
+        final User user = userRepository.findActivatedUserByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("User is not exists by getting with email " + email));
 
-        if ((authenticatedProvider.getUserId().isPresent() && EncrytedPasswordUtils.isMatched(request.getPassword(), account.getPassword())) ||
-                accountTempService.isValid(email, request.getPassword())) {
+        if ((authenticatedProvider.getUserId().isPresent() && EncrytedPasswordUtils.isMatched(request.getPassword(), user.getPassword())) ||
+                userTempService.isValid(email, request.getPassword())) {
             // Save a new password
-            account.setPassword(EncrytedPasswordUtils.encryptPassword(request.getNewPassword()));
-            userRepository.save(account);
+            user.setPassword(EncrytedPasswordUtils.encryptPassword(request.getNewPassword()));
+            userRepository.save(user);
 
             // Delete temp account
-            accountTempService.delete(email);
+            userTempService.delete(email);
 
             // Return token
             LoginRequest loginRequest = LoginRequest.builder()
@@ -212,9 +212,9 @@ public class AuthServiceImpl implements AuthService {
         throw new ResourceNotFoundException("Incorrect password or password is expired");
     }
 
-    private List<Feature> getFeatures(Account account) {
+    private List<Feature> getFeatures(User user) {
         List<Feature> features = new ArrayList<>();
-        account.getRoles().forEach(role -> features.addAll(role.getFeatures()));
+        user.getRoles().forEach(role -> features.addAll(role.getFeatures()));
         return features;
     }
 

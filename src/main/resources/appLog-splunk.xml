@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+
+	<appender name="SPLUNK_APP" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+		<url>http://localhost:5555</url>
+		<host>${HOST_NAME}</host>
+		<token>11111111-2222-3333-4444-555555555555</token>
+		<source>splunktest</source>
+		<index>app-log</index>
+		<sourcetype>prostylee-api</sourcetype>
+		<messageFormat>text</messageFormat>
+		<disableCertificateValidation>true</disableCertificateValidation>
+		<batch_size_interval>10000</batch_size_interval>
+		<batch_size_count>100</batch_size_count>
+		<batch_size_bytes>102400</batch_size_bytes>
+		<!--<send_mode>parallel</send_mode>-->
+		<!--<middleware>Todo create a new implmentation which extends from HttpSenderMiddleware</middleware>-->
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>${LOG_PATTERN}</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ASYNC_SPLUNK_APP" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>1024</queueSize>
+		<discardingThreshold>512</discardingThreshold>
+		<neverBlock>true</neverBlock>
+		<appender-ref ref="SPLUNK_APP" />
+	</appender>
+    
+</included>
