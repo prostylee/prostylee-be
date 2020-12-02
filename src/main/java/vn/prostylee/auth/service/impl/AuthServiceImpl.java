@@ -1,5 +1,6 @@
 package vn.prostylee.auth.service.impl;
 
+import com.google.firebase.auth.FirebaseToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
@@ -86,11 +87,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthenticationToken login(LoginRequest loginRequest) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
+        Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
         return this.createResponse((AuthUserDetails) auth.getPrincipal());
+    }
+
+    @Override
+    public JwtAuthenticationToken loginWithSocial(FirebaseToken firebaseToken) {
+        Account account = buildAccountBaseOnFirebaseToken(firebaseToken);
+        AuthUserDetails userDetail = new AuthUserDetails(account, null);
+        return this.createResponse(userDetail);
+    }
+
+    private Account buildAccountBaseOnFirebaseToken(FirebaseToken firebaseToken) {
+        Account account = new Account();
+        account.setEmail(firebaseToken.getEmail());
+        account.setFullName(firebaseToken.getName());
+        return account;
     }
 
     @Override
@@ -129,11 +142,12 @@ public class AuthServiceImpl implements AuthService {
 
     private JwtAuthenticationToken createResponse(AuthUserDetails userDetail) {
         AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
-        return JwtAuthenticationToken.builder()
+        JwtAuthenticationToken token = JwtAuthenticationToken.builder()
                 .accessToken(accessToken.getToken())
                 .refreshToken(tokenFactory.createRefreshToken(userDetail).getToken())
                 .tokenType(AuthConstants.BEARER_PREFIX)
                 .build();
+        return token;
     }
 
     @Override
