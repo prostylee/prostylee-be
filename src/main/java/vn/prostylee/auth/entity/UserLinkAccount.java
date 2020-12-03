@@ -10,11 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+
+import lombok.*;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.entity.AuditEntity;
 
@@ -27,6 +24,8 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "user_link_account", catalog = "prostylee")
 public class UserLinkAccount extends AuditEntity {
 
@@ -48,6 +47,6 @@ public class UserLinkAccount extends AuditEntity {
 	private String providerName;
 
 	@Column(name = "provider_id", length = 45)
-	private String providerId;
+	private String providerId; //id user
 
 }

@@ -2,9 +2,9 @@ package vn.prostylee.auth.repository.impl;
 
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.core.repository.query.HibernateQueryResult;
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
-import vn.prostylee.auth.repository.custom.CustomUserRepository;
 import vn.prostylee.core.utils.DbUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-@Qualifier("customUserRepository")
-public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implements CustomUserRepository {
+@Qualifier("userRepository")
+public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implements UserRepository {
 
     public UserRepositoryImpl(EntityManager em) {
         super(User.class, em);

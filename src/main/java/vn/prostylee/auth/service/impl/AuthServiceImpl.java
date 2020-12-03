@@ -1,5 +1,6 @@
 package vn.prostylee.auth.service.impl;
 
+import com.google.api.client.util.ArrayMap;
 import com.google.firebase.auth.FirebaseToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
@@ -22,8 +24,11 @@ import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.exception.InvalidJwtToken;
-import vn.prostylee.auth.repository.custom.CustomUserRepository;
+import vn.prostylee.auth.repository.UserLinkAccountRepository;
+import vn.prostylee.auth.repository.UserRepository;
+import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.auth.service.UserTempService;
 import vn.prostylee.auth.service.AuthService;
@@ -45,6 +50,7 @@ import vn.prostylee.notification.service.EmailTemplateService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -60,8 +66,7 @@ public class AuthServiceImpl implements AuthService {
     private TokenVerifier tokenVerifier;
 
     @Autowired
-    @Qualifier("customUserRepository")
-    private CustomUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private SecurityProperties securityProperties;
@@ -72,6 +77,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     @Qualifier("userService")
     private UserService userService;
+
+    @Autowired
+    private UserLinkAccountService userLinkAccountService;
 
     @Autowired
     private EmailService emailService;
@@ -94,16 +102,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthenticationToken loginWithSocial(FirebaseToken firebaseToken) {
-        Account account = buildAccountBaseOnFirebaseToken(firebaseToken);
-        AuthUserDetails userDetail = new AuthUserDetails(account, null);
-        return this.createResponse(userDetail);
-    }
-
-    private Account buildAccountBaseOnFirebaseToken(FirebaseToken firebaseToken) {
-        Account account = new Account();
-        account.setEmail(firebaseToken.getEmail());
-        account.setFullName(firebaseToken.getName());
-        return account;
+        //Check exist
+        if(false) {
+            //login(loginRequest);
+            //GET userLink check
+            return new JwtAuthenticationToken();
+        } else {
+            User user = userService.saveBy(firebaseToken);
+            userLinkAccountService.saveBy(firebaseToken , user);
+            AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
+            return this.createResponse(authUserDetails);
+        }
     }
 
     @Override
