@@ -4,8 +4,8 @@ import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.auth.repository.custom.CustomUserRepository;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,10 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	private final CustomUserRepository userRepository;
+	private final UserRepository userRepository;
 
 	@Autowired
-	public UserDetailsServiceImpl(@Qualifier("customUserRepository") CustomUserRepository userRepository) {
+	public UserDetailsServiceImpl(@Qualifier("userRepository") UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 

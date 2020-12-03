@@ -30,8 +30,9 @@ public class AuthController {
 
     @PostMapping("/sign-in-with-social")
     @ResponseStatus(code = HttpStatus.OK)
-    public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody String request) throws FirebaseAuthException {
-        FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request);
+    public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) throws FirebaseAuthException {
+        FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
+
         if(fireBaseToken.isEmailVerified()){
             return authService.loginWithSocial(fireBaseToken);
         }
