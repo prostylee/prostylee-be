@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.auth.dto.request.*;
@@ -33,7 +34,7 @@ public class AuthController {
     public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) throws FirebaseAuthException {
         FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
 
-        if(fireBaseToken.isEmailVerified()){
+        if(!StringUtils.isEmpty(fireBaseToken.getEmail())){
             return authService.loginWithSocial(fireBaseToken);
         }
         return new JwtAuthenticationToken();
