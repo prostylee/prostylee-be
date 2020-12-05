@@ -4,6 +4,9 @@ import com.google.firebase.auth.FirebaseToken;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.entity.UserLinkAccount;
 
+import java.util.Optional;
+
 public interface UserLinkAccountService {
-    UserLinkAccount saveBy(FirebaseToken firebaseToken, User user);
+
+    Optional<UserLinkAccount> getUserLinkAccountBy(FirebaseToken token);
 }

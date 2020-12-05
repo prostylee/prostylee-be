@@ -1,6 +1,7 @@
 package vn.prostylee.auth.service.impl;
 
 import com.google.firebase.auth.FirebaseToken;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +14,7 @@ import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.repository.RoleRepository;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserService;
@@ -151,17 +153,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User saveBy(FirebaseToken firebaseToken) {
+    public User save(FirebaseToken firebaseToken) {
         User user = buildUser(firebaseToken);
         userRepository.save(user);
         return user;
     }
 
     private User buildUser(FirebaseToken firebaseToken) {
-        User account = new User();
-        account.setEmail(firebaseToken.getEmail());
-        account.setFullName(firebaseToken.getName());
-        account.setUsername(firebaseToken.getEmail());
-        return account;
+        User user = new User();
+        user.setEmail(firebaseToken.getEmail());
+        user.setActive(true);
+        user.setAllowNotification(true);
+        user.setFullName(firebaseToken.getName());
+        user.setUsername(firebaseToken.getEmail());
+        user.setAvatar(getPicture(firebaseToken));
+        Set<UserLinkAccount> sets = buildUserLinkAccounts(firebaseToken, user);
+        user.setUserLinkAccounts(sets);
+        return user;
+    }
+
+    private String getPicture(FirebaseToken firebaseToken) {
+        return String.valueOf(firebaseToken.getClaims().get("picture"));
+    }
+
+    private Set<UserLinkAccount> buildUserLinkAccounts(FirebaseToken firebaseToken, User user) {
+        Set<UserLinkAccount> set = new HashSet<>();
+        Map<String, Object> claims = firebaseToken.getClaims();
+        Map<String, Object> fireBases = (Map<String, Object>) claims.get("firebase");
+        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
+                .user(user)
+                .providerId(String.valueOf(claims.get("user_id")))
+                .providerName(String.valueOf(fireBases.get("sign_in_provider")))
+                .build();
+        set.add(userLinkAccount);
+        return set;
     }
 }
