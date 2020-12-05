@@ -1,28 +1,45 @@
 package vn.prostylee.auth.service.impl;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.tcp.TcpClient;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
 import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.constant.Scope;
+import vn.prostylee.auth.constant.SocialProviderType;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
+import vn.prostylee.auth.dto.response.ZaloResponse;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.entity.UserLinkAccount;
+import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.exception.InvalidJwtToken;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserLinkAccountService;
@@ -48,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -98,13 +116,52 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtAuthenticationToken loginWithSocial(FirebaseToken firebaseToken) {
-        Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(firebaseToken);
-        if(linkAccount.isPresent()) {
-            return processExist(linkAccount);
+    public JwtAuthenticationToken loginWithSocial(LoginSocialRequest request) throws FirebaseAuthException {
+        if(SocialProviderType.FIREBASE == request.getProviderType()) {
+            FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
+            if(ObjectUtils.isNotEmpty(fireBaseToken)){
+                Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(fireBaseToken);
+                if(linkAccount.isPresent()) {
+                    return processExist(linkAccount);
+                } else {
+                    return processNew(fireBaseToken);
+                }
+            }
+        } else if (SocialProviderType.ZALO == request.getProviderType()) {
+            TcpClient tcpClient = getTcpClient();
+            WebClient client = getWebClient(tcpClient);
+            call(client);
         } else {
-            return processNew(firebaseToken);
+            throw new AuthenticationException("Provider type incorrect or doesn't support");
         }
+        return new JwtAuthenticationToken();
+    }
+
+    private Mono<ZaloResponse> call(WebClient client) {
+        return  client.method(HttpMethod.GET).uri(uriBuilder -> uriBuilder
+                .path("/{version}/me?access_token={token}&fields={fields}")
+                .build("v2.0", "sjdkajkdjToken gui tu client len", "id,birthday,name,gender,picture" ))
+                .retrieve().bodyToMono(ZaloResponse.class);
+    }
+
+    private WebClient getWebClient(TcpClient tcpClient) {
+        WebClient client = WebClient
+                .builder()
+                .baseUrl("https://graph.zalo.me")
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
+                .defaultCookie("cookieKey", "cookieValue")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+        return client;
+    }
+
+    private TcpClient getTcpClient() {
+        return TcpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .doOnConnected(connection -> {
+                    connection.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS));
+                    connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));
+                });
     }
 
     private JwtAuthenticationToken processNew(FirebaseToken firebaseToken) {
