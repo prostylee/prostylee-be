@@ -6,6 +6,8 @@ import vn.prostylee.auth.entity.UserLinkAccount;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 
+import java.util.Optional;
+
 /**
  * Repository for domain model class UserLinkAccount.
  * @see UserLinkAccount;
@@ -14,4 +16,5 @@ import vn.prostylee.core.repository.BaseRepository;
 @Repository
 public interface UserLinkAccountRepository extends BaseRepository<UserLinkAccount, Long> {
 
+    Optional<UserLinkAccount> getByProviderId(String providerId);
 }

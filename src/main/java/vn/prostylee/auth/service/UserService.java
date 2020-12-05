@@ -11,5 +11,6 @@ import vn.prostylee.core.validator.FieldValueExists;
 public interface UserService extends CrudService<UserRequest, UserResponse, Long>, FieldValueExists, EntityExists<Long> {
 
     UserResponse findByPushToken(String pushToken);
-    User saveBy(FirebaseToken firebaseToken);
+
+    User save(FirebaseToken firebaseToken);
 }

@@ -10,6 +10,7 @@ import vn.prostylee.auth.repository.UserLinkAccountRepository;
 import vn.prostylee.auth.service.UserLinkAccountService;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserLinkAccountServiceImpl implements UserLinkAccountService {
@@ -18,14 +19,9 @@ public class UserLinkAccountServiceImpl implements UserLinkAccountService {
     private UserLinkAccountRepository userLinkAccountRepository;
 
     @Override
-    public UserLinkAccount saveBy(FirebaseToken firebaseToken, User user) {
+    public Optional<UserLinkAccount> getUserLinkAccountBy(FirebaseToken firebaseToken) {
         Map<String, Object> claims = firebaseToken.getClaims();
-        Map<String, Object> fireBases = (Map<String, Object>) claims.get("firebase");
-        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
-                .user(user)
-                .providerId(String.valueOf(claims.get("user_id")))
-                .providerName(String.valueOf(fireBases.get("sign_in_provider")))
-                .build();
-        return userLinkAccountRepository.save(userLinkAccount);
+        String userId = String.valueOf(claims.get("user_id"));
+        return userLinkAccountRepository.getByProviderId(userId);
     }
 }

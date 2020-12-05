@@ -1,6 +1,5 @@
 package vn.prostylee.auth.service.impl;
 
-import com.google.api.client.util.ArrayMap;
 import com.google.firebase.auth.FirebaseToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -11,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
@@ -26,7 +24,6 @@ import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.exception.InvalidJwtToken;
-import vn.prostylee.auth.repository.UserLinkAccountRepository;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
@@ -50,7 +47,7 @@ import vn.prostylee.notification.service.EmailTemplateService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -102,17 +99,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthenticationToken loginWithSocial(FirebaseToken firebaseToken) {
-        //Check exist
-        if(false) {
-            //login(loginRequest);
-            //GET userLink check
-            return new JwtAuthenticationToken();
+        Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(firebaseToken);
+        if(linkAccount.isPresent()) {
+            return processExist(linkAccount);
         } else {
-            User user = userService.saveBy(firebaseToken);
-            userLinkAccountService.saveBy(firebaseToken , user);
-            AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
-            return this.createResponse(authUserDetails);
+            return processNew(firebaseToken);
         }
+    }
+
+    private JwtAuthenticationToken processNew(FirebaseToken firebaseToken) {
+        User user = userService.save(firebaseToken);
+        AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
+        return this.createResponse(authUserDetails);
+    }
+
+    private JwtAuthenticationToken processExist(Optional<UserLinkAccount> linkAccount) {
+        User user = linkAccount.get().getUser();
+        AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
+        return this.createResponse(authUserDetails);
     }
 
     @Override
