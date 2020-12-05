@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import vn.prostylee.auth.constant.SocialProviderType;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -24,4 +25,7 @@ public class LoginSocialRequest {
 
     @NotBlank
     private String idToken;
+
+    @NotBlank
+    private SocialProviderType  providerType;
 }

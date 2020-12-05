@@ -33,12 +33,7 @@ public class AuthController {
     @PostMapping("/sign-in-with-social")
     @ResponseStatus(code = HttpStatus.OK)
     public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) throws FirebaseAuthException {
-        FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
-
-        if(ObjectUtils.isNotEmpty(fireBaseToken)){
-            return authService.loginWithSocial(fireBaseToken);
-        }
-        return new JwtAuthenticationToken();
+        return authService.loginWithSocial(request);
     }
 
     @PostMapping("/sign-up")
