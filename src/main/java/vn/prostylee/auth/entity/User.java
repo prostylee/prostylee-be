@@ -42,6 +42,15 @@ public class User extends AuditEntity {
 	@Column(name = "gender")
 	private Character gender;
 
+	@Column(name = "dobDay")
+	private String day;
+
+	@Column(name = "dobMonth")
+	private String month;
+
+	@Column(name = "dobYear")
+	private String year;
+
 	@Column(name = "phone_number", length = 32)
 	private String phoneNumber;
 
