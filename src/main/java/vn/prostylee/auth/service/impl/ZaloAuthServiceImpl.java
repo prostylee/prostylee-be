@@ -1,6 +1,5 @@
 package vn.prostylee.auth.service.impl;
 
-import com.google.firebase.auth.FirebaseToken;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 import vn.prostylee.auth.constant.SocialProviderType;
@@ -26,13 +24,19 @@ import vn.prostylee.auth.service.AuthenticationService;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The helper class for implement login with Zalo
+ */
 @Component
 public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
-    public static final String REQUIRED_FIELDS_FOR_PARAMS = "id,birthday,name,gender,picture";
+    /**
+     * https://developers.zalo.me/docs/api/open-api/tai-lieu/thong-tin-nguoi-dung-post-28
+     */
+    public static final String REQUIRED_FIELDS_FOR_PARAMS = "id,birthday,name,gender,picture.type(large)";
+
     public static final String ACCESS_TOKEN_KEY = "access_token";
     public static final String FIELDS_KEY = "fields";
     public static final String ZALO_VERSION = "v2.0";

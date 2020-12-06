@@ -20,6 +20,9 @@ import vn.prostylee.auth.service.UserService;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The helper class for implement login with Firebase
+ */
 @Component
 public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
     @Override

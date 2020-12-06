@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.constant.Gender;
+import vn.prostylee.auth.converter.ZaloConverter;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
@@ -25,6 +26,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,13 +34,11 @@ import java.util.stream.Collectors;
 @Qualifier("userService")
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    public static final String MALE_RESPONSE_KEY = "male";
-    public static final String FEMALE_RESPONSE_KEY = "female";
     public static final String PICTURE_RESPONSE_KEY = "picture";
     public static final String USER_ID_RESPONSE_KEY = "user_id";
     public static final String SIGN_IN_PROVIDER_RESPONSE_KEY = "sign_in_provider";
     public static final String FIREBASE_RESPONSE_KEY = "firebase";
+    public static final String ZALO = "zalo";
 
     private final UserRepository userRepository;
 
@@ -194,21 +194,15 @@ public class UserServiceImpl implements UserService {
         user.setAllowNotification(true);
         user.setFullName(zaloResponse.getName());
         user.setUsername(zaloResponse.getId());
-        user.setGender(convertGender(zaloResponse));
-        user.setAvatar(zaloResponse.getPictureUrl());
+        user.setGender(ZaloConverter.convertGender(zaloResponse));
+        user.setAvatar(zaloResponse.getPicture());
+        String birthDay = zaloResponse.getBirthDay();
+        user.setDate(ZaloConverter.convertDay(birthDay));
+        user.setMonth(ZaloConverter.convertMonth(birthDay));
+        user.setYear(ZaloConverter.convertYear(birthDay));
         Set<UserLinkAccount> sets = buildUserLinkAccounts(zaloResponse, user);
         user.setUserLinkAccounts(sets);
         return user;
-    }
-
-    private Character convertGender(ZaloResponse zaloResponse) {
-        if(MALE_RESPONSE_KEY.equalsIgnoreCase(zaloResponse.getGender())){
-            return Gender.MALE.getValue();
-        }else if(FEMALE_RESPONSE_KEY.equalsIgnoreCase(zaloResponse.getGender())){
-            return Gender.FEMALE.getValue();
-        }else{
-            return Gender.OTHER.getValue();
-        }
     }
 
     private String getPicture(FirebaseToken firebaseToken) {
@@ -233,7 +227,7 @@ public class UserServiceImpl implements UserService {
         UserLinkAccount userLinkAccount = UserLinkAccount.builder()
                 .user(user)
                 .providerId(zaloResponse.getId())
-                .providerName("zalo")
+                .providerName(ZALO)
                 .build();
         set.add(userLinkAccount);
         return set;

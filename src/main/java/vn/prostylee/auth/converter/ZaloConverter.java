@@ -1,0 +1,65 @@
+package vn.prostylee.auth.converter;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.type.DateTime;
+import vn.prostylee.auth.constant.Gender;
+import vn.prostylee.auth.dto.response.ZaloResponse;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Optional;
+
+public class ZaloConverter{
+    private static final String MALE_RESPONSE_KEY = "male";
+    private static final String FEMALE_RESPONSE_KEY = "female";
+    private static final String FORMAT_DD_MM_YYYY = "dd/MM/yyyy";
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FORMAT_DD_MM_YYYY);
+
+    public static class Deserialize extends JsonDeserializer<String> {
+
+        @Override
+        public String deserialize(JsonParser jp, DeserializationContext context) throws IOException {
+            ObjectCodec oc =  jp.getCodec();
+            JsonNode node = oc.readTree(jp);
+            Optional<String> url = Optional.ofNullable(node.get("data").get("url").asText());
+            if (url.isPresent()) {
+                return url.get();
+            } else{
+                return "Has not avatar";
+            }
+        }
+    }
+
+    public static Character convertGender(ZaloResponse response){
+        if(MALE_RESPONSE_KEY.equalsIgnoreCase(response.getGender())){
+            return Gender.MALE.getValue();
+        }else if(FEMALE_RESPONSE_KEY.equalsIgnoreCase(response.getGender())){
+            return Gender.FEMALE.getValue();
+        }else{
+            return Gender.OTHER.getValue();
+        }
+    }
+    public static int convertDay(String birthday) {
+        return Optional.ofNullable(getLocalDate(birthday).getDayOfMonth()).orElse(0);
+    }
+
+    public static int convertMonth(String birthday) {
+        return getLocalDate(birthday).getDayOfMonth();
+    }
+
+    public static int convertYear(String birthday) {
+        return getLocalDate(birthday).getDayOfMonth();
+    }
+
+    private static LocalDate getLocalDate(String birthday) {
+        return LocalDate.parse(birthday, formatter);
+    }
+}
