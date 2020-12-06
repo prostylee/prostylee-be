@@ -42,8 +42,8 @@ public class User extends AuditEntity {
 	@Column(name = "gender")
 	private Character gender;
 
-	@Column(name = "dob_day")
-	private int day;
+	@Column(name = "dob_date")
+	private int date;
 
 	@Column(name = "dob_month")
 	private int month;
