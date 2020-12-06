@@ -14,14 +14,11 @@ import java.util.Optional;
 
 @Service
 public class UserLinkAccountServiceImpl implements UserLinkAccountService {
-
     @Autowired
     private UserLinkAccountRepository userLinkAccountRepository;
 
     @Override
-    public Optional<UserLinkAccount> getUserLinkAccountBy(FirebaseToken firebaseToken) {
-        Map<String, Object> claims = firebaseToken.getClaims();
-        String userId = String.valueOf(claims.get("user_id"));
-        return userLinkAccountRepository.getByProviderId(userId);
+    public Optional<UserLinkAccount> getUserLinkAccountBy(String Id) {
+        return userLinkAccountRepository.getByProviderId(Id);
     }
 }

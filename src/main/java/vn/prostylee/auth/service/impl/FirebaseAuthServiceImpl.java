@@ -17,6 +17,7 @@ import vn.prostylee.auth.service.AuthenticationService;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -43,7 +44,9 @@ public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon impleme
         }
 
         if(ObjectUtils.isNotEmpty(fireBaseToken)){
-            Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(fireBaseToken);
+            Map<String, Object> claims = fireBaseToken.getClaims();
+            String userId = String.valueOf(claims.get("user_id"));
+            Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(userId);
             if(linkAccount.isPresent()) {
                 return processExist(linkAccount);
             } else {
