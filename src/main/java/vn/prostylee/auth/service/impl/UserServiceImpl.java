@@ -195,6 +195,7 @@ public class UserServiceImpl implements UserService {
         user.setFullName(zaloResponse.getName());
         user.setUsername(zaloResponse.getId());
         user.setGender(convertGender(zaloResponse));
+        user.setAvatar(zaloResponse.getPictureUrl());
         Set<UserLinkAccount> sets = buildUserLinkAccounts(zaloResponse, user);
         user.setUserLinkAccounts(sets);
         return user;
