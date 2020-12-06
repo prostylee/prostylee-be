@@ -9,6 +9,7 @@ import vn.prostylee.auth.constant.SocialProviderType;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
@@ -26,6 +27,6 @@ public class LoginSocialRequest {
     @NotBlank
     private String idToken;
 
-    @NotBlank
+    @NotNull
     private SocialProviderType  providerType;
 }

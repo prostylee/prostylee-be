@@ -42,10 +42,7 @@ import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.exception.InvalidJwtToken;
 import vn.prostylee.auth.repository.UserRepository;
-import vn.prostylee.auth.service.UserLinkAccountService;
-import vn.prostylee.auth.service.UserService;
-import vn.prostylee.auth.service.UserTempService;
-import vn.prostylee.auth.service.AuthService;
+import vn.prostylee.auth.service.*;
 import vn.prostylee.auth.token.AccessToken;
 import vn.prostylee.auth.token.factory.JwtTokenFactory;
 import vn.prostylee.auth.token.parser.TokenParser;
@@ -108,6 +105,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthenticatedProvider authenticatedProvider;
 
+    @Autowired
+    AuthenticationServiceFactory authFactory;
+
     @Override
     public JwtAuthenticationToken login(LoginRequest loginRequest) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -117,63 +117,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public JwtAuthenticationToken loginWithSocial(LoginSocialRequest request) throws FirebaseAuthException {
-        if(SocialProviderType.FIREBASE == request.getProviderType()) {
-            FirebaseToken fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
-            if(ObjectUtils.isNotEmpty(fireBaseToken)){
-                Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(fireBaseToken);
-                if(linkAccount.isPresent()) {
-                    return processExist(linkAccount);
-                } else {
-                    return processNew(fireBaseToken);
-                }
-            }
-        } else if (SocialProviderType.ZALO == request.getProviderType()) {
-            TcpClient tcpClient = getTcpClient();
-            WebClient client = getWebClient(tcpClient);
-            call(client);
-        } else {
-            throw new AuthenticationException("Provider type incorrect or doesn't support");
-        }
-        return new JwtAuthenticationToken();
-    }
-
-    private Mono<ZaloResponse> call(WebClient client) {
-        return  client.method(HttpMethod.GET).uri(uriBuilder -> uriBuilder
-                .path("/{version}/me?access_token={token}&fields={fields}")
-                .build("v2.0", "sjdkajkdjToken gui tu client len", "id,birthday,name,gender,picture" ))
-                .retrieve().bodyToMono(ZaloResponse.class);
-    }
-
-    private WebClient getWebClient(TcpClient tcpClient) {
-        WebClient client = WebClient
-                .builder()
-                .baseUrl("https://graph.zalo.me")
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
-                .defaultCookie("cookieKey", "cookieValue")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-        return client;
-    }
-
-    private TcpClient getTcpClient() {
-        return TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .doOnConnected(connection -> {
-                    connection.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS));
-                    connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));
-                });
-    }
-
-    private JwtAuthenticationToken processNew(FirebaseToken firebaseToken) {
-        User user = userService.save(firebaseToken);
-        AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
-        return this.createResponse(authUserDetails);
-    }
-
-    private JwtAuthenticationToken processExist(Optional<UserLinkAccount> linkAccount) {
-        User user = linkAccount.get().getUser();
-        AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
-        return this.createResponse(authUserDetails);
+        AuthenticationService authenticationService = authFactory.getService(request.getProviderType());
+        return authenticationService.login(request);
     }
 
     @Override
