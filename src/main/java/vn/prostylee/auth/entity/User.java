@@ -42,14 +42,14 @@ public class User extends AuditEntity {
 	@Column(name = "gender")
 	private Character gender;
 
-	@Column(name = "dobDay")
-	private String day;
+	@Column(name = "dob_day")
+	private int day;
 
-	@Column(name = "dobMonth")
-	private String month;
+	@Column(name = "dob_month")
+	private int month;
 
-	@Column(name = "dobYear")
-	private String year;
+	@Column(name = "dob_year")
+	private int year;
 
 	@Column(name = "phone_number", length = 32)
 	private String phoneNumber;
