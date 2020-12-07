@@ -9,7 +9,7 @@ public class ZaloResponse {
 
     private String id;
 
-    private String birthDay;
+    private String birthday;
 
     private String gender;
 

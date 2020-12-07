@@ -8,7 +8,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import vn.prostylee.auth.constant.Gender;
 import vn.prostylee.auth.converter.ZaloConverter;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
@@ -26,7 +25,6 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -196,7 +194,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(zaloResponse.getId());
         user.setGender(ZaloConverter.convertGender(zaloResponse));
         user.setAvatar(zaloResponse.getPicture());
-        String birthDay = zaloResponse.getBirthDay();
+        String birthDay = Optional.ofNullable(zaloResponse.getBirthday()).orElse(StringUtils.EMPTY);
         user.setDate(ZaloConverter.convertDay(birthDay));
         user.setMonth(ZaloConverter.convertMonth(birthDay));
         user.setYear(ZaloConverter.convertYear(birthDay));

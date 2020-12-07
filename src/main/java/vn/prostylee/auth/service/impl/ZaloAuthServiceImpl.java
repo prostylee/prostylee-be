@@ -20,10 +20,12 @@ import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.dto.response.ZaloResponse;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.entity.UserLinkAccount;
+import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.service.AuthenticationService;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +61,9 @@ public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements 
         TcpClient tcpClient = getTcpClient();
         WebClient client = getWebClient(tcpClient);
         ZaloResponse response = call(client, request.getIdToken());
+        if(Objects.isNull(response))
+            throw new AuthenticationException("Can not login to the system, Please contact administrator!");
+
         Optional<UserLinkAccount> userLinkAccount  = userLinkAccountService.getUserLinkAccountBy(response.getId());
 
         if(userLinkAccount.isPresent()){

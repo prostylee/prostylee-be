@@ -5,16 +5,12 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.type.DateTime;
 import vn.prostylee.auth.constant.Gender;
 import vn.prostylee.auth.dto.response.ZaloResponse;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
 
 public class ZaloConverter{
@@ -48,15 +44,15 @@ public class ZaloConverter{
         }
     }
     public static int convertDay(String birthday) {
-        return Optional.ofNullable(getLocalDate(birthday).getDayOfMonth()).orElse(0);
+        return getLocalDate(birthday).getDayOfMonth();
     }
 
     public static int convertMonth(String birthday) {
-        return getLocalDate(birthday).getDayOfMonth();
+        return getLocalDate(birthday).getMonthValue();
     }
 
     public static int convertYear(String birthday) {
-        return getLocalDate(birthday).getDayOfMonth();
+        return getLocalDate(birthday).getYear();
     }
 
     private static LocalDate getLocalDate(String birthday) {
