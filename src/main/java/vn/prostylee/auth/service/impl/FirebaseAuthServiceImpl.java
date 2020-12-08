@@ -26,8 +26,8 @@ import java.util.Optional;
 @Component
 public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
     @Override
-    public SocialProviderType getProviderType() {
-        return SocialProviderType.FIREBASE;
+    public boolean canHandle(SocialProviderType type) {
+        return type == SocialProviderType.FIREBASE;
     }
 
     @Autowired

@@ -52,8 +52,8 @@ public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements 
     private UserService userService;
 
     @Override
-    public SocialProviderType getProviderType() {
-        return SocialProviderType.ZALO;
+    public boolean canHandle(SocialProviderType type) {
+        return type == SocialProviderType.ZALO;
     }
 
     @Override

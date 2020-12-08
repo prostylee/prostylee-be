@@ -74,6 +74,9 @@ public class AuthServiceImpl extends AuthenticationServiceCommon implements Auth
     @Autowired
     private AuthenticatedProvider authenticatedProvider;
 
+    @Autowired
+    private AuthenticationServiceFactory authenticationServiceFactory;
+
     @Override
     public JwtAuthenticationToken login(LoginRequest loginRequest) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -83,7 +86,7 @@ public class AuthServiceImpl extends AuthenticationServiceCommon implements Auth
 
     @Override
     public JwtAuthenticationToken loginWithSocial(LoginSocialRequest request) {
-        AuthenticationService authenticationService = AuthenticationServiceFactory.getService(request.getProviderType());
+        AuthenticationService authenticationService = authenticationServiceFactory.getService(request.getProviderType());
         return authenticationService.login(request);
     }
 
