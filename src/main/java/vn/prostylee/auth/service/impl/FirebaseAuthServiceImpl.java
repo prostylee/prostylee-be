@@ -3,6 +3,8 @@ package vn.prostylee.auth.service.impl;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,18 +26,17 @@ import java.util.Optional;
  * The helper class for implement login with Firebase
  */
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
     @Override
     public boolean canHandle(SocialProviderType type) {
         return type == SocialProviderType.FIREBASE;
     }
 
-    @Autowired
-    private UserLinkAccountService userLinkAccountService;
+    private final UserLinkAccountService userLinkAccountService;
 
-    @Autowired
-    @Qualifier("userService")
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public JwtAuthenticationToken login(LoginSocialRequest request) {
@@ -43,7 +44,7 @@ public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon impleme
         try {
             fireBaseToken = FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
         } catch (FirebaseAuthException e) {
-            e.printStackTrace();
+           log.error("Firebase verify token has problem:", e);
         }
 
         if(ObjectUtils.isNotEmpty(fireBaseToken)){
@@ -52,9 +53,9 @@ public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon impleme
             Optional<UserLinkAccount> linkAccount = userLinkAccountService.getUserLinkAccountBy(userId);
             if(linkAccount.isPresent()) {
                 return processExist(linkAccount);
-            } else {
-                return processNew(fireBaseToken);
             }
+            return processNew(fireBaseToken);
+
         }
         return new JwtAuthenticationToken();
     }

@@ -32,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/sign-in-with-social")
     @ResponseStatus(code = HttpStatus.OK)
-    public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) throws FirebaseAuthException {
+    public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) {
         return authService.loginWithSocial(request);
     }
 

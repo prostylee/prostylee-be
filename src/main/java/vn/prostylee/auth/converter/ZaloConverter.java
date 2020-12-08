@@ -23,14 +23,9 @@ public class ZaloConverter{
 
         @Override
         public String deserialize(JsonParser jp, DeserializationContext context) throws IOException {
-            ObjectCodec oc =  jp.getCodec();
+            ObjectCodec oc = jp.getCodec();
             JsonNode node = oc.readTree(jp);
-            Optional<String> url = Optional.ofNullable(node.get("data").get("url").asText());
-            if (url.isPresent()) {
-                return url.get();
-            } else{
-                return "Has not avatar";
-            }
+            return Optional.ofNullable(node.get("data")).map(jsonNode -> jsonNode.get("url").asText()).orElse(null);
         }
     }
 

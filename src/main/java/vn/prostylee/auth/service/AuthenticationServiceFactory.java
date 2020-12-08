@@ -1,7 +1,6 @@
 package vn.prostylee.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.constant.SocialProviderType;
 import vn.prostylee.auth.exception.AuthenticationException;
@@ -15,7 +14,7 @@ public class AuthenticationServiceFactory {
     private final List<AuthenticationService> services;
 
     public AuthenticationService getService(SocialProviderType type) {
-        return services.stream().filter(authenticationService -> authenticationService.getProviderType() == type)
-                .findFirst().orElseThrow( () -> new AuthenticationException("Provider not support"));
+        return services.stream().filter(authenticationService -> authenticationService.canHandle(type))
+                .findFirst().orElseThrow( () -> new AuthenticationException("Provider not support"  + type));
     }
 }
