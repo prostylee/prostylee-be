@@ -1,22 +1,20 @@
 package vn.prostylee.core.controller;
 
-import vn.prostylee.core.dto.filter.BaseFilter;
-import vn.prostylee.core.service.CrudService;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.service.CrudService;
 
 import javax.validation.Valid;
 
+@RequiredArgsConstructor
 public class CrudController<T, R, ID, F extends BaseFilter> {
 
     @Getter
     private final CrudService<T, R, ID> crudService;
-
-    public CrudController(CrudService crudService) {
-        this.crudService = crudService;
-    }
 
     @GetMapping
     public Page<R> getAll(F baseFilter) {

@@ -3,16 +3,12 @@ package vn.prostylee.notification.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import vn.prostylee.ProStyleeApplication;
+import vn.prostylee.ComponentTest;
 import vn.prostylee.notification.dto.MailData;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.SimpleMailInfo;
@@ -23,9 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@SpringJUnitWebConfig(ProStyleeApplication.class)
+@ComponentTest
 public class EmailServiceTest {
 
     @Autowired

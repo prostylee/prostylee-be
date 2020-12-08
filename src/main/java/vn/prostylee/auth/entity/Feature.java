@@ -28,7 +28,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "feature", catalog = "prostylee")
+@Table(name = "feature")
 public class Feature extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class Feature extends AuditEntity {
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "feature_role", catalog = "prostylee", joinColumns = {
+	@JoinTable(name = "feature_role", joinColumns = {
 			@JoinColumn(name = "feature_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "role_id", nullable = false, updatable = false) })
 	private Set<Role> roles;

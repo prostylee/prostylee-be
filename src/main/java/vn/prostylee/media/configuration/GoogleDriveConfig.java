@@ -54,10 +54,11 @@ public class GoogleDriveConfig {
      *
      */
     private void authorize() throws IOException {
-        if(googleCredential == null)
+        if(googleCredential == null) {
             googleCredential = GoogleCredentials.fromStream(resourceLoader.getResource(googleDriveProperties.getServiceAccountCredential())
                     .getInputStream())
                     .createScoped(SCOPES);
+        }
 
         if(googleCredential.getAccessToken() == null) {
             googleCredential.refresh();

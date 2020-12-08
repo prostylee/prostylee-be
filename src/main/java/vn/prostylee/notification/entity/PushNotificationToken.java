@@ -22,7 +22,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "push_notification_token", catalog = "prostylee")
+@Table(name = "push_notification_token")
 public class PushNotificationToken extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;

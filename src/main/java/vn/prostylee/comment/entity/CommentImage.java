@@ -26,7 +26,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "comment_image", catalog = "prostylee")
+@Table(name = "comment_image")
 public class CommentImage extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;

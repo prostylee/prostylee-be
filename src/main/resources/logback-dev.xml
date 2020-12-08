@@ -4,6 +4,7 @@
 	<!-- LOG everything at DEBUG level -->
 	<root level="DEBUG">
 		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="FILE_DEFAULT"/>
 	</root>
 
 	<logger name="com.google.ads.googleads.lib.request.summary" level="INFO"/>

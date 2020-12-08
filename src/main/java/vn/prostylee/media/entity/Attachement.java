@@ -22,7 +22,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "attachement", catalog = "prostylee")
+@Table(name = "attachement")
 public class Attachement extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
