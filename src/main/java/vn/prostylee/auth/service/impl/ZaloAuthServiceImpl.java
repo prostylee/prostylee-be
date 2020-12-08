@@ -3,12 +3,14 @@ package vn.prostylee.auth.service.impl;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -33,23 +35,21 @@ import java.util.concurrent.TimeUnit;
  * The helper class for implement login with Zalo
  */
 @Component
+@RequiredArgsConstructor
 public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
     /**
      * https://developers.zalo.me/docs/api/open-api/tai-lieu/thong-tin-nguoi-dung-post-28
      */
-    public static final String REQUIRED_FIELDS_FOR_PARAMS = "id,birthday,name,gender,picture.type(large)";
+    private static final String REQUIRED_FIELDS_FOR_PARAMS = "id,birthday,name,gender,picture.type(large)";
+    private static final String ACCESS_TOKEN_KEY = "access_token";
+    private static final String FIELDS_KEY = "fields";
+    private static final String ZALO_VERSION = "v2.0";
+    private static final String ZALO_ENDPOINT_GET_PROFILE = "me";
+    private static final String ZALO_MAIN_API = "https://graph.zalo.me";
 
-    public static final String ACCESS_TOKEN_KEY = "access_token";
-    public static final String FIELDS_KEY = "fields";
-    public static final String ZALO_VERSION = "v2.0";
-    public static final String ZALO_ENDPOINT_GET_PROFILE = "me";
-    public static final String ZALO_MAIN_API = "https://graph.zalo.me";
-    @Autowired
-    private UserLinkAccountService userLinkAccountService;
+    private final UserLinkAccountService userLinkAccountService;
 
-    @Autowired
-    @Qualifier("userService")
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     public boolean canHandle(SocialProviderType type) {

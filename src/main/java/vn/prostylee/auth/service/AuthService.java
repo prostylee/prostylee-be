@@ -18,5 +18,5 @@ public interface AuthService {
 
     JwtAuthenticationToken changePassword(ChangePasswordRequest request);
 
-    JwtAuthenticationToken loginWithSocial(LoginSocialRequest request) throws FirebaseAuthException;
+    JwtAuthenticationToken loginWithSocial(LoginSocialRequest request);
 }
