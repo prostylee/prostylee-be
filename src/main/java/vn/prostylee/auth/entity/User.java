@@ -19,7 +19,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "user", catalog = "prostylee", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class User extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
@@ -73,7 +73,7 @@ public class User extends AuditEntity {
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_role", catalog = "prostylee", joinColumns = {
+	@JoinTable(name = "user_role", joinColumns = {
 			@JoinColumn(name = "user_id", nullable = false, updatable = false) }, inverseJoinColumns = {
 					@JoinColumn(name = "role_id", nullable = false, updatable = false) })
 	private Set<Role> roles;

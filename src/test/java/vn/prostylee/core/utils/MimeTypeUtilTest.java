@@ -1,4 +1,4 @@
-package vn.prostylee.utils;
+package vn.prostylee.core.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

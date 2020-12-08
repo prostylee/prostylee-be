@@ -26,7 +26,7 @@ import vn.prostylee.core.entity.AuditEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "shipping_address", catalog = "prostylee")
+@Table(name = "shipping_address")
 public class ShippingAddress extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
