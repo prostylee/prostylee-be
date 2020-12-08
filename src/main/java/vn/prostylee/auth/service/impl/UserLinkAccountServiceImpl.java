@@ -1,6 +1,6 @@
 package vn.prostylee.auth.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.repository.UserLinkAccountRepository;
@@ -9,13 +9,9 @@ import vn.prostylee.auth.service.UserLinkAccountService;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserLinkAccountServiceImpl implements UserLinkAccountService {
     private final UserLinkAccountRepository userLinkAccountRepository;
-
-    @Autowired
-    public UserLinkAccountServiceImpl(UserLinkAccountRepository repo){
-        this.userLinkAccountRepository = repo;
-    }
 
     @Override
     public Optional<UserLinkAccount> getUserLinkAccountBy(String Id) {
