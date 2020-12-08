@@ -1,28 +1,21 @@
 package vn.prostylee.auth.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.constant.SocialProviderType;
+import vn.prostylee.auth.exception.AuthenticationException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationServiceFactory {
 
-    private static final Map<SocialProviderType, AuthenticationService> myServiceCache = new HashMap<>();
+    private final List<AuthenticationService> services;
 
-    @Autowired
-    public void initMyServiceCache(List<AuthenticationService> services) {
-        for(AuthenticationService service : services) {
-            myServiceCache.put(service.getProviderType(), service);
-        }
-    }
-
-    public static AuthenticationService getService(SocialProviderType type) {
-        AuthenticationService service = myServiceCache.get(type);
-        if(service == null) throw new RuntimeException("Unknown service type: " + type);
-        return service;
+    public AuthenticationService getService(SocialProviderType type) {
+        return services.stream().filter(authenticationService -> authenticationService.getProviderType() == type)
+                .findFirst().orElseThrow( () -> new AuthenticationException("Provider not support"));
     }
 }

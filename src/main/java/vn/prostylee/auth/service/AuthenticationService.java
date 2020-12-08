@@ -5,8 +5,6 @@ import vn.prostylee.auth.dto.request.LoginSocialRequest;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 
 public interface AuthenticationService {
-
     JwtAuthenticationToken login(LoginSocialRequest request);
-
-    SocialProviderType getProviderType();
+    boolean canHandle(SocialProviderType type);
 }
