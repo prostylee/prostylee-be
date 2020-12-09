@@ -13,7 +13,5 @@ public interface UserService extends CrudService<UserRequest, UserResponse, Long
 
     UserResponse findByPushToken(String pushToken);
 
-    User save(FirebaseToken firebaseToken);
-
-    User save(ZaloResponse zaloResponse);
+    User save(User user);
 }

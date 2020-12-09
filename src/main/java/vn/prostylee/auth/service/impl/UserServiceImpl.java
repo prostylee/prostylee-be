@@ -1,6 +1,5 @@
 package vn.prostylee.auth.service.impl;
 
-import com.google.firebase.auth.FirebaseToken;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,14 +7,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import vn.prostylee.auth.converter.ZaloConverter;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
-import vn.prostylee.auth.dto.response.ZaloResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
-import vn.prostylee.auth.entity.UserLinkAccount;
 import vn.prostylee.auth.repository.RoleRepository;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserService;
@@ -32,11 +28,6 @@ import java.util.stream.Collectors;
 @Qualifier("userService")
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    public static final String PICTURE_RESPONSE_KEY = "picture";
-    public static final String USER_ID_RESPONSE_KEY = "user_id";
-    public static final String SIGN_IN_PROVIDER_RESPONSE_KEY = "sign_in_provider";
-    public static final String FIREBASE_RESPONSE_KEY = "firebase";
-    public static final String ZALO = "zalo";
 
     private final UserRepository userRepository;
 
@@ -159,75 +150,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(FirebaseToken firebaseToken) {
-        User user = buildUser(firebaseToken);
-        userRepository.save(user);
-        return user;
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
-    @Override
-    public User save(ZaloResponse zaloResponse){
-        User user = buildUser(zaloResponse);
-        userRepository.save(user);
-        return user;
-    }
-
-    private User buildUser(FirebaseToken firebaseToken) {
-        User user = new User();
-        user.setEmail(firebaseToken.getEmail());
-        user.setActive(true);
-        user.setAllowNotification(true);
-        user.setFullName(firebaseToken.getName());
-        user.setUsername(firebaseToken.getEmail());
-        user.setAvatar(getPicture(firebaseToken));
-        Set<UserLinkAccount> sets = buildUserLinkAccounts(firebaseToken, user);
-        user.setUserLinkAccounts(sets);
-        return user;
-    }
-
-
-    private User buildUser(ZaloResponse zaloResponse) {
-        User user = new User();
-        user.setActive(true);
-        user.setAllowNotification(true);
-        user.setFullName(zaloResponse.getName());
-        user.setUsername(zaloResponse.getId());
-        user.setGender(ZaloConverter.convertGender(zaloResponse));
-        user.setAvatar(zaloResponse.getPicture());
-        String birthDay = Optional.ofNullable(zaloResponse.getBirthday()).orElse(StringUtils.EMPTY);
-        user.setDate(ZaloConverter.convertDay(birthDay));
-        user.setMonth(ZaloConverter.convertMonth(birthDay));
-        user.setYear(ZaloConverter.convertYear(birthDay));
-        Set<UserLinkAccount> sets = buildUserLinkAccounts(zaloResponse, user);
-        user.setUserLinkAccounts(sets);
-        return user;
-    }
-
-    private String getPicture(FirebaseToken firebaseToken) {
-        return String.valueOf(firebaseToken.getClaims().get(PICTURE_RESPONSE_KEY));
-    }
-
-    private Set<UserLinkAccount> buildUserLinkAccounts(FirebaseToken firebaseToken, User user) {
-        Set<UserLinkAccount> set = new HashSet<>();
-        Map<String, Object> claims = firebaseToken.getClaims();
-        Map<String, Object> fireBases = (Map<String, Object>) claims.get(FIREBASE_RESPONSE_KEY);
-        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
-                .user(user)
-                .providerId(String.valueOf(claims.get(USER_ID_RESPONSE_KEY)))
-                .providerName(String.valueOf(fireBases.get(SIGN_IN_PROVIDER_RESPONSE_KEY)))
-                .build();
-        set.add(userLinkAccount);
-        return set;
-    }
-
-    private Set<UserLinkAccount> buildUserLinkAccounts(ZaloResponse zaloResponse, User user) {
-        Set<UserLinkAccount> set = new HashSet<>();
-        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
-                .user(user)
-                .providerId(zaloResponse.getId())
-                .providerName(ZALO)
-                .build();
-        set.add(userLinkAccount);
-        return set;
-    }
 }

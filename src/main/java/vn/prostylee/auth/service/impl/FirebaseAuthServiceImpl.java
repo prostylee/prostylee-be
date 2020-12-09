@@ -6,8 +6,6 @@ import com.google.firebase.auth.FirebaseToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import vn.prostylee.auth.constant.SocialProviderType;
 import vn.prostylee.auth.dto.AuthUserDetails;
@@ -19,8 +17,10 @@ import vn.prostylee.auth.service.AuthenticationService;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The helper class for implement login with Firebase
@@ -29,6 +29,11 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon implements AuthenticationService {
+    private static final String PICTURE_RESPONSE_KEY = "picture";
+    private static final String USER_ID_RESPONSE_KEY = "user_id";
+    private static final String SIGN_IN_PROVIDER_RESPONSE_KEY = "sign_in_provider";
+    private static final String FIREBASE_RESPONSE_KEY = "firebase";
+
     @Override
     public boolean canHandle(SocialProviderType type) {
         return type == SocialProviderType.FIREBASE;
@@ -61,7 +66,8 @@ public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon impleme
     }
 
     private JwtAuthenticationToken processNew(FirebaseToken firebaseToken) {
-        User user = userService.save(firebaseToken);
+        User user  = buildUser(firebaseToken);
+        userService.save(user);
         AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
         return this.createResponse(authUserDetails);
     }
@@ -71,4 +77,35 @@ public class FirebaseAuthServiceImpl extends AuthenticationServiceCommon impleme
         AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
         return this.createResponse(authUserDetails);
     }
+
+    private User buildUser(FirebaseToken firebaseToken) {
+        User user = new User();
+        user.setEmail(firebaseToken.getEmail());
+        user.setActive(true);
+        user.setAllowNotification(true);
+        user.setFullName(firebaseToken.getName());
+        user.setUsername(firebaseToken.getEmail());
+        user.setAvatar(getPicture(firebaseToken));
+        Set<UserLinkAccount> sets = buildUserLinkAccounts(firebaseToken, user);
+        user.setUserLinkAccounts(sets);
+        return user;
+    }
+
+    private String getPicture(FirebaseToken firebaseToken) {
+        return String.valueOf(firebaseToken.getClaims().get(PICTURE_RESPONSE_KEY));
+    }
+
+    private Set<UserLinkAccount> buildUserLinkAccounts(FirebaseToken firebaseToken, User user) {
+        Set<UserLinkAccount> set = new HashSet<>();
+        Map<String, Object> claims = firebaseToken.getClaims();
+        Map<String, Object> fireBases = (Map<String, Object>) claims.get(FIREBASE_RESPONSE_KEY);
+        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
+                .user(user)
+                .providerId(String.valueOf(claims.get(USER_ID_RESPONSE_KEY)))
+                .providerName(String.valueOf(fireBases.get(SIGN_IN_PROVIDER_RESPONSE_KEY)))
+                .build();
+        set.add(userLinkAccount);
+        return set;
+    }
+
 }

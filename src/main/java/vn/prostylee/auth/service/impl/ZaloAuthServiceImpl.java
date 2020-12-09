@@ -4,18 +4,17 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 import vn.prostylee.auth.constant.SocialProviderType;
+import vn.prostylee.auth.converter.ZaloConverter;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.request.LoginSocialRequest;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
@@ -26,9 +25,12 @@ import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.service.AuthenticationService;
 import vn.prostylee.auth.service.UserLinkAccountService;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.converter.GenderConverter;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +48,7 @@ public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements 
     private static final String ZALO_VERSION = "v2.0";
     private static final String ZALO_ENDPOINT_GET_PROFILE = "me";
     private static final String ZALO_MAIN_API = "https://graph.zalo.me";
+    private static final String ZALO = "zalo";
 
     private final UserLinkAccountService userLinkAccountService;
 
@@ -74,7 +77,8 @@ public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements 
     }
 
     private JwtAuthenticationToken processNew(ZaloResponse response) {
-        User user = userService.save(response);
+        User user  = buildUser(response);
+        userService.save(user);
         AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
         return this.createResponse(authUserDetails);
     }
@@ -83,6 +87,34 @@ public class ZaloAuthServiceImpl extends AuthenticationServiceCommon implements 
         User user = linkAccount.get().getUser();
         AuthUserDetails authUserDetails = new AuthUserDetails(user, null);
         return this.createResponse(authUserDetails);
+    }
+
+    private User buildUser(ZaloResponse zaloResponse) {
+        User user = new User();
+        user.setActive(true);
+        user.setAllowNotification(true);
+        user.setFullName(zaloResponse.getName());
+        user.setUsername(zaloResponse.getId());
+        user.setGender(GenderConverter.convertGender(zaloResponse.getGender()));
+        user.setAvatar(zaloResponse.getPicture());
+        String birthDay = Optional.ofNullable(zaloResponse.getBirthday()).orElse(StringUtils.EMPTY);
+        user.setDate(ZaloConverter.convertDay(birthDay));
+        user.setMonth(ZaloConverter.convertMonth(birthDay));
+        user.setYear(ZaloConverter.convertYear(birthDay));
+        Set<UserLinkAccount> sets = buildUserLinkAccounts(zaloResponse, user);
+        user.setUserLinkAccounts(sets);
+        return user;
+    }
+
+    private Set<UserLinkAccount> buildUserLinkAccounts(ZaloResponse zaloResponse, User user) {
+        Set<UserLinkAccount> set = new HashSet<>();
+        UserLinkAccount userLinkAccount = UserLinkAccount.builder()
+                .user(user)
+                .providerId(zaloResponse.getId())
+                .providerName(ZALO)
+                .build();
+        set.add(userLinkAccount);
+        return set;
     }
 
     private ZaloResponse call(WebClient client, String idToken) {
