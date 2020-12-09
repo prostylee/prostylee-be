@@ -2,6 +2,7 @@ package vn.prostylee.auth.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -29,9 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 public class AuthenticationServiceCommon {
-    @Autowired
-    private JwtTokenFactory tokenFactory;
+    private final JwtTokenFactory tokenFactory;
+    private final TokenParser tokenParser;
+    private final SecurityProperties securityProperties;
 
     @Autowired
     private EmailService emailService;
@@ -39,11 +42,7 @@ public class AuthenticationServiceCommon {
     @Autowired
     private EmailTemplateService emailTemplateService;
 
-    @Autowired
-    private TokenParser tokenParser;
 
-    @Autowired
-    private SecurityProperties securityProperties;
 
     protected JwtAuthenticationToken createResponse(AuthUserDetails userDetail) {
         AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
