@@ -32,17 +32,20 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationServiceCommon {
-    private final JwtTokenFactory tokenFactory;
-    private final TokenParser tokenParser;
-    private final SecurityProperties securityProperties;
+    @Autowired
+    private JwtTokenFactory tokenFactory;
+
+    @Autowired
+    private TokenParser tokenParser;
+
+    @Autowired
+    private SecurityProperties securityProperties;
 
     @Autowired
     private EmailService emailService;
 
     @Autowired
     private EmailTemplateService emailTemplateService;
-
-
 
     protected JwtAuthenticationToken createResponse(AuthUserDetails userDetail) {
         AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
