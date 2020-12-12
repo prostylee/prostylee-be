@@ -1,10 +1,10 @@
 package vn.prostylee.app.service.impl;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import vn.prostylee.app.dto.AppConfiguration;
 import vn.prostylee.app.entity.AppMetadata;
 import vn.prostylee.app.repository.AppMetadataRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import vn.prostylee.app.service.AppMetadataService;
 import vn.prostylee.core.utils.JsonUtils;
 

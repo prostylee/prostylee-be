@@ -1,11 +1,5 @@
 package vn.prostylee.auth.repository.impl;
 
-import vn.prostylee.auth.dto.filter.UserFilter;
-import vn.prostylee.auth.entity.User;
-import vn.prostylee.auth.repository.UserRepository;
-import vn.prostylee.core.repository.query.HibernateQueryResult;
-import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
-import vn.prostylee.core.utils.DbUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import vn.prostylee.auth.dto.filter.UserFilter;
+import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.repository.UserRepository;
+import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
+import vn.prostylee.core.repository.query.HibernateQueryResult;
+import vn.prostylee.core.utils.DbUtil;
+import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 
 import javax.persistence.EntityManager;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implement
     public Page<User> getAllUsers(UserFilter filter, Pageable pageable) {
         StringBuilder queryBuilder = new StringBuilder("SELECT user "
                 + " FROM "+ User.class.getName() + " user "
-                + " JOIN user.roles as roles "
+                + " LEFT JOIN user.roles as roles "
                 + " WHERE user.deletedAt = null ");
 
         Map<String, Object> parameterMap = buildFilterParameters(queryBuilder, filter);

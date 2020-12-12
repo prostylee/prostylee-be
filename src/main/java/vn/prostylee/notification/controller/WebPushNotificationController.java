@@ -1,8 +1,8 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
 import vn.prostylee.notification.dto.request.FcmSubscriptionRequest;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.service.FcmPushNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

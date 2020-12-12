@@ -1,19 +1,13 @@
 package vn.prostylee.auth.controller;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import vn.prostylee.auth.dto.AuthUserDetails;
-import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.auth.dto.request.*;
-import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
-import vn.prostylee.auth.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import vn.prostylee.auth.dto.request.*;
+import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
+import vn.prostylee.auth.service.AuthService;
+import vn.prostylee.core.constant.ApiVersion;
 
 import javax.validation.Valid;
 
@@ -22,6 +16,7 @@ import javax.validation.Valid;
 @RequestMapping(value = ApiVersion.API_V1 + "/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
     @PostMapping("/sign-in")

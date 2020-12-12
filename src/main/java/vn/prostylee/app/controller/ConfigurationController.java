@@ -1,7 +1,7 @@
 package vn.prostylee.app.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.app.dto.AppConfiguration;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.app.service.AppMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

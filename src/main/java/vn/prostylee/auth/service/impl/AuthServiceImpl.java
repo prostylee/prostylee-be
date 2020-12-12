@@ -1,9 +1,7 @@
 package vn.prostylee.auth.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,7 +17,9 @@ import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.exception.InvalidJwtToken;
 import vn.prostylee.auth.repository.UserRepository;
-import vn.prostylee.auth.service.*;
+import vn.prostylee.auth.service.AuthService;
+import vn.prostylee.auth.service.UserService;
+import vn.prostylee.auth.service.UserTempService;
 import vn.prostylee.auth.token.AccessToken;
 import vn.prostylee.auth.token.factory.JwtTokenFactory;
 import vn.prostylee.auth.token.parser.TokenParser;
@@ -60,7 +60,6 @@ public class AuthServiceImpl extends AuthenticationServiceCommon implements Auth
     private TokenParser tokenParser;
 
     @Autowired
-    @Qualifier("userService")
     private UserService userService;
 
     @Autowired
