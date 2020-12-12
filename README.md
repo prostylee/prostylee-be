@@ -41,7 +41,7 @@ Or
 ### Run Spring Boot Application
 
 There are several ways to run a Spring Boot application on your local machine. 
-One way is to execute the `main` method in the `vn.prostylee.ProStyleeApplication` class from your IDE.
+One way is to execute the `main` method in the `ProStyleeApplication` class from your IDE.
 
 Or run the following command in a terminal:
 
@@ -94,6 +94,14 @@ So, let's create a directory db/migration in $PROJECT_ROOT with a migration scri
 ```
 
 ### Run End to End test
+
+Start Prostylee application first.
+
+```shell
+./gradlew bootRun
+```
+
+Run end to end test
 
 ```shell
 ./gradlew e2eTest

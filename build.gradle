@@ -1,3 +1,5 @@
+import vn.prostylee.plugins.ProStyleePlugin
+
 import java.time.Duration
 
 buildscript {
@@ -10,6 +12,7 @@ buildscript {
 		dockerComposeVersion = "0.13.4"
 		cucumberVersion = "6.8.0"
 		qualityToolVersion = "0.20.0"
+		restAssuredVersion = "3.3.0"
 	}
 
 	dependencies {
@@ -31,7 +34,7 @@ plugins {
 	id 'com.avast.gradle.docker-compose' version "${dockerComposeVersion}" // https://github.com/avast/gradle-docker-compose-plugin
 }
 
-apply plugin: vn.prostylee.plugins.ProStyleePlugin
+apply plugin: ProStyleePlugin
 
 group = 'vn.prostylee'
 version = '1.0.0-SNAPSHOT'
@@ -43,6 +46,10 @@ repositories {
 }
 
 dependencies {
+	// Rest-assured
+	testCompile "io.rest-assured:rest-assured:${restAssuredVersion}"
+	testCompile "io.rest-assured:json-schema-validator:${restAssuredVersion}"
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
@@ -120,6 +127,7 @@ dependencies {
 
 	// Wiremock will only be available in integration tests, but not in unit tests
 	testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
+
 }
 
 // For TESTING
@@ -148,6 +156,7 @@ e2eTest {
 		showStandardStreams = false
 		events "passed", "skipped", "failed"
 	}
+//	dependsOn bootRun // TODO should start spring app before running end to end test
 }
 
 tasks.withType(Test) {
@@ -181,7 +190,7 @@ dockerCompose {
 	useComposeFiles = ["src/main/docker/docker-compose.yaml"]
 	dockerComposeStopTimeout = Duration.ofSeconds(120)
 }
-dockerCompose.isRequiredBy(e2eTest)
+//dockerCompose.isRequiredBy(e2eTest) // TODO Deploy app on docker
 
 task startDocker {
 	dependsOn += ['composeUp']
