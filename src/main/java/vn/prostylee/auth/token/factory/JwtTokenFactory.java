@@ -1,17 +1,18 @@
 package vn.prostylee.auth.token.factory;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
 import vn.prostylee.auth.constant.Scope;
 import vn.prostylee.auth.converter.UserCredentialConverter;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.response.UserCredential;
 import vn.prostylee.auth.token.AccessToken;
+import vn.prostylee.auth.token.JwtToken;
 import vn.prostylee.auth.token.RefreshToken;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import vn.prostylee.core.utils.JsonUtils;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Factory class that should be always used to create {@link vn.prostylee.auth.token.JwtToken}.
+ * Factory class that should be always used to create {@link JwtToken}.
  */
 @RequiredArgsConstructor
 @Component

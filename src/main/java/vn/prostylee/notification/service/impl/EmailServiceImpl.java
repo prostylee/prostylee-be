@@ -2,6 +2,12 @@ package vn.prostylee.notification.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import vn.prostylee.core.configuration.properties.ServiceProperties;
+import vn.prostylee.notification.dto.mail.MailAttachment;
+import vn.prostylee.notification.dto.mail.MailInfo;
+import vn.prostylee.notification.dto.mail.MailTemplateConfig;
+import vn.prostylee.notification.dto.mail.SimpleMailInfo;
+import vn.prostylee.notification.exception.NotificationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-import vn.prostylee.core.configuration.properties.ServiceProperties;
-import vn.prostylee.notification.dto.mail.MailAttachment;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.MailTemplateConfig;
-import vn.prostylee.notification.dto.mail.SimpleMailInfo;
-import vn.prostylee.notification.exception.NotificationException;
 import vn.prostylee.notification.service.EmailService;
 
 import javax.activation.DataHandler;

@@ -1,12 +1,12 @@
 package vn.prostylee.core.configuration.async;
 
+import vn.prostylee.core.configuration.properties.ThreadExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import vn.prostylee.core.configuration.properties.ThreadExecutor;
 
 import java.util.concurrent.Executor;
 

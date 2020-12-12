@@ -1,15 +1,15 @@
 package vn.prostylee.app.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.stereotype.Service;
 import vn.prostylee.app.dto.request.ContactFormRequest;
 import vn.prostylee.app.service.SupportService;
-import vn.prostylee.core.configuration.properties.EmailProperties;
 import vn.prostylee.notification.constant.EmailTemplateType;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.MailTemplateConfig;
 import vn.prostylee.notification.dto.response.EmailTemplateResponse;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.stereotype.Service;
+import vn.prostylee.core.configuration.properties.EmailProperties;
 import vn.prostylee.notification.service.EmailService;
 import vn.prostylee.notification.service.EmailTemplateService;
 
