@@ -1,5 +1,6 @@
 package vn.prostylee;
 
+import vn.prostylee.auth.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -11,7 +12,6 @@ import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.constant.Gender;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.entity.Role;
-import vn.prostylee.auth.repository.RoleRepository;
 import vn.prostylee.auth.service.UserService;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-@Profile({"dev", "test"})
+@Profile({"dev", "staging"})
 @AllArgsConstructor
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {

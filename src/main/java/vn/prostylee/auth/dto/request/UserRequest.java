@@ -2,9 +2,9 @@ package vn.prostylee.auth.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.validator.UniqueEntity;
 import vn.prostylee.core.validator.UniqueIdentifier;
+import vn.prostylee.auth.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,11 +19,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(
-        value = {"password"},
-        allowSetters = true
-)
-@UniqueEntity(service = UserService.class, serviceQualifier = "userService", fieldNames = {"username"})
+@UniqueEntity(service = UserService.class, fieldNames = {"username"})
 public class UserRequest implements UniqueIdentifier<Long> {
 
     private Long id;
@@ -42,12 +38,10 @@ public class UserRequest implements UniqueIdentifier<Long> {
     private Character gender;
 
     @Email
-    @JsonIgnore
     private String email;
 
     private List<String> roles;
 
-    @NotNull
     private Boolean active;
 
     private Boolean allowNotification;

@@ -1,5 +1,8 @@
 package vn.prostylee.notification.service;
 
+import vn.prostylee.ComponentTest;
+import vn.prostylee.notification.dto.mail.MailInfo;
+import vn.prostylee.notification.dto.mail.SimpleMailInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import vn.prostylee.ComponentTest;
 import vn.prostylee.notification.dto.MailData;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.SimpleMailInfo;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

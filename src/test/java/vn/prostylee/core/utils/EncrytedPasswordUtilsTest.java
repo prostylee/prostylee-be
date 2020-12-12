@@ -3,7 +3,6 @@ package vn.prostylee.core.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
 @Slf4j
 public class EncrytedPasswordUtilsTest {
