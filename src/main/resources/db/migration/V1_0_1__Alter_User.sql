@@ -1,5 +1,4 @@
-ALTER TABLE user
-    ADD dob_date int null,
-    ADD dob_month int null,
-    ADD dob_year int null,
-    ADD avatar varchar(512) null;
+ALTER TABLE user ADD COLUMN dob_date int null;
+ALTER TABLE user ADD COLUMN dob_month int null;
+ALTER TABLE user ADD COLUMN dob_year int null;
+ALTER TABLE user ADD COLUMN avatar varchar(512) null;
