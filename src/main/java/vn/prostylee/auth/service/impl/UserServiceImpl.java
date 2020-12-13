@@ -2,7 +2,6 @@ package vn.prostylee.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +12,7 @@ import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.repository.RoleRepository;
-import vn.prostylee.auth.repository.custom.CustomUserRepository;
+import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -25,11 +24,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Qualifier("userService")
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final CustomUserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
 
@@ -148,4 +146,10 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User is not found with push token [" + pushToken + "]"));
         return convertToResponse(user);
     }
+
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
 }

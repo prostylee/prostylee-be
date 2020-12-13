@@ -1,5 +1,6 @@
 package vn.prostylee.core.configuration.database;
 
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import vn.prostylee.ProStyleeApplication;
-import vn.prostylee.core.provider.AuthenticatedProvider;
 
 @Configuration
 @EntityScan(basePackageClasses = { ProStyleeApplication.class, Jsr310JpaConverters.class })

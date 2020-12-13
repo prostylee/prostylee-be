@@ -1,20 +1,19 @@
 package vn.prostylee.notification.service.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import vn.prostylee.core.constant.LocaleConstant;
 import vn.prostylee.core.exception.ApplicationException;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.exception.ValidatingException;
-import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.MailTemplateConfig;
 import vn.prostylee.notification.dto.request.EmailTemplateRequest;
 import vn.prostylee.notification.dto.response.EmailTemplateResponse;
 import vn.prostylee.notification.entity.EmailTemplate;
 import vn.prostylee.notification.repository.EmailTemplateRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.notification.service.EmailService;
 import vn.prostylee.notification.service.EmailTemplateService;
 

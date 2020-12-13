@@ -1,12 +1,12 @@
 package vn.prostylee.media.provider;
 
+import vn.prostylee.media.exception.ConfigurationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.configuration.properties.TempFolderProperties;
 import vn.prostylee.core.exception.MissingConfigurationException;
-import vn.prostylee.media.exception.ConfigurationException;
 
 import javax.annotation.PostConstruct;
 import java.io.File;

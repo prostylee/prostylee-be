@@ -1,32 +1,34 @@
 package vn.prostylee.auth.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.service.AuthService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import vn.prostylee.core.constant.ApiVersion;
 
 import javax.validation.Valid;
 
 @Slf4j
 @RestController
 @RequestMapping(value = ApiVersion.API_V1 + "/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    @Autowired
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/sign-in")
     @ResponseStatus(code = HttpStatus.OK)
     public JwtAuthenticationToken login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/sign-in-with-social")
+    @ResponseStatus(code = HttpStatus.OK)
+    public JwtAuthenticationToken loginWithSocial(@Valid @RequestBody LoginSocialRequest request) {
+        return authService.loginWithSocial(request);
     }
 
     @PostMapping("/sign-up")

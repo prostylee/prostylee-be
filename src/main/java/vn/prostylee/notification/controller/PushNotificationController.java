@@ -1,8 +1,8 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
 import vn.prostylee.notification.dto.request.SubscribePushNotificationRequest;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.service.PushNotificationService;
 import vn.prostylee.notification.service.PushNotificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;

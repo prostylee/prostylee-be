@@ -1,8 +1,8 @@
 package vn.prostylee.core.exception.handler;
 
+import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.core.dto.response.ApiErrorResponse;
 import vn.prostylee.core.dto.response.ValidationError;
-import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.core.validator.UniqueEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;

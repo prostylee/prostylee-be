@@ -1,12 +1,12 @@
 package vn.prostylee.app.controller;
 
+import vn.prostylee.app.dto.filter.MasterDataFilter;
+import vn.prostylee.app.dto.response.MasterDataResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.app.dto.filter.MasterDataFilter;
-import vn.prostylee.app.dto.response.MasterDataResponse;
 import vn.prostylee.app.service.AppMetadataService;
 
 @AllArgsConstructor

@@ -1,11 +1,11 @@
 package vn.prostylee.media.provider;
 
+import vn.prostylee.media.dto.TempFile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import vn.prostylee.media.dto.TempFile;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

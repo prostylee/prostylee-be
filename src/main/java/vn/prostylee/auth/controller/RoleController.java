@@ -1,8 +1,8 @@
 package vn.prostylee.auth.controller;
 
+import vn.prostylee.auth.dto.response.RoleResponse;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.MasterDataController;
-import vn.prostylee.auth.dto.response.RoleResponse;
 import vn.prostylee.auth.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

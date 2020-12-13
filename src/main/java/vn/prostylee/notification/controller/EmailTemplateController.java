@@ -1,7 +1,7 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.request.EmailTemplateRequest;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.response.EmailTemplateResponse;
 import vn.prostylee.notification.service.EmailTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;

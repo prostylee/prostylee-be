@@ -1,0 +1,35 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build with Gradle
+        run: ./gradlew build -x e2eTest
+      # Action Slack: slack-workflow-result
+      # https://github.com/marketplace/actions/slack-workflow-result
+      - uses: 8398a7/action-slack@v2
+        with:
+          status: ${{ job.status }}
+          author_name: "${{ github.event.pull_request.user.login }}"
+          text: "<${{ github.event.pull_request._links.html.href }}|View Pull Request>"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
