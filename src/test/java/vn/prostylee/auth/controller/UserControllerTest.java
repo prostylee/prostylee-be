@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNotNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -92,7 +91,7 @@ class UserControllerTest {
                 .username(createEmail(userId))
                 .password("1234")
                 .build();
-        when(userService.save(request)).thenReturn(mockResponse(userId));
+        when(userService.save(any())).thenReturn(mockResponse(userId));
 
         MvcResult mvcResult = this.mockMvc
                 .perform(post(ENDPOINT)
@@ -101,7 +100,7 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(isNotNull()))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value(createEmail(userId)))
                 .andReturn();
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
