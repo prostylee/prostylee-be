@@ -1,8 +1,8 @@
 package vn.prostylee.auth.repository;
 // Generated May 31, 2020, 11:28:53 PM by Hibernate Tools 5.2.12.Final
 
-import vn.prostylee.auth.entity.UserTemp;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.auth.entity.UserTemp;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;

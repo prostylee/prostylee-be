@@ -1,8 +1,8 @@
 package vn.prostylee.auth.token.verifier;
 
+import vn.prostylee.auth.configure.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vn.prostylee.auth.configure.properties.SecurityProperties;
 import vn.prostylee.auth.token.parser.TokenParser;
 
 @RequiredArgsConstructor

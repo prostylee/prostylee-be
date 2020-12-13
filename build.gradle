@@ -1,9 +1,29 @@
+import vn.prostylee.plugins.ProStyleePlugin
+
+import java.time.Duration
+
 buildscript {
 	ext {
 		lombokVersion = "1.18.16"
 		mapstructProcessorVersion = "1.4.1.Final"
 		springdocVersion = "1.4.8"
 		googleDriveVersion = "1.23.0"
+		flywayVersion = "7.3.1"
+		dockerComposeVersion = "0.13.4"
+		cucumberVersion = "6.8.0"
+		qualityToolVersion = "0.20.0"
+		restAssuredVersion = "3.3.0"
+		prostyleeDockerTaskGroup  = 'ProStylee Docker'
+	}
+
+	dependencies {
+		// https://github.com/avast/gradle-docker-compose-plugin
+		classpath "gradle.plugin.com.avast.gradle:gradle-docker-compose-plugin:${dockerComposeVersion}"
+		// https://github.com/vanniktech/gradle-code-quality-tools-plugin/
+		classpath "com.vanniktech:gradle-code-quality-tools-plugin:${qualityToolVersion}"
+
+		// Spotbugs
+		classpath 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.10.1'
 	}
 }
 
@@ -11,67 +31,278 @@ plugins {
 	id 'org.springframework.boot' version '2.4.0'
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
+	id "org.flywaydb.flyway" version "${flywayVersion}"
+	id "com.vanniktech.code.quality.tools" version "${qualityToolVersion}"
+	id "com.github.spotbugs" version "4.6.0" // https://github.com/spotbugs/spotbugs-gradle-plugin
+	id 'jacoco' // https://docs.gradle.org/current/userguide/jacoco_plugin.html
+	id 'org.unbroken-dome.test-sets' version '3.0.1' // https://github.com/unbroken-dome/gradle-testsets-plugin
+	id 'com.avast.gradle.docker-compose' version "${dockerComposeVersion}" // https://github.com/avast/gradle-docker-compose-plugin
 }
+
+apply plugin: ProStyleePlugin
 
 group = 'vn.prostylee'
 version = '1.0.0-SNAPSHOT'
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
+	// Rest-assured
+	testCompile "io.rest-assured:rest-assured:${restAssuredVersion}"
+	testCompile "io.rest-assured:json-schema-validator:${restAssuredVersion}"
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// Send mail with template
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20200713.1'
-	implementation 'mysql:mysql-connector-java:8.0.20'
 
+	// Database - JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'mysql:mysql-connector-java:8.0.20'
+	compile "org.flywaydb:flyway-core:${flywayVersion}"
+
+	//Use for WebClient
+	compile 'org.springframework.boot:spring-boot-starter-webflux'
+	compile 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
+
+	// Lombok
 	compile 'org.springframework.boot:spring-boot-devtools'
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 	testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
 	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
+	// Swagger
 	implementation "org.springdoc:springdoc-openapi-ui:${springdocVersion}"
 	implementation "org.springdoc:springdoc-openapi-security:${springdocVersion}"
 	implementation "org.springdoc:springdoc-openapi-data-rest:${springdocVersion}"
 
+	// Utils
 	implementation 'org.apache.commons:commons-lang3:3.10'
 	implementation 'org.apache.commons:commons-collections4:4.1'
 	implementation 'org.apache.commons:commons-text:1.9'
 	implementation 'commons-fileupload:commons-fileupload:1.4'
 
+	// Logging
 	implementation 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
 
+	// Security - JWT
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'com.auth0:auth0:1.16.0'
+	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20200713.1'
 
+	// Object mapper
 	compile 'org.modelmapper:modelmapper:2.3.0'
 	implementation "org.mapstruct:mapstruct:${mapstructProcessorVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructProcessorVersion}"
 
+	// Google Drive
 	compile 'org.apache.commons:commons-text:1.8'
 	compile 'commons-fileupload:commons-fileupload:1.4'
 	compile "com.google.apis:google-api-services-drive:v3-rev110-${googleDriveVersion}"
 
-	compile 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
-
+	// Google Firebase
 	implementation 'com.google.firebase:firebase-admin:7.0.1'
+
+	// Encrypt password
+	compile 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
 	// For dev only
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	// For testing only
+	// In memory database
+	testImplementation 'com.h2database:h2'
+
+	// For testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Cucumber
+	testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+	testImplementation "io.cucumber:cucumber-junit:${cucumberVersion}"
+	testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
+
+	// Wiremock will only be available in integration tests, but not in unit tests
+	testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
+
 }
 
-test {
-	useJUnitPlatform()
+// For TESTING
+
+greeting {
+	greeter = "ProStylee Backend"
 }
+
+testSets {
+	componentTest { dirName = 'componentTest' }
+	e2eTest { dirName = 'e2eTest' }
+}
+
+componentTest {
+	useJUnitPlatform {
+		includeTags 'IT'
+	}
+	testLogging {
+		showStandardStreams = false
+		events "passed", "skipped", "failed"
+	}
+}
+
+e2eTest {
+	testLogging {
+		showStandardStreams = false
+		events "passed", "skipped", "failed"
+	}
+//	dependsOn bootRun // TODO should start spring app before running end to end test
+}
+
+tasks.withType(Test) {
+	useJUnitPlatform {
+		excludeTags 'IT'
+	}
+	testLogging {
+		showStandardStreams = false
+		events "passed", "skipped", "failed"
+	}
+}
+
+// Jacoco Report
+task combineJaCoCoReports(type: JacocoReport) {
+	executionData fileTree(project.buildDir.absolutePath).include("jacoco/*.exec")
+	classDirectories.setFrom files(project.sourceSets.main.output)
+	sourceDirectories.setFrom files(project.sourceSets.main.allSource.srcDirs)
+
+	reports {
+		xml.enabled(true)
+		html.enabled(true)
+		html.destination file("${buildDir}/reports/jacocoHtml")
+	}
+}
+
+task cleanRunAllTests(type: GradleBuild) {
+	tasks = ['clean', 'test', 'componentTest', 'combineJaCoCoReports', 'e2eTest']
+}
+
+dockerCompose {
+	useComposeFiles = ["src/main/docker/docker-compose.yaml"]
+	dockerComposeStopTimeout = Duration.ofSeconds(120)
+}
+//dockerCompose.isRequiredBy(e2eTest) // TODO Deploy app on docker
+
+task startDocker {
+	group = prostyleeDockerTaskGroup 
+	dependsOn += ['composeUp']
+}
+
+task stopDocker {
+	group = prostyleeDockerTaskGroup 
+	dependsOn += ['composeDown']
+}
+
+codeQualityTools {
+	failEarly = false
+	xmlReports = true
+	htmlReports = true
+	textReports = false
+	ignoreProjects = []
+
+	// https://docs.gradle.org/current/userguide/checkstyle_plugin.html
+	checkstyle {
+		enabled = true
+		toolVersion = '8.36.1'
+		configFile = 'code-quality-tools/checkstyle.xml'
+		ignoreFailures = null
+		showViolations = null
+		source = 'src/main'
+		include = ['**/*.java']
+		exclude = ['**/gen/**', '**/entity/**']
+	}
+	// https://docs.gradle.org/current/userguide/pmd_plugin.html
+	pmd {
+		enabled = true
+		toolVersion = '6.29.0'
+		ruleSetFile = 'code-quality-tools/pmd.xml'
+		ignoreFailures = null
+		source = 'src/main'
+		include = ['**/*.java']
+		exclude = ['**/gen/**', '**/entity/**', '**/dto/**']
+	}
+	cpd {
+		enabled = true
+		source = 'src/main/java'
+		language = 'java'
+		ignoreFailures = null
+		minimumTokenCount = 50
+	}
+	errorProne {
+		enabled = false
+		toolVersion = '2.0.0'
+	}
+}
+
+// Findbugs
+// https://github.com/spotbugs/spotbugs-gradle-plugin
+spotbugs {
+	toolVersion = '4.2.0'
+	ignoreFailures = true
+	showStackTraces = true
+	showProgress = true
+	reportsDir = file("$buildDir/reports/spotbugs")
+	excludeFilter = file("code-quality-tools/spotbugs-exclude.xml")
+}
+
+task findbugsMain {
+	description 'Alias to spotbugsMain'
+	dependsOn 'spotbugsMain'
+}
+
+task findbugsTest {
+	description 'Alias to spotbugsTest'
+	dependsOn 'spotbugsTest'
+}
+
+spotbugsMain {
+	reports {
+		html {
+			ignoreFailures = false
+		}
+	}
+}
+spotbugsTest {
+	reports {
+		html {
+			enabled = !project.hasProperty('shortSha') // Enable HTML on local dev, but not Jenkins
+		}
+		xml {
+			enabled = project.hasProperty('shortSha')
+		}
+	}
+}
+tasks.matching {task -> task.name.startsWith('spotbugs')}.forEach {
+	it.reports {
+		html {
+			enabled = !project.hasProperty('shortSha') // Enable HTML on local dev, but not Jenkins
+		}
+		xml {
+			enabled = project.hasProperty('shortSha')
+		}
+	}
+}
+
+task findbugsAll {
+	dependsOn 'spotbugsMain'
+	dependsOn 'spotbugsTest'
+	dependsOn 'spotbugsComponentTest'
+	dependsOn 'spotbugsE2eTest'
+}
+
+// TODO config SpringLint
+// https://github.com/mauricioaniche/springlint

@@ -1,7 +1,7 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.filter.NotificationFilter;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.notification.dto.response.NotificationResponse;
 import vn.prostylee.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;

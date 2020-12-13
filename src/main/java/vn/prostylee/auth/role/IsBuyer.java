@@ -1,7 +1,7 @@
 package vn.prostylee.auth.role;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import vn.prostylee.auth.constant.AuthRoleConstants;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

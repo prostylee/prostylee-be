@@ -65,8 +65,9 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 
     @Override
     public Iterable<T> findAllActive(Iterable<ID> ids) {
-        if (ids == null || !ids.iterator().hasNext())
+        if (ids == null || !ids.iterator().hasNext()) {
             return Collections.emptyList();
+        }
 
         if (entityInformation.hasCompositeId()) {
             List<T> results = new ArrayList<>();
