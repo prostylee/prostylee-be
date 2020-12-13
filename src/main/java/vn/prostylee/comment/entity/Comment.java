@@ -1,15 +1,12 @@
 package vn.prostylee.comment.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
+import java.util.Date;
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
+import javax.persistence.*;
+
 import static javax.persistence.GenerationType.IDENTITY;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,6 +46,10 @@ public class Comment extends AuditEntity {
 	@Column(name = "target_type", length = 512)
 	private String targetType;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "deleted_at", length = 19)
+	private Date deletedAt;
+	
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "comment")
