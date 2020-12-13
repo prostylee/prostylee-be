@@ -13,6 +13,7 @@ buildscript {
 		cucumberVersion = "6.8.0"
 		qualityToolVersion = "0.20.0"
 		restAssuredVersion = "3.3.0"
+		prostyleeDockerTaskGroup  = 'ProStylee Docker'
 	}
 
 	dependencies {
@@ -20,6 +21,9 @@ buildscript {
 		classpath "gradle.plugin.com.avast.gradle:gradle-docker-compose-plugin:${dockerComposeVersion}"
 		// https://github.com/vanniktech/gradle-code-quality-tools-plugin/
 		classpath "com.vanniktech:gradle-code-quality-tools-plugin:${qualityToolVersion}"
+
+		// Spotbugs
+		classpath 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.10.1'
 	}
 }
 
@@ -29,6 +33,7 @@ plugins {
 	id 'java'
 	id "org.flywaydb.flyway" version "${flywayVersion}"
 	id "com.vanniktech.code.quality.tools" version "${qualityToolVersion}"
+	id "com.github.spotbugs" version "4.6.0" // https://github.com/spotbugs/spotbugs-gradle-plugin
 	id 'jacoco' // https://docs.gradle.org/current/userguide/jacoco_plugin.html
 	id 'org.unbroken-dome.test-sets' version '3.0.1' // https://github.com/unbroken-dome/gradle-testsets-plugin
 	id 'com.avast.gradle.docker-compose' version "${dockerComposeVersion}" // https://github.com/avast/gradle-docker-compose-plugin
@@ -193,10 +198,12 @@ dockerCompose {
 //dockerCompose.isRequiredBy(e2eTest) // TODO Deploy app on docker
 
 task startDocker {
+	group = prostyleeDockerTaskGroup 
 	dependsOn += ['composeUp']
 }
 
 task stopDocker {
+	group = prostyleeDockerTaskGroup 
 	dependsOn += ['composeDown']
 }
 
@@ -240,3 +247,62 @@ codeQualityTools {
 		toolVersion = '2.0.0'
 	}
 }
+
+// Findbugs
+// https://github.com/spotbugs/spotbugs-gradle-plugin
+spotbugs {
+	toolVersion = '4.2.0'
+	ignoreFailures = true
+	showStackTraces = true
+	showProgress = true
+	reportsDir = file("$buildDir/reports/spotbugs")
+	excludeFilter = file("code-quality-tools/spotbugs-exclude.xml")
+}
+
+task findbugsMain {
+	description 'Alias to spotbugsMain'
+	dependsOn 'spotbugsMain'
+}
+
+task findbugsTest {
+	description 'Alias to spotbugsTest'
+	dependsOn 'spotbugsTest'
+}
+
+spotbugsMain {
+	reports {
+		html {
+			ignoreFailures = false
+		}
+	}
+}
+spotbugsTest {
+	reports {
+		html {
+			enabled = !project.hasProperty('shortSha') // Enable HTML on local dev, but not Jenkins
+		}
+		xml {
+			enabled = project.hasProperty('shortSha')
+		}
+	}
+}
+tasks.matching {task -> task.name.startsWith('spotbugs')}.forEach {
+	it.reports {
+		html {
+			enabled = !project.hasProperty('shortSha') // Enable HTML on local dev, but not Jenkins
+		}
+		xml {
+			enabled = project.hasProperty('shortSha')
+		}
+	}
+}
+
+task findbugsAll {
+	dependsOn 'spotbugsMain'
+	dependsOn 'spotbugsTest'
+	dependsOn 'spotbugsComponentTest'
+	dependsOn 'spotbugsE2eTest'
+}
+
+// TODO config SpringLint
+// https://github.com/mauricioaniche/springlint
