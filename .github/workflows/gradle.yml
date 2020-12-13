@@ -24,10 +24,12 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Build with Gradle
         run: ./gradlew build -x e2eTest
+      # Action Slack: slack-workflow-result
+      # https://github.com/marketplace/actions/slack-workflow-result
       - uses: 8398a7/action-slack@v2
         with:
           status: ${{ job.status }}
-          author_name: Prostylee Admin
-          text: Prostylee check quality result
+          author_name: "${{ github.event.pull_request.user.login }}"
+          text: "<${{ github.event.pull_request._links.html.href }}|View Pull Request>"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
