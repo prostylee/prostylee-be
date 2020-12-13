@@ -9,6 +9,7 @@ import vn.prostylee.auth.service.UserService;
 import vn.prostylee.comment.dto.filter.CommentFilter;
 import vn.prostylee.comment.dto.request.CommentRequest;
 import vn.prostylee.comment.dto.response.CommentResponse;
+import vn.prostylee.comment.service.CommentService;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
 
@@ -18,7 +19,7 @@ import vn.prostylee.core.controller.CrudController;
 public class CommentController extends CrudController<CommentRequest, CommentResponse, Long, CommentFilter> {
 
     @Autowired
-    public CommentController(@Qualifier("userService") UserService service) {
+    public CommentController(CommentService service) {
         super(service);
     }
 }
