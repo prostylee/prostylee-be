@@ -87,10 +87,10 @@ So, let's create a directory db/migration in $PROJECT_ROOT with a migration scri
 ./gradlew test
 ```
 
-### Run Component test
+### Run Integration  test
 
 ```shell
-./gradlew componentTest
+./gradlew integrationTest
 ```
 
 ### Run End to End test
@@ -107,10 +107,10 @@ Run end to end test
 ./gradlew e2eTest
 ```
 
-### Run Unit and Component test
+### Run Unit and Integration  test
 
 ```shell
-./gradlew test componentTest
+./gradlew test integrationTest
 ```
 
 ### Run all tests

@@ -1,8 +1,6 @@
 package vn.prostylee.media.service;
 
 import com.google.api.services.drive.model.File;
-import vn.prostylee.ComponentTest;
-import vn.prostylee.media.mock.HttpServletRequestMock;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.IntegrationTest;
+import vn.prostylee.media.mock.HttpServletRequestMock;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@ComponentTest
+@IntegrationTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class GoogleDriveServiceTest {
+public class GoogleDriveServiceIT {
 
     private static final String FILE1 = "images/img-test-01.png";
 
