@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import vn.prostylee.ComponentTest;
+import vn.prostylee.IntegrationTest;
 import vn.prostylee.auth.dto.request.RegisterRequest;
 import vn.prostylee.core.utils.JsonUtils;
 
@@ -19,9 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ComponentTest
+@IntegrationTest
 @WebAppConfiguration
-public class AuthControllerTest {
+public class AuthControllerIT {
 
     @Autowired
     private WebApplicationContext wac;

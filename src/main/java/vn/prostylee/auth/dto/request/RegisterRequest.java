@@ -2,12 +2,12 @@ package vn.prostylee.auth.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import vn.prostylee.core.validator.Gender;
-import vn.prostylee.core.validator.Unique;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.validator.Gender;
+import vn.prostylee.core.validator.Unique;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -28,7 +28,7 @@ public class RegisterRequest {
     private String phoneNumber;
 
 
-    @Unique(service = UserService.class, serviceQualifier = "userService")
+    @Unique(service = UserService.class)
     @NotBlank
     @Email
     @Size(min = 4, max = 256)
