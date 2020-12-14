@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith({ SpringExtension.class })
 @SpringBootTest(classes = ProStyleeApplication.class)
-@ActiveProfiles({ "test", "component-test" })
-@Tag("ComponentTest")
-public @interface ComponentTest {
+@ActiveProfiles({ "test", "it" })
+@Tag("IntegrationTest")
+public @interface IntegrationTest {
 
 }

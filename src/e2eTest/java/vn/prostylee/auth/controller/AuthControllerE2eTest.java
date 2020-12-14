@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class AuthControllerTest extends BaseRestControllerE2eTest {
+public class AuthControllerE2eTest extends BaseRestControllerE2eTest {
 
     @Test
     void register_Successfully() {

@@ -7,7 +7,7 @@ import vn.prostylee.BaseRestControllerE2eTest;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
-public class PingControllerTest extends BaseRestControllerE2eTest {
+public class PingControllerE2eTest extends BaseRestControllerE2eTest {
 
     @Test
     void callPing_ReturnOkStatus() {

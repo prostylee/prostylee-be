@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import vn.prostylee.ComponentTest;
+import vn.prostylee.IntegrationTest;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.core.utils.JsonUtils;
 
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ComponentTest
+@IntegrationTest
 @WebAppConfiguration
 @Sql(
         scripts = { "/data/database/users.sql" },
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD,
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )
-class UserControllerTest {
+class UserControllerIT {
 
     private static final String ENDPOINT = "/v1/users";
 

@@ -14,11 +14,13 @@ buildscript {
 		qualityToolVersion = "0.20.0"
 		restAssuredVersion = "3.3.0"
 		prostyleeDockerTaskGroup  = 'ProStylee Docker'
+		qualityTaskGroup  = 'ProStylee Quality'
 	}
 
 	dependencies {
 		// https://github.com/avast/gradle-docker-compose-plugin
 		classpath "gradle.plugin.com.avast.gradle:gradle-docker-compose-plugin:${dockerComposeVersion}"
+
 		// https://github.com/vanniktech/gradle-code-quality-tools-plugin/
 		classpath "com.vanniktech:gradle-code-quality-tools-plugin:${qualityToolVersion}"
 
@@ -32,7 +34,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
 	id 'java'
 	id "org.flywaydb.flyway" version "${flywayVersion}"
-	id "com.vanniktech.code.quality.tools" version "${qualityToolVersion}"
+	id "com.vanniktech.code.quality.tools" version "${qualityToolVersion}" // https://github.com/vanniktech/gradle-code-quality-tools-plugin
 	id "com.github.spotbugs" version "4.6.0" // https://github.com/spotbugs/spotbugs-gradle-plugin
 	id 'jacoco' // https://docs.gradle.org/current/userguide/jacoco_plugin.html
 	id 'org.unbroken-dome.test-sets' version '3.0.1' // https://github.com/unbroken-dome/gradle-testsets-plugin
@@ -142,11 +144,11 @@ greeting {
 }
 
 testSets {
-	componentTest { dirName = 'componentTest' }
+	integrationTest { dirName = 'integrationTest' }
 	e2eTest { dirName = 'e2eTest' }
 }
 
-componentTest {
+integrationTest {
 	useJUnitPlatform {
 		includeTags 'IT'
 	}
@@ -174,6 +176,9 @@ tasks.withType(Test) {
 	}
 }
 
+// Running Tests as Part of the Build
+check.dependsOn integrationTest
+
 // Jacoco Report
 task combineJaCoCoReports(type: JacocoReport) {
 	executionData fileTree(project.buildDir.absolutePath).include("jacoco/*.exec")
@@ -187,25 +192,12 @@ task combineJaCoCoReports(type: JacocoReport) {
 	}
 }
 
-task cleanRunAllTests(type: GradleBuild) {
-	tasks = ['clean', 'test', 'componentTest', 'combineJaCoCoReports', 'e2eTest']
-}
-
+// Docker config
 dockerCompose {
 	useComposeFiles = ["src/main/docker/docker-compose.yaml"]
 	dockerComposeStopTimeout = Duration.ofSeconds(120)
 }
 //dockerCompose.isRequiredBy(e2eTest) // TODO Deploy app on docker
-
-task startDocker {
-	group = prostyleeDockerTaskGroup 
-	dependsOn += ['composeUp']
-}
-
-task stopDocker {
-	group = prostyleeDockerTaskGroup 
-	dependsOn += ['composeDown']
-}
 
 codeQualityTools {
 	failEarly = false
@@ -259,16 +251,6 @@ spotbugs {
 	excludeFilter = file("code-quality-tools/spotbugs-exclude.xml")
 }
 
-task findbugsMain {
-	description 'Alias to spotbugsMain'
-	dependsOn 'spotbugsMain'
-}
-
-task findbugsTest {
-	description 'Alias to spotbugsTest'
-	dependsOn 'spotbugsTest'
-}
-
 spotbugsMain {
 	reports {
 		html {
@@ -297,12 +279,63 @@ tasks.matching {task -> task.name.startsWith('spotbugs')}.forEach {
 	}
 }
 
-task findbugsAll {
+// TODO config SpringLint
+// https://github.com/mauricioaniche/springlint
+
+// PROSTYLEE GROUPS
+task startDocker {
+	group = prostyleeDockerTaskGroup
+	dependsOn += ['composeUp']
+}
+
+task stopDocker {
+	group = prostyleeDockerTaskGroup
+	dependsOn += ['composeDown']
+}
+
+task runUnitTest {
+	group = qualityTaskGroup
+	dependsOn += ['test']
+}
+
+task runIntegrationTest {
+	group = qualityTaskGroup
+	dependsOn += ['integrationTest']
+}
+
+task runE2eTest {
+	group = qualityTaskGroup
+	dependsOn += ['e2eTest']
+}
+
+task cleanRunAllTests(type: GradleBuild) {
+	group = qualityTaskGroup
+	tasks = ['clean', 'test', 'integrationTest', 'combineJaCoCoReports', 'e2eTest']
+}
+
+task findbugsMain {
+	group = qualityTaskGroup
+	description 'Alias to spotbugsMain'
 	dependsOn 'spotbugsMain'
+}
+
+task findbugsTest {
+	group = qualityTaskGroup
+	description 'Alias to spotbugsTest'
 	dependsOn 'spotbugsTest'
-	dependsOn 'spotbugsComponentTest'
+	dependsOn 'spotbugsIntegrationTest'
 	dependsOn 'spotbugsE2eTest'
 }
 
-// TODO config SpringLint
-// https://github.com/mauricioaniche/springlint
+task findbugsAll {
+	group = qualityTaskGroup
+	dependsOn 'spotbugsMain'
+	dependsOn 'spotbugsTest'
+	dependsOn 'spotbugsIntegrationTest'
+	dependsOn 'spotbugsE2eTest'
+}
+
+task qualityCheck {
+	group = qualityTaskGroup
+	dependsOn 'check'
+}
