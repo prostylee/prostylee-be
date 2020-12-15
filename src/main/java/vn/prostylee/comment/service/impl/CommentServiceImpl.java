@@ -1,5 +1,6 @@
 package vn.prostylee.comment.service.impl;
 
+import com.google.common.collect.Collections2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -58,9 +59,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentResponse update(Long id, CommentRequest commentRequest) {
-        Comment comment = getById(id);
-        Comment savedUser = commentRepo.save(comment);
+    public CommentResponse update(Long id, CommentRequest req) {
+        Comment entity = getById(id);
+        Collection<CommentImage> commentImages = entity.getCommentImages();
+        entity.getCommentImages().clear();
+        entity.getCommentImages()
+                .addAll(commentImages.stream().filter(ci ->
+                        req.getAttachmentId().contains(ci.getAttachmentId())).collect(Collectors.toSet()));
+        BeanUtil.mergeProperties(req, entity);
+        Comment savedUser = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedUser, CommentResponse.class);
     }
 

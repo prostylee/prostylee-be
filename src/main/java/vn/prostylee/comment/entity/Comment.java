@@ -48,7 +48,7 @@ public class Comment extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "comment")
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true,  cascade = CascadeType.ALL, mappedBy = "comment")
 	private Set<CommentImage> commentImages;
 
 }
