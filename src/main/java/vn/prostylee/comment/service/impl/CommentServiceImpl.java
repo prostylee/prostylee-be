@@ -16,7 +16,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
 import vn.prostylee.core.utils.BeanUtil;
 
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,15 +40,18 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse save(CommentRequest req) {
         Comment entity = BeanUtil.copyProperties(req, Comment.class);
-        Comment savedEntity = commentRepo.save(entity);
+        Set<CommentImage> commentImages = new HashSet<>();
         if(!req.getAttachmentId().isEmpty()){
-            for (Long id : req.getAttachmentId()) {
+            req.getAttachmentId().forEach(id -> {
                 CommentImage ci = new CommentImage();
                 ci.setAttachmentId(id);
-                commentImageRepo.save(ci);
-            }
+                ci.setOrder(id.intValue());
+                commentImages.add(ci);
+            });
 
+            entity.setCommentImages(commentImages);
         }
+        Comment savedEntity = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
 
