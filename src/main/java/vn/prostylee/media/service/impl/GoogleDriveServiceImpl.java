@@ -20,7 +20,7 @@ import vn.prostylee.media.constant.GoogleMeta;
 import vn.prostylee.media.dto.request.DownloadFileRequest;
 import vn.prostylee.media.dto.request.UploadFileRequest;
 import vn.prostylee.media.dto.request.ZipFileRequest;
-import vn.prostylee.media.dto.response.AttachmentResponse;
+import vn.prostylee.media.dto.response.GoogleDriveFileResponse;
 import vn.prostylee.media.exception.GoogleDriveException;
 import vn.prostylee.media.provider.FolderProvider;
 import vn.prostylee.media.provider.async.GoogleDriveAsyncProvider;
@@ -101,8 +101,8 @@ public class GoogleDriveServiceImpl implements CloudStorageService {
 		}
 		try {
 			UploadFileRequest[] requests = buildUploadFileRequests(files);
-			List<AttachmentResponse> responses = this.uploadFilesAsync(folderId, requests);
-			return responses.stream().map(AttachmentResponse::getGoogleDriveFile).collect(Collectors.toList());
+			List<GoogleDriveFileResponse> responses = this.uploadFilesAsync(folderId, requests);
+			return responses.stream().map(GoogleDriveFileResponse::getGoogleDriveFile).collect(Collectors.toList());
 		} catch (GoogleDriveException e) {
 			throw new GoogleDriveException("Can't upload files to google drive", e);
 		}
@@ -210,22 +210,22 @@ public class GoogleDriveServiceImpl implements CloudStorageService {
 	/**
 	 * Perform async storage file to Google drive
 	 *
-	 * @param requests The request files need to upload
 	 * @param folderId The Google folder id will contains the uploaded files
-	 * @return The {@link AttachmentResponse}
+	 * @param requests The request files need to upload
+	 * @return The {@link GoogleDriveFileResponse}
 	 *
 	 * @throws GoogleDriveException if can not upload files to google drive
 	 */
 	@Override
-	public List<AttachmentResponse> uploadFilesAsync(String folderId, UploadFileRequest... requests) {
-		List<AttachmentResponse> responses = new ArrayList<>();
+	public List<GoogleDriveFileResponse> uploadFilesAsync(String folderId, UploadFileRequest... requests) {
+		List<GoogleDriveFileResponse> responses = new ArrayList<>();
 
 		if (requests == null || requests.length < 1) {
 			return responses;
 		}
 
 		try {
-			List<Future<AttachmentResponse>> futures = new ArrayList<>();
+			List<Future<GoogleDriveFileResponse>> futures = new ArrayList<>();
 			// Execute async upload files
 			for (UploadFileRequest request : requests) {
 				futures.add(googleDriveAsyncProvider.uploadFile(request, folderId));
@@ -238,7 +238,7 @@ public class GoogleDriveServiceImpl implements CloudStorageService {
 			}
 
 			// Get results
-			for (Future<AttachmentResponse> future : futures) {
+			for (Future<GoogleDriveFileResponse> future : futures) {
 				responses.add(future.get());
 			}
 		} catch (InterruptedException | ExecutionException | IOException e) {
@@ -287,7 +287,7 @@ public class GoogleDriveServiceImpl implements CloudStorageService {
 	/**
 	 * Delete files if there are any error when upload files
 	 */
-	private void rollbackAsync(List<AttachmentResponse> responses) {
+	private void rollbackAsync(List<GoogleDriveFileResponse> responses) {
 		try {
 			if (CollectionUtils.isEmpty(responses)) {
 				return;

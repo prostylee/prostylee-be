@@ -1,6 +1,7 @@
 package vn.prostylee.media.service;
 
 import vn.prostylee.ComponentTest;
+import vn.prostylee.media.dto.response.FileStorageResponse;
 import vn.prostylee.media.mock.HttpServletRequestMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,7 @@ public class FileStorageServiceTest {
         FileStorageRequest fileStorageRequest = new FileStorageRequest();
         fileStorageRequest.setTypes(types);
 
-        List<FileStorageResponse> responses = fileStorageService.uploadFiles(fileStorageRequest, files, request);
+        List< FileStorageResponse> responses = fileStorageService.uploadFiles(fileStorageRequest, files, request);
 
         Assertions.assertEquals(types.size(), responses.size());
 

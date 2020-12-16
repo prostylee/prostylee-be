@@ -3,6 +3,7 @@ package vn.prostylee.media.service;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.dto.request.FileStorageRequest;
+import vn.prostylee.media.dto.response.FileStorageResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

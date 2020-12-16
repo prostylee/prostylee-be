@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.dto.request.FileStorageRequest;
+import vn.prostylee.media.dto.response.FileStorageResponse;
 import vn.prostylee.media.provider.FolderProvider;
 import vn.prostylee.media.provider.async.FileStorageAsyncProvider;
 import vn.prostylee.media.service.FileStorageService;

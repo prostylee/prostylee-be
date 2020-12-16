@@ -1,6 +1,5 @@
 package vn.prostylee.media.provider.async;
 
-import vn.prostylee.core.utils.UrlUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -8,7 +7,9 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
+import vn.prostylee.core.utils.UrlUtil;
 import vn.prostylee.media.constant.ApiUrl;
+import vn.prostylee.media.dto.response.FileStorageResponse;
 import vn.prostylee.media.provider.FileProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ public class FileStorageAsyncProvider extends BaseAsyncProvider {
 	 */
 	@Async
 	public Future<FileStorageResponse> storeFile(Integer type, Path fileStorageLocation, MultipartFile file,
-                                                 HttpServletRequest request) throws IOException {
+												 HttpServletRequest request) throws IOException {
 		// Normalize file name
 		final String originalFilename = org.springframework.util.StringUtils.cleanPath(file.getOriginalFilename());
 		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
