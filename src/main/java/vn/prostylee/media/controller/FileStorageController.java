@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.utils.MimeTypeUtil;
 import vn.prostylee.media.constant.ApiUrl;
 import vn.prostylee.media.dto.request.FileStorageRequest;
-import vn.prostylee.media.dto.response.FileStorageResponse;
 import vn.prostylee.media.service.FileStorageService;
 
 import javax.servlet.http.HttpServletRequest;

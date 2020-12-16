@@ -1,7 +1,6 @@
 package vn.prostylee.media.provider.async;
 
 import vn.prostylee.core.utils.UrlUtil;
-import vn.prostylee.media.dto.response.FileStorageResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

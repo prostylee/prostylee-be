@@ -14,7 +14,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.dto.request.FileStorageItemRequest;
 import vn.prostylee.media.dto.request.FileStorageRequest;
-import vn.prostylee.media.dto.response.FileStorageResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
