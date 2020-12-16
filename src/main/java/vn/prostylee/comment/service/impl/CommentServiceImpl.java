@@ -39,14 +39,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse save(CommentRequest req) {
         Comment entity = BeanUtil.copyProperties(req, Comment.class);
-        entity.setCommentImages(buildCommentImages(req, entity));
+        entity.setCommentImages(buildCommentImages(req.getAttachmentId(), entity));
         Comment savedEntity = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
 
-    private Set<CommentImage> buildCommentImages(CommentRequest req, Comment entity) {
-        return IntStream.range(0, req.getAttachmentId().size())
-                .mapToObj(index -> buildCommentImage(entity, req.getAttachmentId().get(index), index + 1))
+    private Set<CommentImage> buildCommentImages(List<Long> attachIds, Comment entity) {
+        return IntStream.range(0, attachIds.size())
+                .mapToObj(index -> buildCommentImage(entity, attachIds.get(index), index + 1))
                 .collect(Collectors.toSet());
     }
 
@@ -61,12 +61,24 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
-        Collection<CommentImage> commentImages = entity.getCommentImages();
-        entity.getCommentImages().clear();
-        entity.getCommentImages()
-                .addAll(commentImages.stream().filter(ci ->
-                        req.getAttachmentId().contains(ci.getAttachmentId())).collect(Collectors.toSet()));
+
+        Set<CommentImage> keepSets = entity.getCommentImages().stream()
+                .filter(commentImage -> req.getAttachmentId().contains(commentImage.getAttachmentId()))
+                .collect(Collectors.toSet());
+
+        entity.getCommentImages().removeIf(ci -> !keepSets.contains(ci)); //Remove
+
+        List<Long> attachmentIds = req.getAttachmentId();
+
+        Set<CommentImage> requestSets = buildCommentImages(attachmentIds, entity)
+                .stream()
+                .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
+                .collect(Collectors.toSet());
+
+        entity.getCommentImages().addAll(requestSets);
+
         BeanUtil.mergeProperties(req, entity);
+
         Comment savedUser = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedUser, CommentResponse.class);
     }
