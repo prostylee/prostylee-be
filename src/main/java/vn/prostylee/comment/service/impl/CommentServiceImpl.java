@@ -3,6 +3,8 @@ package vn.prostylee.comment.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.comment.dto.request.CommentRequest;
 import vn.prostylee.comment.dto.response.CommentResponse;
@@ -12,6 +14,8 @@ import vn.prostylee.comment.repository.CommentRepository;
 import vn.prostylee.comment.service.CommentService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.provider.AuthenticatedProvider;
+import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 
 import java.util.List;
@@ -23,12 +27,20 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-
+    private final AuthenticatedProvider authenticatedProvider;
     private final CommentRepository commentRepo;
+    private final BaseFilterSpecs<Comment> baseFilterSpecs;
 
     @Override
     public Page<CommentResponse> findAll(BaseFilter baseFilter) {
-        return null;
+        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserId().get());
+
+        searchable = searchable.and(additionalSpec);
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+
+        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
     }
 
     @Override
