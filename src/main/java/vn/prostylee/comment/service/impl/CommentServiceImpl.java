@@ -1,6 +1,5 @@
 package vn.prostylee.comment.service.impl;
 
-import com.google.common.collect.Collections2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,9 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,30 +63,35 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
         Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentId());
-
         if(attachmentIds.isPresent()) {
-            Set<CommentImage> keepSets = entity.getCommentImages().stream().parallel()
-                .filter(commentImage -> attachmentIds.get().contains(commentImage.getAttachmentId()))
-                .collect(Collectors.toSet());
-
-            entity.getCommentImages().removeIf(ci -> !keepSets.contains(ci));
-
-            List<Long> keepIds = keepSets.stream().map(commentImage -> commentImage.getAttachmentId()).collect(Collectors.toList());
-
-            Set<CommentImage> requestSets = buildCommentImages(attachmentIds.get(), entity).stream()
-                    .filter(commentImage -> !keepIds.contains(commentImage.getAttachmentId()))
-                    .collect(Collectors.toSet());
-
-            entity.getCommentImages().addAll(requestSets);
+            processHasAttachments(entity, attachmentIds.get());
         }else{
             entity.getCommentImages().clear();
         }
 
-
         BeanUtil.mergeProperties(req, entity);
-
         Comment savedUser = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedUser, CommentResponse.class);
+    }
+
+    private void processHasAttachments(Comment entity, List<Long> attachmentIds) {
+        Set<CommentImage> keepSets = getCommentImagesNeedToKeep(entity, attachmentIds);
+        entity.getCommentImages().removeIf(ci -> !keepSets.contains(ci));
+        Set<CommentImage> requestSets = buildImagesNeedToStore(entity, attachmentIds, keepSets);
+        entity.getCommentImages().addAll(requestSets);
+    }
+
+    private Set<CommentImage> buildImagesNeedToStore(Comment entity, List<Long> attachmentIds, Set<CommentImage> keepSets) {
+        List<Long> keepIds = keepSets.stream().map(CommentImage::getAttachmentId).collect(Collectors.toList());
+        return buildCommentImages(attachmentIds, entity).stream()
+                .filter(commentImage -> !keepIds.contains(commentImage.getAttachmentId()))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<CommentImage> getCommentImagesNeedToKeep(Comment entity, List<Long> attachmentIds) {
+        return entity.getCommentImages().stream().parallel()
+            .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
+            .collect(Collectors.toSet());
     }
 
     @Override
@@ -95,18 +101,6 @@ public class CommentServiceImpl implements CommentService {
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
-    }
-
-    @Override
-    public boolean isEntityExists(Long aLong, Map<String, Object> uniqueValues) {
-        //TODO
-        return false;
-    }
-
-    @Override
-    public boolean isFieldValueExists(String fieldName, Object value) {
-        //TODO
-        return false;
     }
 
     private Comment getById(Long id) {
