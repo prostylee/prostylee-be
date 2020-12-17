@@ -61,21 +61,26 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
+        Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentId());
 
-        Set<CommentImage> keepSets = entity.getCommentImages().stream()
-                .filter(commentImage -> req.getAttachmentId().contains(commentImage.getAttachmentId()))
+        if(attachmentIds.isPresent()) {
+            Set<CommentImage> keepSets = entity.getCommentImages().stream().parallel()
+                .filter(commentImage -> attachmentIds.get().contains(commentImage.getAttachmentId()))
                 .collect(Collectors.toSet());
 
-        entity.getCommentImages().removeIf(ci -> !keepSets.contains(ci)); //Remove
+            entity.getCommentImages().removeIf(ci -> !keepSets.contains(ci));
 
-        List<Long> attachmentIds = req.getAttachmentId();
+            List<Long> keepIds = keepSets.stream().map(commentImage -> commentImage.getAttachmentId()).collect(Collectors.toList());
 
-        Set<CommentImage> requestSets = buildCommentImages(attachmentIds, entity)
-                .stream()
-                .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
-                .collect(Collectors.toSet());
+            Set<CommentImage> requestSets = buildCommentImages(attachmentIds.get(), entity).stream()
+                    .filter(commentImage -> !keepIds.contains(commentImage.getAttachmentId()))
+                    .collect(Collectors.toSet());
 
-        entity.getCommentImages().addAll(requestSets);
+            entity.getCommentImages().addAll(requestSets);
+        }else{
+            entity.getCommentImages().clear();
+        }
+
 
         BeanUtil.mergeProperties(req, entity);
 
