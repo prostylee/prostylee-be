@@ -75,7 +75,7 @@ app:
       refreshTokenExpirationInMs: 604800000
 
       # The issuer
-      tokenIssuer: http://prostylee.vn/
+      tokenIssuer: https://prostylee.vn/
 
       # The token signing key
       tokenSigningKey: ProStylee-JWT-Secret-Key
