@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.comment.constant.CommentDestinationType;
 import vn.prostylee.comment.dto.request.CommentRequest;
 import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.comment.entity.Comment;
@@ -27,15 +28,32 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-    private final AuthenticatedProvider authenticatedProvider;
+    public static final String TARGET_TYPE = "targetType";
     private final CommentRepository commentRepo;
     private final BaseFilterSpecs<Comment> baseFilterSpecs;
 
     @Override
     public Page<CommentResponse> findAll(BaseFilter baseFilter) {
         Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserId().get());
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
+    }
 
+    @Override
+    public Page<CommentResponse> getAllByStore(BaseFilter baseFilter) {
+        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), CommentDestinationType.STORE);
+        searchable = searchable.and(additionalSpec);
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
+    }
+
+    @Override
+    public Page<CommentResponse> getAllByProduct(BaseFilter baseFilter) {
+        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), CommentDestinationType.PRODUCT);
         searchable = searchable.and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
 
@@ -119,4 +137,5 @@ public class CommentServiceImpl implements CommentService {
         return commentRepo.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment is not found with id [" + id + "]"));
     }
+
 }
