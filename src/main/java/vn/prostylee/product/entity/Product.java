@@ -62,6 +62,9 @@ public class Product extends AuditEntity {
 	@Column(name = "price_sale", precision = 22, scale = 0)
 	private Double priceSale;
 
+//	@Column(name = "status")
+//	private Status status;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "published_date", length = 19)
 	private Date publishedDate;
@@ -79,5 +82,12 @@ public class Product extends AuditEntity {
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
 	private Set<ProductImage> productImages;
+
+	public enum Status {
+		DRAFT,
+		WAITING_FOR_APPROVE,
+		PUBLISHED,
+		CLOSED
+	}
 
 }
