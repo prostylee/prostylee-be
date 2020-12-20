@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import java.util.List;
+
 /**
  * Repository for domain model class Attribute.
  * @see Attribute;
