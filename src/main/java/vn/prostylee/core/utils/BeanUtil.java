@@ -2,6 +2,7 @@ package vn.prostylee.core.utils;
 
 import vn.prostylee.core.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -12,13 +13,27 @@ import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Slf4j
 public final class BeanUtil {
 
+	private static ModelMapper MODEL_MAPPER_INSTANCE;
+
 	private BeanUtil() {
 		super();
+	}
+
+	private static ModelMapper getModelMapperInstance() {
+		if (Objects.isNull(MODEL_MAPPER_INSTANCE)) {
+			synchronized (ModelMapper.class) {
+				if (Objects.isNull(MODEL_MAPPER_INSTANCE)) {
+					MODEL_MAPPER_INSTANCE = new ModelMapper();
+				}
+			}
+		}
+		return MODEL_MAPPER_INSTANCE;
 	}
 
 	/**
@@ -34,7 +49,7 @@ public final class BeanUtil {
 		try {
 			Class<?> clazz = Class.forName(type.getName());
 			T desc = createNewInstance(clazz);
-			BeanUtils.copyProperties(source, desc);
+			getModelMapperInstance().map(source, desc);
 			return desc;
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			log.error("Error copy properties: ", e);
