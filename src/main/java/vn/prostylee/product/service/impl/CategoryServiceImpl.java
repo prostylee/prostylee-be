@@ -70,7 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
         BeanUtil.mergeProperties(request, category);
         this.updateAttribute(category, request.getAttributes());
 
-        return BeanUtil.copyProperties(category, CategoryResponse.class);
+        return BeanUtil.copyProperties(this.categoryRepository.save(category), CategoryResponse.class);
     }
 
     @Override
@@ -127,7 +127,8 @@ public class CategoryServiceImpl implements CategoryService {
             if (attrRequestIds.contains(item.getId())) {
                 attributes.forEach(attr -> {
                     if (attr.getId().equals(item.getId())) {
-                        this.updateAttributeOptions(BeanUtil.copyProperties(item, Attribute.class), item.getAttributeOptions());
+                        BeanUtil.mergeProperties(item, attr);
+                        this.updateAttributeOptions(attr, item.getAttributeOptions());
                     }
                 });
                 this.attributeRepository.saveAll(attributes);
@@ -146,9 +147,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (attrOptionsRequestIds.contains(option.getId())) {
                 attrOptions.forEach(attributeOption -> {
                     if (attributeOption.getId().equals(option.getId())) {
-                        attributeOption.setValue(option.getValue());
-                        attributeOption.setName(option.getName());
-                        attributeOption.setLabel(option.getLabel());
+                        BeanUtil.mergeProperties(option, attributeOption);
                     }
                 });
                 this.attrOptionRepository.saveAll(attrOptions);
@@ -162,18 +161,17 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category is not found with id [" + id + "]"));
     }
 
-    private List<Long> getAttrOptionsRequestIds(Set<AttributeOptionRequest> attributeOptionRequest) {
-        return Optional.ofNullable(attributeOptionRequest.stream().map(AttributeOptionRequest::getId)
-                .collect(Collectors.toList()))
-                .orElse(Collections.EMPTY_LIST);
+    private List<Long> getAttrOptionsRequestIds(Set<AttributeOptionRequest> attributeOptionRequests) {
+        if (Objects.isNull(attributeOptionRequests)) {
+            return Collections.EMPTY_LIST;
+        }
+        return attributeOptionRequests.stream().map(AttributeOptionRequest::getId).collect(Collectors.toList());
     }
 
-    private List<Long> getAttrRequestIds(Set<AttributeRequest> attributeRequest) {
-        return Optional.ofNullable(attributeRequest.stream().map(AttributeRequest::getId)
-                .collect(Collectors.toList()))
-                .orElse(Collections.EMPTY_LIST);
+    private List<Long> getAttrRequestIds(Set<AttributeRequest> attributeRequests) {
+        if (Objects.isNull(attributeRequests)) {
+            return Collections.EMPTY_LIST;
+        }
+        return attributeRequests.stream().map(AttributeRequest::getId).collect(Collectors.toList());
     }
-
-
-
 }
