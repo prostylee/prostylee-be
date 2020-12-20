@@ -15,7 +15,6 @@ import vn.prostylee.comment.repository.CommentRepository;
 import vn.prostylee.comment.service.CommentService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 
@@ -28,7 +27,7 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-    public static final String TARGET_TYPE = "targetType";
+    private static final String TARGET_TYPE = "targetType";
     private final CommentRepository commentRepo;
     private final BaseFilterSpecs<Comment> baseFilterSpecs;
 
@@ -42,23 +41,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<CommentResponse> getAllByStore(BaseFilter baseFilter) {
-        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), CommentDestinationType.STORE);
-        searchable = searchable.and(additionalSpec);
-        Pageable pageable = baseFilterSpecs.page(baseFilter);
-        Page<Comment> page = commentRepo.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
+        return getCommentResponses(baseFilter, CommentDestinationType.STORE);
     }
 
     @Override
     public Page<CommentResponse> getAllByProduct(BaseFilter baseFilter) {
-        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), CommentDestinationType.PRODUCT);
-        searchable = searchable.and(additionalSpec);
-        Pageable pageable = baseFilterSpecs.page(baseFilter);
-
-        Page<Comment> page = commentRepo.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
+        return getCommentResponses(baseFilter, CommentDestinationType.PRODUCT);
     }
 
     @Override
@@ -75,20 +63,6 @@ public class CommentServiceImpl implements CommentService {
         return  BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
 
-    private Set<CommentImage> buildCommentImages(List<Long> attachIds, Comment entity) {
-        return IntStream.range(0, attachIds.size())
-                .mapToObj(index -> buildCommentImage(entity, attachIds.get(index), index + 1))
-                .collect(Collectors.toSet());
-    }
-
-    private CommentImage buildCommentImage(Comment entity, Long id, Integer index) {
-        CommentImage commentImage =  new CommentImage();
-        commentImage.setAttachmentId(id);
-        commentImage.setComment(entity);
-        commentImage.setOrder(index);
-        return commentImage;
-    }
-
     @Override
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
@@ -102,6 +76,29 @@ public class CommentServiceImpl implements CommentService {
         BeanUtil.mergeProperties(req, entity);
         Comment savedUser = commentRepo.save(entity);
         return  BeanUtil.copyProperties(savedUser, CommentResponse.class);
+    }
+
+    @Override
+    public boolean deleteById(Long id) {
+        try {
+            return commentRepo.softDelete(id) > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
+    }
+
+    private Comment getById(Long id) {
+        return commentRepo.findOneActive(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment is not found with id [" + id + "]"));
+    }
+
+    private Page<CommentResponse> getCommentResponses(BaseFilter baseFilter, CommentDestinationType type) {
+        Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type);
+        searchable = searchable.and(additionalSpec);
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
     }
 
     private void processHasAttachments(Comment entity, List<Long> attachmentIds) {
@@ -120,22 +117,22 @@ public class CommentServiceImpl implements CommentService {
 
     private Set<CommentImage> getCommentImagesNeedToKeep(Comment entity, List<Long> attachmentIds) {
         return entity.getCommentImages().stream().parallel()
-            .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
-            .collect(Collectors.toSet());
+                .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
+                .collect(Collectors.toSet());
     }
 
-    @Override
-    public boolean deleteById(Long id) {
-        try {
-            return commentRepo.softDelete(id) > 0;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+    private Set<CommentImage> buildCommentImages(List<Long> attachIds, Comment entity) {
+        return IntStream.range(0, attachIds.size())
+                .mapToObj(index -> buildCommentImage(entity, attachIds.get(index), index + 1))
+                .collect(Collectors.toSet());
     }
 
-    private Comment getById(Long id) {
-        return commentRepo.findOneActive(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Comment is not found with id [" + id + "]"));
+    private CommentImage buildCommentImage(Comment entity, Long id, Integer index) {
+        CommentImage commentImage =  new CommentImage();
+        commentImage.setAttachmentId(id);
+        commentImage.setComment(entity);
+        commentImage.setOrder(index);
+        return commentImage;
     }
 
 }
