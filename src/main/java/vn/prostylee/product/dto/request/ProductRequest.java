@@ -1,15 +1,20 @@
-package vn.prostylee.product.dto.response;
+package vn.prostylee.product.dto.request;
 
 import lombok.Data;
 
-@Data
-public class ProductResponse {
-    private Long id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+@Data
+public class ProductRequest {
+
+    @NotNull
     private Long brandId;
 
+    @NotNull
     private Long categoryId;
 
+    @NotBlank
     private String name;
 
     private String description;
@@ -18,6 +23,7 @@ public class ProductResponse {
 
     private Long storeId;
 
+    @NotNull
     private Double price;
 
     private Double priceSale;
