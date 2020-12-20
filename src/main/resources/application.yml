@@ -128,9 +128,9 @@ spring:
     enabled: true
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/prostylee?useUnicode=true&characterEncoding=utf8
-    username: root
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/prostylee
+    username: postgres
     password: ENC(LIutR+3yZgTVvs2yu+IzPQ==)
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -151,7 +151,7 @@ spring:
       hibernate:
         enable_lazy_load_no_trans: true
         globally_quoted_identifiers: true
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           lob:
             non_contextual_creation: true

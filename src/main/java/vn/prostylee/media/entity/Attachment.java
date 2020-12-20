@@ -23,8 +23,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "attachement")
-public class Attachement extends AuditEntity {
+@Table(name = "attachment")
+public class Attachment extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
 
