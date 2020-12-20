@@ -1,13 +1,11 @@
 version: '3'
 services:
-  mysql:
-    image: mysql:5.7
-    container_name: mysql-db-dev
+  postgres:
+    image: postgres:12.5
+    container_name: postgres-db-dev
     ports:
-      - "3306:3306"
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci
+      - "5433:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: 1234567
-      MYSQL_DATABASE: prostylee
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: 1234567
+      POSTGRES_DB: prostylee
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234567
