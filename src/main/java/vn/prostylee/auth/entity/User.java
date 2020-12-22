@@ -25,8 +25,8 @@ public class User extends AuditEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
-
+	@SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

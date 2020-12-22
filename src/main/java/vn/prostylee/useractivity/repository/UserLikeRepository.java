@@ -3,14 +3,14 @@ package vn.prostylee.useractivity.repository;
 
 import vn.prostylee.core.repository.BaseRepository;
 import org.springframework.stereotype.Repository;
-import vn.prostylee.useractivity.entity.UserLike;
+import vn.prostylee.useractivity.entity.UserRating;
 
 /**
  * Repository for domain model class UserLike.
- * @see UserLike ;
+ * @see UserRating ;
  * @author prostylee
  */
 @Repository
-public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
+public interface UserLikeRepository extends BaseRepository<UserRating, Long> {
 
 }
