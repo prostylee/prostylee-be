@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties("app.security.jwt-properties")
+@ConfigurationProperties("app.security.jwt")
 public class JwtProperties {
 
     /**

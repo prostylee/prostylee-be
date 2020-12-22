@@ -43,13 +43,13 @@ public class User extends AuditEntity {
 	private Character gender;
 
 	@Column(name = "dob_date")
-	private int date;
+	private Integer date;
 
 	@Column(name = "dob_month")
-	private int month;
+	private Integer month;
 
 	@Column(name = "dob_year")
-	private int year;
+	private Integer year;
 
 	@Column(name = "phone_number", length = 32)
 	private String phoneNumber;

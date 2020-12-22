@@ -1,8 +1,5 @@
 package vn.prostylee.notification.service;
 
-import vn.prostylee.ComponentTest;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.SimpleMailInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import vn.prostylee.IntegrationTest;
 import vn.prostylee.notification.dto.MailData;
+import vn.prostylee.notification.dto.mail.MailInfo;
+import vn.prostylee.notification.dto.mail.SimpleMailInfo;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -19,8 +19,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 
-@ComponentTest
-public class EmailServiceTest {
+@IntegrationTest
+public class EmailServiceIT {
 
     @Autowired
     private EmailService emailService;
@@ -32,12 +32,12 @@ public class EmailServiceTest {
     protected WebApplicationContext webAppContext;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void setup() {
         MockMvcBuilders.webAppContextSetup(webAppContext).build();// Standalone context
     }
 
     @Test
-    public void sendSimpleEmail() throws IOException {
+    public void sendSimpleEmail() {
         SimpleMailInfo mailInfo = new SimpleMailInfo();
         mailInfo.addTo("gpcodervn@gmail.com");
         mailInfo.setContent("This is an email content");
