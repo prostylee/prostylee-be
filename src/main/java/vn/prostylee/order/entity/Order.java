@@ -65,7 +65,7 @@ public class Order extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "order")
 	private Set<ShippingAddress> shippingAddresses;
 
 }

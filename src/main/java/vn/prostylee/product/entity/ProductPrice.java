@@ -51,7 +51,7 @@ public class ProductPrice extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productPrice")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "productPrice")
 	private Set<ProductAttribute> productAttributes;
 
 }

@@ -80,7 +80,7 @@ public class User extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, cascade =  CascadeType.ALL, mappedBy = "user")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<UserLinkAccount> userLinkAccounts;
 
 	@Column(name = "avatar")
