@@ -18,7 +18,5 @@ public class AttachmentResponse {
 
 	private String displayName;
 
-	private String thumbnail;
-
 	private Long sizeInKb;
 }

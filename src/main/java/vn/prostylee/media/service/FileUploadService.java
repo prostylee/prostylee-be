@@ -27,11 +27,11 @@ public interface FileUploadService {
     List<AttachmentResponse> uploadFiles(String folderId, MultipartFile... files);
 
     /**
-     * Perform delete a file
+     * Perform delete multiple files
      *
-     * @param fileId The file id will be deleted
+     * @param fileIds The files will be deleted
      * @return true if deleted successfully, otherwise false
      */
-    boolean deleteFile(String fileId);
+    boolean deleteFiles(String... fileIds);
 
 }

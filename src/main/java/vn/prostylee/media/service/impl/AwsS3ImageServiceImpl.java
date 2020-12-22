@@ -1,12 +1,16 @@
 package vn.prostylee.media.service.impl;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.util.StringUtils;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.response.AttachmentResponse;
@@ -27,36 +31,38 @@ import java.util.UUID;
 @Service
 public class AwsS3ImageServiceImpl implements FileUploadService {
 
-    private static final String IMAGE_URL_PREFIX_FORMAT = "https://##BUCKET_NAME##.s3.##REGION##.amazonaws.com/";
+    private static final String FILE_URL_PREFIX_FORMAT = "https://##BUCKET_NAME##.s3-##REGION##.amazonaws.com/";
     private static final String BUCKET_NAME_KEY = "##BUCKET_NAME##";
     private static final String REGION_KEY = "##REGION##";
     private static final String EMPTY_STRING = "";
     private static final String SEPARATOR = "/";
-    private static final String IMAGE_UPLOAD_ERROR = "Uploading image to S3 bucket was failed";
-    private static final String IMAGE_DELETE_ERROR = "Deleting image from S3 bucket was failed";
-    private static final String INVALID_IMAGE_URL = "Invalid image url";
+    private static final String FILE_UPLOAD_ERROR = "Uploading file to S3 bucket was failed";
+    private static final String FILE_DELETE_ERROR = "Deleting file from S3 bucket was failed";
+    private static final String INVALID_FILE_URL = "Invalid file url";
     private final AmazonS3 s3Client;
     private final String bucketName;
-    private final String imageUrlPrefix;
+    private final String fileUrlPrefix;
     private final AttachementRepository attachmentRepository;
 
     @Autowired
-    public AwsS3ImageServiceImpl(AmazonS3 s3Client,
-                                 @Value("${aws.bucket}") String bucketName,
-                                 @Value("${aws.region}") String region,
+    public AwsS3ImageServiceImpl(@Value("${app.aws.bucket}") String bucketName,
+                                 @Value("${app.aws.region}") String region,
+                                 @Value("${app.aws.accessKey}") String accessKey,
+                                 @Value("${app.aws.secretKey}") String secretKey,
                                  AttachementRepository attachmentRepository) {
-        this.s3Client = s3Client;
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        this.s3Client = new AmazonS3Client(credentials);
         this.bucketName = bucketName;
-        this.imageUrlPrefix = IMAGE_URL_PREFIX_FORMAT
+        this.fileUrlPrefix = FILE_URL_PREFIX_FORMAT
                 .replace(BUCKET_NAME_KEY, bucketName)
                 .replace(REGION_KEY, region);
         this.attachmentRepository = attachmentRepository;
     }
 
     /**
-     * This method generates unique image name.
+     * This method generates unique file name.
      *
-     * @return unique image name
+     * @return unique file name
      */
     private static String generateUniqueName() {
         return UUID.randomUUID().toString();
@@ -72,7 +78,11 @@ public class AwsS3ImageServiceImpl implements FileUploadService {
         List<AttachmentResponse> attachments = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
-                String fileName = folderId + SEPARATOR + generateUniqueName();
+                if (StringUtils.isEmpty(file.getOriginalFilename())) {
+                    continue;
+                }
+                String folder = StringUtils.isEmpty(folderId) ? "" : folderId + SEPARATOR;
+                String fileName = folder + generateUniqueName();
                 s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
                 URL storedUrl = s3Client.getUrl(bucketName, fileName);
                 Attachement attachment = saveUploadFiles(storedUrl, file);
@@ -81,41 +91,29 @@ public class AwsS3ImageServiceImpl implements FileUploadService {
             }
             return attachments;
         } catch (AmazonClientException | IOException e) {
-            throw new FileUploaderException(IMAGE_UPLOAD_ERROR, e);
+            throw new FileUploaderException(FILE_UPLOAD_ERROR, e);
         }
     }
 
     @Override
-    public boolean deleteFile(String fileId) {
+    public boolean deleteFiles(String... fileIds) {
         try {
-            long formattedFileId = Long.valueOf(fileId);
-            final Attachement attachement = getAttachement(formattedFileId);
-            attachmentRepository.deleteById(formattedFileId);
-            String fileName = getFileName(attachement.getName());
-            s3Client.deleteObject(bucketName, fileName);
-            return s3Client.doesObjectExist(bucketName, fileName);
-        } catch (AmazonClientException e) {
-            throw new FileUploaderException(IMAGE_DELETE_ERROR, e);
+            for(String fileId : fileIds) {
+                long formattedFileId = Long.valueOf(fileId);
+                final Attachement attachement = getAttachement(formattedFileId);
+                attachmentRepository.deleteById(formattedFileId);
+                String fileName = attachement.getName();
+                s3Client.deleteObject(bucketName, fileName);
+            }
+            return true;
+        } catch (IllegalArgumentException | AmazonClientException e) {
+            throw new FileUploaderException(FILE_DELETE_ERROR, e);
         }
     }
 
     private Attachement getAttachement(long fileId) {
         return attachmentRepository.findById(fileId)
-                .orElseThrow(() -> new ResourceNotFoundException("User is not exists by getting with id " + fileId));
-    }
-
-    /**
-     * This method returns image name from the url.
-     *
-     * @param imageUrl imageUrl
-     * @return image name
-     */
-    private String getFileName(String imageUrl) {
-        if (imageUrl.startsWith(imageUrlPrefix) && !imageUrl.replace(imageUrlPrefix, EMPTY_STRING).isEmpty()) {
-            return imageUrl.replace(imageUrlPrefix, EMPTY_STRING).trim();
-        } else {
-            throw new FileUploaderException(INVALID_IMAGE_URL);
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Attachment is not exists by getting with id " + fileId));
     }
 
     private Attachement saveUploadFiles(URL fileUrl, MultipartFile file) {
@@ -125,7 +123,7 @@ public class AwsS3ImageServiceImpl implements FileUploadService {
         Attachement attachment = new Attachement();
         attachment.setType(file.getContentType());
         attachment.setPath(fileUrl.toString());
-        attachment.setName(fileUrl.getFile());
+        attachment.setName(fileUrl.getFile().replaceAll("/", ""));
         attachment.setDisplayName(file.getOriginalFilename());
         attachment.setSizeInKb(file.getSize() / 1024);
         return attachmentRepository.save(attachment);

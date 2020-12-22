@@ -7,12 +7,16 @@ app:
   security:
     allowed-origins:
       - "*"
-
+  aws:
+    bucket: thebucketofkai2020
+    region: ap-southeast-1
+    accessKey: AKIAZVNNPQGLWGFMYF6X
+    secretKey: 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
 spring:
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     password: ENC(LIutR+3yZgTVvs2yu+IzPQ==)
-    url: jdbc:log4jdbc:mysql://localhost:3306/prostylee?useUnicode=true&characterEncoding=utf8
+    url: jdbc:log4jdbc:mysql://localhost:3307/prostylee?useUnicode=true&characterEncoding=utf8
     username: admin
   jpa:
     hibernate:

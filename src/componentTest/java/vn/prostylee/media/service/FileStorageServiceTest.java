@@ -69,7 +69,7 @@ public class FileStorageServiceTest {
         FileStorageRequest fileStorageRequest = new FileStorageRequest();
         fileStorageRequest.setTypes(types);
 
-        List< FileStorageResponse> responses = fileStorageService.uploadFiles(fileStorageRequest, files, request);
+        List<FileStorageResponse> responses = fileStorageService.uploadFiles(fileStorageRequest, files, request);
 
         Assertions.assertEquals(types.size(), responses.size());
 
