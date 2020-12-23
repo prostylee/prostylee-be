@@ -14,7 +14,7 @@ public interface FileUploadService {
      * @param files The {@link MultipartFile}
      * @return The list of {@link File} after uploaded
      */
-    List<AttachmentResponse> uploadFiles(MultipartFile... files);
+    List<AttachmentResponse> uploadFiles(List<MultipartFile> files);
 
     /**
      * Upload files to the given google folder id.
@@ -24,7 +24,7 @@ public interface FileUploadService {
      * @param folderId The folder id will stored the given files
      * @return The list of {@link File} after uploaded
      */
-    List<AttachmentResponse> uploadFiles(String folderId, MultipartFile... files);
+    List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files);
 
     /**
      * Perform delete multiple files
@@ -32,6 +32,6 @@ public interface FileUploadService {
      * @param fileIds The files will be deleted
      * @return true if deleted successfully, otherwise false
      */
-    boolean deleteFiles(String... fileIds);
+    boolean deleteFiles(List<String> fileIds);
 
 }
