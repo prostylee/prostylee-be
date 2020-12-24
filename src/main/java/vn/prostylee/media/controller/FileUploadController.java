@@ -19,6 +19,8 @@ import java.util.List;
 @RequestMapping(ApiUrl.FILE_UPLOADER)
 public class FileUploadController {
 
+	private static final String WIDTH = "w";
+	private static final String HEIGHT = "h";
 	private final FileUploadService fileUploadService;
 
 	@Autowired
@@ -26,15 +28,14 @@ public class FileUploadController {
 		this.fileUploadService = fileUploadService;
 	}
 
-//	@GetMapping(value = "/files")
-//	public List<File> getFiles() {
-//		return fileUploadService.getFiles();
-//	}
-//
-//	@GetMapping(value = "/files/{fileId}")
-//	public File getFile(@PathVariable(value = "fileId") String fileId) {
-//		return fileUploadService.getFile(fileId);
-//	}
+	@GetMapping(value = "/files/{fileIds}")
+	public List<String> getFileUrl(
+			@RequestParam(required = false, name = WIDTH, defaultValue = "0") int width,
+			@RequestParam(required = false, name = HEIGHT, defaultValue = "0") int height,
+			@PathVariable(value = "fileIds") String... fileIds
+	) {
+		return fileUploadService.getFiles(Arrays.asList(fileIds), width, height);
+	}
 
 	@PostMapping(value = "/files")
 	public List<AttachmentResponse> upload(@RequestParam("file") MultipartFile[] files) {

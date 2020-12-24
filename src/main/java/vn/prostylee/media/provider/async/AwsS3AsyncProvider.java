@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachement;
-import vn.prostylee.media.exception.GoogleDriveException;
 import vn.prostylee.media.repository.AttachementRepository;
 
 import java.io.IOException;
@@ -60,7 +59,6 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
      * @param file The {@link MultipartFile}
      * @return The {@link AttachmentResponse}
      *
-     * @throws GoogleDriveException if can not upload files to google drive
      */
     @Async
     public Future<AttachmentResponse> uploadFile(String folderId, MultipartFile file) throws IOException {

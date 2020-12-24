@@ -9,6 +9,16 @@ import java.util.List;
 public interface FileUploadService {
 
     /**
+     * Get list file's url
+     *
+     * @param  fileIds The list of file ids will be get
+     * @param width width
+     * @param height height
+     * @return The list file's url
+     */
+    List<String> getFiles(List<String> fileIds, int width, int height);
+
+    /**
      * Upload files to the default folder id
      *
      * @param files The {@link MultipartFile}
@@ -17,11 +27,11 @@ public interface FileUploadService {
     List<AttachmentResponse> uploadFiles(List<MultipartFile> files);
 
     /**
-     * Upload files to the given google folder id.
+     * Upload files to the given folder id.
      * This method will execute uploading in async mode.
      *
-     * @param files The {@link MultipartFile}
      * @param folderId The folder id will stored the given files
+     * @param files The {@link MultipartFile}
      * @return The list of {@link File} after uploaded
      */
     List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files);
