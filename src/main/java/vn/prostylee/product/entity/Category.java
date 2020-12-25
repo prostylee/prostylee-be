@@ -3,16 +3,9 @@ package vn.prostylee.product.entity;
 
 import java.util.Date;
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
+import javax.persistence.*;
+
 import static javax.persistence.GenerationType.IDENTITY;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import vn.prostylee.core.entity.AuditEntity;
 import lombok.EqualsAndHashCode;
@@ -36,8 +29,8 @@ public class Category extends AuditEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
-
+	@SequenceGenerator(name = "category_seq", sequenceName = "category_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
@@ -62,12 +55,12 @@ public class Category extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
 	private Set<Attribute> attributes;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
 	private Set<Product> products;
 
 }
