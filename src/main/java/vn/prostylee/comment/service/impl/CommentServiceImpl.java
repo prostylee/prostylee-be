@@ -40,13 +40,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<CommentResponse> getAllByStore(BaseFilter baseFilter) {
-        return getCommentResponses(baseFilter, CommentDestinationType.STORE);
+    public Page<CommentResponse> getCommentsByStoreId(Long id, BaseFilter baseFilter) {
+        return getCommentResponses(id, baseFilter, CommentDestinationType.STORE);
     }
 
     @Override
-    public Page<CommentResponse> getAllByProduct(BaseFilter baseFilter) {
-        return getCommentResponses(baseFilter, CommentDestinationType.PRODUCT);
+    public Page<CommentResponse> getAllByProduct(Long id,  BaseFilter baseFilter) {
+        return getCommentResponses(id, baseFilter, CommentDestinationType.PRODUCT);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse save(CommentRequest req) {
         Comment entity = BeanUtil.copyProperties(req, Comment.class);
-        entity.setCommentImages(buildCommentImages(req.getAttachmentId(), entity));
+        entity.setCommentImages(buildCommentImages(req.getAttachmentIds(), entity));
         Comment savedEntity = commentRepo.save(entity);
         return BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
-        Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentId());
+        Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentIds());
         if (attachmentIds.isPresent()) {
             processHasAttachments(entity, attachmentIds.get());
         } else {
@@ -92,10 +92,11 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment is not found with id [" + id + "]"));
     }
 
-    private Page<CommentResponse> getCommentResponses(BaseFilter baseFilter, CommentDestinationType type) {
+    private Page<CommentResponse> getCommentResponses(Long id, BaseFilter baseFilter, CommentDestinationType type) {
         Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
         Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type);
-        searchable = searchable.and(additionalSpec);
+        Specification<Comment> idComment = (root, query, cb) -> cb.equal(root.get("id"), id);
+        searchable = searchable.and(additionalSpec).and(idComment);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<Comment> page = commentRepo.findAll(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));

@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class CommentRequest {
 
-    private List<Long> attachmentId;
+    private List<Long> attachmentIds;
 
     private String content;
 
