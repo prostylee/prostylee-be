@@ -12,11 +12,10 @@ For building and running the application you need:
 
 ## Running the application locally
 
-### Run MySQL
+### Run Postgres
 
 #### Start docker
-
-Open terminal at folder `src/main/docker`
+Go to place stay the gradlew file.
 
 Run the following command:
 ```shell

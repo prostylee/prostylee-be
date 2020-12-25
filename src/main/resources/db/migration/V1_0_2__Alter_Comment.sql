@@ -1,1 +1,1 @@
-ALTER TABLE comment ADD COLUMN deleted_at datetime null;
+ALTER TABLE comment ADD COLUMN deleted_at timestamp null;

@@ -60,22 +60,22 @@ public class CommentServiceImpl implements CommentService {
         Comment entity = BeanUtil.copyProperties(req, Comment.class);
         entity.setCommentImages(buildCommentImages(req.getAttachmentId(), entity));
         Comment savedEntity = commentRepo.save(entity);
-        return  BeanUtil.copyProperties(savedEntity, CommentResponse.class);
+        return BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
 
     @Override
     public CommentResponse update(Long id, CommentRequest req) {
         Comment entity = getById(id);
         Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentId());
-        if(attachmentIds.isPresent()) {
+        if (attachmentIds.isPresent()) {
             processHasAttachments(entity, attachmentIds.get());
-        }else{
+        } else {
             entity.getCommentImages().clear();
         }
 
         BeanUtil.mergeProperties(req, entity);
         Comment savedUser = commentRepo.save(entity);
-        return  BeanUtil.copyProperties(savedUser, CommentResponse.class);
+        return BeanUtil.copyProperties(savedUser, CommentResponse.class);
     }
 
     @Override
@@ -128,7 +128,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentImage buildCommentImage(Comment entity, Long id, Integer index) {
-        CommentImage commentImage =  new CommentImage();
+        CommentImage commentImage = new CommentImage();
         commentImage.setAttachmentId(id);
         commentImage.setComment(entity);
         commentImage.setOrder(index);

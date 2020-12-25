@@ -1,7 +1,10 @@
 package vn.prostylee.comment.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -9,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import vn.prostylee.auth.controller.RoleController;
 import vn.prostylee.comment.constant.CommentDestinationType;
 import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.comment.entity.CommentImage;
@@ -27,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ExtendWith(MockitoExtension.class)
 public class CommentControllerTest {
     private static final String ENDPOINT = "/v1/comments";
     private static final int totalOfRecords = 10;
@@ -37,6 +43,11 @@ public class CommentControllerTest {
     @Mock
     private CommentServiceImpl service;
 
+    @BeforeEach
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new CommentController(service)).build();
+    }
+
     @Test
     void getAll_Successfully() throws Exception {
         final int page = 0;
@@ -44,7 +55,7 @@ public class CommentControllerTest {
 
         MvcResult mvcResult = this.mockMvc
                 .perform(get(ENDPOINT))
-                .andDo(print())
+                .andDo(print()) //log
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(totalOfRecords))
                 .andExpect(jsonPath("$.totalPages").value(totalOfRecords /pageSize))
