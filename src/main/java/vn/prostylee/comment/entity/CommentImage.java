@@ -15,9 +15,11 @@ import vn.prostylee.core.entity.AuditEntity;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Builder
 @Table(name = "comment_image")
 public class CommentImage extends AuditEntity {
 
@@ -29,6 +31,10 @@ public class CommentImage extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
+	/**
+	 * @see <a href="https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue">Fix problem Infinite recursion</a>
+	 * By using @JsonIgnore
+	 */
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@JsonIgnore

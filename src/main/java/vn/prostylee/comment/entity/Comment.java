@@ -1,6 +1,7 @@
 package vn.prostylee.comment.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
+import java.util.Date;
 import java.util.Set;
 import javax.persistence.*;
 
@@ -44,6 +45,10 @@ public class Comment extends AuditEntity {
 
 	@Column(name = "target_type", length = 512)
 	private String targetType;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "deleted_at")
+	private Date deletedAt;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

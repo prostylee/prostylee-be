@@ -1,6 +1,8 @@
 package vn.prostylee.comment.service.impl;
 
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +38,7 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResponse> findAll(BaseFilter baseFilter) {
         Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
-        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        Page<Comment> page = commentRepo.findAllActive(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
     }
 
@@ -45,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<CommentResponse> getAllByProduct(Long id,  BaseFilter baseFilter) {
+    public Page<CommentResponse> getAllByProduct(Long id, BaseFilter baseFilter) {
         return getCommentResponses(id, baseFilter, CommentDestinationType.PRODUCT);
     }
 
@@ -58,7 +61,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponse save(CommentRequest req) {
         Comment entity = BeanUtil.copyProperties(req, Comment.class);
-        entity.setCommentImages(buildCommentImages(req.getAttachmentIds(), entity));
+        if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
+            entity.setCommentImages(buildCommentImages(req.getAttachmentIds(), entity));
         Comment savedEntity = commentRepo.save(entity);
         return BeanUtil.copyProperties(savedEntity, CommentResponse.class);
     }
@@ -98,7 +102,7 @@ public class CommentServiceImpl implements CommentService {
         Specification<Comment> idComment = (root, query, cb) -> cb.equal(root.get("id"), id);
         searchable = searchable.and(additionalSpec).and(idComment);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
-        Page<Comment> page = commentRepo.findAll(searchable, pageable);
+        Page<Comment> page = commentRepo.findAllActive(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, CommentResponse.class));
     }
 
@@ -117,7 +121,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private Set<CommentImage> getCommentImagesNeedToKeep(Comment entity, List<Long> attachmentIds) {
-        return entity.getCommentImages().stream().parallel()
+        return entity.getCommentImages().stream()
                 .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
                 .collect(Collectors.toSet());
     }
@@ -129,11 +133,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentImage buildCommentImage(Comment entity, Long id, Integer index) {
-        CommentImage commentImage = new CommentImage();
-        commentImage.setAttachmentId(id);
-        commentImage.setComment(entity);
-        commentImage.setOrder(index);
-        return commentImage;
+        return CommentImage.builder().attachmentId(id)
+                .comment(entity).order(index)
+                .build();
     }
 
 }
