@@ -42,7 +42,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final BaseFilterSpecs<Notification> baseFilterSpecs;
 
-
     @Override
     public Page<NotificationResponse> findAll(BaseFilter baseFilter) {
         Specification<Notification> searchable = baseFilterSpecs.search(baseFilter);
