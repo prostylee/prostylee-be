@@ -20,14 +20,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "user_like")
+@Table(name = "user_rating")
 public class UserRating extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "user_like_seq", sequenceName = "user_like_seq", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_like_seq")
+	@SequenceGenerator(name = "user_rating_seq", sequenceName = "user_rating_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_rating_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

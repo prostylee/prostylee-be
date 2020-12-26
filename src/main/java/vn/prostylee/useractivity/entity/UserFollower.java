@@ -21,7 +21,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user_follower")
-public class UserFollower extends AuditEntity {
+public class 	UserFollower extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
 
