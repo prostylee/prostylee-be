@@ -2,14 +2,7 @@ package vn.prostylee.product.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import vn.prostylee.core.entity.AuditEntity;
 import lombok.EqualsAndHashCode;
@@ -33,9 +26,10 @@ public class ProductPrice extends AuditEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-
+	@SequenceGenerator(name = "product_price_seq", sequenceName = "product_price_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_price_seq")
 	@Column(name = "id", unique = true, nullable = false)
-	private long id;
+	private Long id;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
@@ -57,7 +51,7 @@ public class ProductPrice extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "productPrice")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "productPrice")
 	private Set<ProductAttribute> productAttributes;
 
 }

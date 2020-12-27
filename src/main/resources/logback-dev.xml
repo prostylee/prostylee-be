@@ -2,7 +2,7 @@
 <included>
 
 	<!-- LOG everything at DEBUG level -->
-	<root level="DEBUG">
+	<root level="INFO">
 		<appender-ref ref="CONSOLE"/>
 		<appender-ref ref="FILE_DEFAULT"/>
 	</root>

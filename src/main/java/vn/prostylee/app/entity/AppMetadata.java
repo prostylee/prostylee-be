@@ -26,7 +26,8 @@ public class AppMetadata extends AuditEntity {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = IDENTITY)
+	@SequenceGenerator(name = "metadata_seq", sequenceName = "metadata_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metadata_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 

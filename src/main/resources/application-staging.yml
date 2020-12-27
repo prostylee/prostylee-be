@@ -11,9 +11,9 @@ app:
 spring:
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    password: ENC(LIutR+3yZgTVvs2yu+IzPQ==)
-    url: jdbc:log4jdbc:mysql://localhost:3306/prostylee?useUnicode=true&characterEncoding=utf8
-    username: admin
+    url: jdbc:log4jdbc:postgresql://prostylee.csccjfkru4sa.ap-southeast-1.rds.amazonaws.com:5432/prostylee4dev
+    username: postgres
+    password: ENC(dMtpW4hsjR85/HRfyaYJRSxuY9Dziw/w1HtKjegRJwY=)
   jpa:
     hibernate:
       ddl-auto: none

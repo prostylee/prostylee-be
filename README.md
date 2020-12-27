@@ -12,17 +12,12 @@ For building and running the application you need:
 
 ## Running the application locally
 
-### Run MySQL
+### Run Postgres
 
 #### Start docker
-
-Open terminal at folder `src/main/docker`
+Go to place stay the gradlew file.
 
 Run the following command:
-```shell
-docker-compose up
-```
-Or
 ```shell
 ./gradlew startDocker
 ```
@@ -30,10 +25,6 @@ Or
 #### Stop docker
 
 Run the following command:
-```shell
-docker-compose down
-```
-Or
 ```shell
 ./gradlew stopDocker
 ```
@@ -49,7 +40,7 @@ Or run the following command in a terminal:
 ./gradlew bootRun
 ```
 
-### Test app
+### Check app running
 
 ```shell
 http://localhost:8090/api/ping
@@ -61,10 +52,6 @@ http://localhost:8090/api/ping
 http://localhost:8090/api/swagger-ui/index.html
 ```
 
-## Deploying the application to AWS
-
-TODO
-
 ## Flyway Database migration
 Flyway adheres to the following naming convention for migration scripts:
 
@@ -72,10 +59,10 @@ Flyway adheres to the following naming convention for migration scripts:
 
 Where:
 
-<Prefix> – Default prefix is V, which may be configured in the above configuration file using the flyway.sqlMigrationPrefix property.
-<Version> – Migration version number. Major and minor versions may be separated by an underscore. The migration version should always start with 1.
-<Description> – Textual description of the migration. The description needs to be separated from the version numbers with a double underscore.
-Example: V1_1_0__my_first_migration.sql
+- `<Prefix>` – Default prefix is V, which may be configured in the above configuration file using the flyway.sqlMigrationPrefix property.
+- `<Version>` – Migration version number. Major and minor versions may be separated by an underscore. The migration version should always start with 1.
+- `<Description>` – Textual description of the migration. The description needs to be separated from the version numbers with a double underscore.
+Example: `V1_1_0__my_first_migration.sql`
 
 So, let's create a directory db/migration in $PROJECT_ROOT with a migration script.
 
@@ -118,3 +105,24 @@ Run end to end test
 ```shell
 ./gradlew cleanRunAllTests
 ```
+
+## Package & deploy
+
+### Package
+
+Run the following command:
+
+```shell
+./gradlew build
+```
+
+After build succesfully, we will have a jar file at folder `build/libs`.
+To start spring appliation from this jar file, run the following command:
+
+```shell
+java -Dspring.profiles.active=staging -jar ./build/libs/prostylee-be-1.0.0-SNAPSHOT.jar
+```
+
+### Deploy the application to AWS
+
+TODO
