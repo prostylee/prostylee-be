@@ -78,7 +78,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
      * @return True if delete success, otherwise false
      */
     @Async
-    public Future<Boolean> deleteFiles(List<String> fileNames) throws IOException {
+    public Future<Boolean> deleteFiles(List<String> fileNames) {
         List<KeyVersion> keys = new ArrayList<>();
         for(String fileName : fileNames) {
             keys.add(new KeyVersion(fileName));

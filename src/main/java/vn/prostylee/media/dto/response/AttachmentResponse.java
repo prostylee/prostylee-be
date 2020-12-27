@@ -2,9 +2,6 @@ package vn.prostylee.media.dto.response;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import java.time.LocalDateTime;
-
 @Data
 public class AttachmentResponse {
 

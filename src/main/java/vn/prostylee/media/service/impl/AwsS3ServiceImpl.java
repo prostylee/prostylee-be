@@ -108,20 +108,19 @@ public class AwsS3ServiceImpl implements FileUploadService {
         try {
             List<String> fileNames = new ArrayList<>();
             for(String fileId : fileIds) {
-                final Attachement attachement = getAttachement(Long.valueOf(fileId));
+                final Attachement attachement = getAttachment(Long.valueOf(fileId));
                 fileNames.add(attachement.getName());
             }
             List<Long> fileIdsAsLong = fileIds.stream().map(Long::valueOf).collect(Collectors.toList());
             attachmentRepository.deleteAttachementsByIdIn(fileIdsAsLong);
-            List<Future<Boolean>> futures = new ArrayList<>();
-            futures.add(awsS3AsyncProvider.deleteFiles(fileNames));
+            awsS3AsyncProvider.deleteFiles(fileNames);
             return true;
-        } catch (IllegalArgumentException | AmazonClientException | IOException e) {
+        } catch (IllegalArgumentException | AmazonClientException e) {
             throw new FileUploaderException(FILE_DELETE_ERROR, e);
         }
     }
 
-    private Attachement getAttachement(Long fileId) {
+    private Attachement getAttachment(Long fileId) {
         return attachmentRepository.findById(fileId)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment is not exists by getting with id " + fileId));
     }
