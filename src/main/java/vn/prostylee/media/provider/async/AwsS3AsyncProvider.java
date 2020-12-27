@@ -1,9 +1,6 @@
 package vn.prostylee.media.provider.async;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.amazonaws.services.s3.model.DeleteObjectsResult;
@@ -42,12 +39,10 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
 
     @Autowired
     public AwsS3AsyncProvider(
+            AmazonS3 s3Client,
             @Value("${app.aws.bucket}") String bucketName,
-            @Value("${app.aws.accessKey}") String accessKey,
-            @Value("${app.aws.secretKey}") String secretKey,
             AttachementRepository attachmentRepository) {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        this.s3Client = new AmazonS3Client(credentials);
+        this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.attachmentRepository = attachmentRepository;
     }
