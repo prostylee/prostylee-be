@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
-import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserActivityResponse;
+import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.request.UserLikeRequest;
+import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
 
 @RestController
@@ -16,24 +16,24 @@ public class UserLikeController {
 
     private final UserLikeService service;
 
-    @GetMapping("/findAll")
-    public Page<UserActivityResponse> findAll(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
-        return service.findAll(request,filter);
+    @GetMapping()
+    public Page<UserLikeResponse> findAll(UserLikeFilter filter) {
+        return service.findAll(filter);
     }
 
     @GetMapping("/count")
-    public long count(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
-        return service.count(request, filter);
+    public long count(UserLikeFilter filter) {
+        return service.count(filter);
     }
 
     @PostMapping("/like")
-    public UserActivityResponse like(@RequestBody UserActivityRequest request) {
+    public UserLikeResponse like(@RequestBody UserLikeRequest request) {
         return service.like(request);
     }
 
-    @PostMapping("/unlike/{id}")
-    public boolean unlike(@PathVariable Long id) {
-        return service.unlike(id);
+    @PutMapping("/unlike")
+    public boolean unlike(@RequestBody UserLikeRequest request) {
+        return service.unlike(request);
     }
 
 

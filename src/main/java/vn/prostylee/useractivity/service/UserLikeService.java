@@ -1,16 +1,16 @@
 package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
-import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
-import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserActivityResponse;
+import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.request.UserLikeRequest;
+import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 
 public interface UserLikeService {
-    long count(UserActivityRequest request, UserActivityFilter baseFilter);
+    long count(UserLikeFilter baseFilter);
 
-    Page<UserActivityResponse> findAll(UserActivityRequest request, UserActivityFilter filter);
+    Page<UserLikeResponse> findAll(UserLikeFilter filter);
 
-    UserActivityResponse like(UserActivityRequest request);
+    UserLikeResponse like(UserLikeRequest request);
 
-    boolean unlike(Long id);
+    boolean unlike(UserLikeRequest request);
 }
