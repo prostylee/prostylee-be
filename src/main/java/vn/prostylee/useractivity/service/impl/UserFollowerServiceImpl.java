@@ -55,12 +55,21 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     private Specification<UserFollower> getUserFollowerSpecification(UserActivityFilter filter, UserActivityRequest request) {
         Specification<UserFollower> searchable = baseFilterSpecs.search(filter);
-        Specification<UserFollower> targetType =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());
-        Specification<UserFollower> targetId =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_ID), request.getTargetId());
-        Specification<UserFollower> userIdParam =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.CREATED_BY), request.getUserId());
-        return searchable.and(targetType).and(targetId).and(userIdParam);
+
+        if(request.getTargetType() != null) {
+            Specification<UserFollower> targetType = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());
+            searchable.and(targetType);
+        }
+
+        if(request.getTargetId() != null){
+            Specification<UserFollower> targetId = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_ID), request.getTargetId());
+            searchable.and(targetId);
+        }
+
+        if(request.getUserId() != null ) {
+            Specification<UserFollower> userIdParam = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.CREATED_BY), request.getUserId());
+            searchable.and(userIdParam);
+        }
+        return searchable;
     }
 }

@@ -13,7 +13,6 @@ public class UserActivityRequest {
     @NotNull
     private Long targetId;
 
-    @NotNull
     private String targetType;
 
     private Long userId;
