@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.entity.UserFollower;
@@ -32,7 +33,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     }
 
     @Override
-    public Page<UserFollowerResponse> findAll(BaseFilter baseFilter, UserFollowerRequest request) {
+    public Page<UserFollowerResponse> findAll(UserFollowerRequest request, UserFollowerFilter baseFilter) {
         Specification<UserFollower> searchable = getUserFollowerSpecification(baseFilter, request);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<UserFollower> page = repository.findAll(searchable, pageable);
@@ -40,7 +41,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     }
 
     @Override
-    public UserFollowerResponse follow(Long aLong, UserFollowerRequest request) {
+    public UserFollowerResponse follow(UserFollowerRequest request) {
         UserFollower entity = BeanUtil.copyProperties(request, UserFollower.class);
         UserFollower savedEntity = repository.save(entity);
         return BeanUtil.copyProperties(savedEntity, UserFollowerResponse.class);
