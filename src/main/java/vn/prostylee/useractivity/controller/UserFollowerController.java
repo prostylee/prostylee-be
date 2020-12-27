@@ -16,7 +16,7 @@ public class UserFollowerController {
 
     private final UserFollowerService service;
 
-    @GetMapping("/count")
+    @GetMapping("/findAll")
     public Page<UserActivityResponse> findAll(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
         return service.findAll(request,filter);
     }
@@ -31,7 +31,7 @@ public class UserFollowerController {
         return service.follow(request);
     }
 
-    @PostMapping("/unfollow/{id}")
+    @DeleteMapping("/unfollow/{id}")
     public boolean unfollow(@PathVariable Long id) {
         return service.unfollow(id);
     }

@@ -13,9 +13,10 @@ import vn.prostylee.useractivity.service.UserLikeService;
 @AllArgsConstructor
 @RequestMapping(value = ApiVersion.API_V1 + "/user-likes")
 public class UserLikeController {
+
     private final UserLikeService service;
 
-    @GetMapping("/count")
+    @GetMapping("/findAll")
     public Page<UserActivityResponse> findAll(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
         return service.findAll(request,filter);
     }

@@ -37,4 +37,7 @@ public class UserRating extends AuditEntity {
 	@Column(name = "product_id")
 	private Long productId;
 
+	@Column(name = "value")
+	private Integer value;
+
 }

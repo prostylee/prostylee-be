@@ -12,6 +12,7 @@ import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
 import vn.prostylee.useractivity.dto.request.UserActivityRequest;
 import vn.prostylee.useractivity.dto.response.UserActivityResponse;
+import vn.prostylee.useractivity.entity.UserFollower;
 import vn.prostylee.useractivity.entity.UserLike;
 import vn.prostylee.useractivity.repository.UserLikeRepository;
 import vn.prostylee.useractivity.service.UserLikeService;
@@ -55,12 +56,24 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     private Specification<UserLike> getUserLikeSpecification(UserActivityFilter filter, UserActivityRequest request) {
         Specification<UserLike> searchable = baseFilterSpecs.search(filter);
-        Specification<UserLike> targetType =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());
-        Specification<UserLike> targetId =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_ID), request.getTargetId());
-        Specification<UserLike> userIdParam =
-                (root, query, cb) -> cb.equal(root.get(UserActivityConstant.CREATED_BY), request.getUserId());
-        return searchable.and(targetType).and(targetId).and(userIdParam);
+
+        if(request.getTargetType() != null) {
+            Specification<UserLike> targetType = (root, query, cb) ->
+                    cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());
+            searchable.and(targetType);
+        }
+
+        if(request.getTargetId() != null){
+            Specification<UserLike> targetId = (root, query, cb) ->
+                    cb.equal(root.get(UserActivityConstant.TARGET_ID), request.getTargetId());
+            searchable.and(targetId);
+        }
+
+        if(request.getUserId() != null ) {
+            Specification<UserLike> userIdParam = (root, query, cb) ->
+                    cb.equal(root.get(UserActivityConstant.CREATED_BY), request.getUserId());
+            searchable.and(userIdParam);
+        }
+        return searchable;
     }
 }

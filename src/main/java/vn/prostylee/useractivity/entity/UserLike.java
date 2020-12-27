@@ -37,7 +37,4 @@ public class UserLike extends AuditEntity {
 	@Column(name = "target_type", length = 512)
 	private String targetType;
 
-	@Column(name = "value")
-	private Integer value;
-
 }

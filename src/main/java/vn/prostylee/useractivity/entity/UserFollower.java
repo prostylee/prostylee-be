@@ -31,9 +31,6 @@ public class 	UserFollower extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "user_id")
-	private Long userId;
-
 	@Column(name = "target_id")
 	private Long targetId;
 
