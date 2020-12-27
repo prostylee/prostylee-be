@@ -4,9 +4,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-
 @Data
-public class UserFollowerRequest {
+public class UserActivityRequest {
     private Date createdAt;
 
     private Long createdBy;
