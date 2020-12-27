@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 @Data
-public class UserFollowerResponse {
+public class UserActivityResponse {
     private Long id;
     private Date createdAt;
     private Long createdBy;

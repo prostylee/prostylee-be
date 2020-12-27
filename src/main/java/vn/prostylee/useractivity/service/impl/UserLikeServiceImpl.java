@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
-import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
 import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserLikeResponse;
+import vn.prostylee.useractivity.dto.response.UserActivityResponse;
 import vn.prostylee.useractivity.entity.UserLike;
 import vn.prostylee.useractivity.repository.UserLikeRepository;
 import vn.prostylee.useractivity.service.UserLikeService;
@@ -23,24 +23,24 @@ public class UserLikeServiceImpl implements UserLikeService {
     private final BaseFilterSpecs<UserLike> baseFilterSpecs;
 
     @Override
-    public long count(UserActivityRequest request, UserLikeFilter filter) {
+    public long count(UserActivityRequest request, UserActivityFilter filter) {
         Specification<UserLike> searchable = getUserLikeSpecification(filter, request);
         return repository.count(searchable);
     }
 
     @Override
-    public Page<UserLikeResponse> findAll(UserActivityRequest request, UserLikeFilter filter) {
+    public Page<UserActivityResponse> findAll(UserActivityRequest request, UserActivityFilter filter) {
         Specification<UserLike> searchable = getUserLikeSpecification(filter, request);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<UserLike> page = repository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, UserLikeResponse.class));
+        return page.map(entity -> BeanUtil.copyProperties(entity, UserActivityResponse.class));
     }
 
     @Override
-    public UserLikeResponse like(UserActivityRequest request) {
+    public UserActivityResponse like(UserActivityRequest request) {
         UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
         UserLike savedEntity = repository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserLikeResponse.class);
+        return BeanUtil.copyProperties(savedEntity, UserActivityResponse.class);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UserLikeServiceImpl implements UserLikeService {
         }
     }
 
-    private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter, UserActivityRequest request) {
+    private Specification<UserLike> getUserLikeSpecification(UserActivityFilter filter, UserActivityRequest request) {
         Specification<UserLike> searchable = baseFilterSpecs.search(filter);
         Specification<UserLike> targetType =
                 (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());

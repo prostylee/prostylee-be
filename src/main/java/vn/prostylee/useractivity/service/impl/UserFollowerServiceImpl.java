@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
-import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
 import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
+import vn.prostylee.useractivity.dto.response.UserActivityResponse;
 import vn.prostylee.useractivity.entity.UserFollower;
 import vn.prostylee.useractivity.repository.UserFollowerRepository;
 import vn.prostylee.useractivity.service.UserFollowerService;
@@ -23,24 +23,24 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     private final BaseFilterSpecs<UserFollower> baseFilterSpecs;
 
     @Override
-    public long count(UserActivityRequest request, UserFollowerFilter filter) {
+    public long count(UserActivityRequest request, UserActivityFilter filter) {
         Specification<UserFollower> searchable = getUserFollowerSpecification(filter, request);
         return repository.count(searchable);
     }
 
     @Override
-    public Page<UserFollowerResponse> findAll(UserActivityRequest request, UserFollowerFilter filter) {
+    public Page<UserActivityResponse> findAll(UserActivityRequest request, UserActivityFilter filter) {
         Specification<UserFollower> searchable = getUserFollowerSpecification(filter, request);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<UserFollower> page = repository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, UserFollowerResponse.class));
+        return page.map(entity -> BeanUtil.copyProperties(entity, UserActivityResponse.class));
     }
 
     @Override
-    public UserFollowerResponse follow(UserActivityRequest request) {
+    public UserActivityResponse follow(UserActivityRequest request) {
         UserFollower entity = BeanUtil.copyProperties(request, UserFollower.class);
         UserFollower savedEntity = repository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserFollowerResponse.class);
+        return BeanUtil.copyProperties(savedEntity, UserActivityResponse.class);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         }
     }
 
-    private Specification<UserFollower> getUserFollowerSpecification(UserFollowerFilter filter, UserActivityRequest request) {
+    private Specification<UserFollower> getUserFollowerSpecification(UserActivityFilter filter, UserActivityRequest request) {
         Specification<UserFollower> searchable = baseFilterSpecs.search(filter);
         Specification<UserFollower> targetType =
                 (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), request.getTargetType());
