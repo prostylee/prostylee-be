@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.mock.web.MockMultipartFile;
-import vn.prostylee.media.entity.Attachement;
+import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.provider.async.AwsS3AsyncProvider;
-import vn.prostylee.media.repository.AttachementRepository;
+import vn.prostylee.media.repository.AttachmentRepository;
 import vn.prostylee.media.service.impl.AwsS3ServiceImpl;
 
 import java.net.MalformedURLException;
@@ -40,13 +40,13 @@ public class AwsS3ServiceImplTest {
     @Mock
     private AmazonS3 s3Client;
     @Mock
-    private AttachementRepository repository;
+    private AttachmentRepository repository;
     @Mock
     private AwsS3AsyncProvider provider;
     private MockMultipartFile image;
     private final List<String> ids = prepareIdsAsString();
     private final List<Long> idsAsLong = prepareIdsAsLong();
-    private final List<Attachement> attachements = prepareAttachments();
+    private final List<Attachment> attachments = prepareAttachments();
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -60,14 +60,14 @@ public class AwsS3ServiceImplTest {
 
     @Test
     public void should_return_listUrlsWithoutSize_When_GetFilesWithZeroSize() {
-        when(repository.findAllById(idsAsLong)).thenReturn(attachements);
+        when(repository.findAllById(idsAsLong)).thenReturn(attachments);
         List<String> results = fileUploadService.getFiles(ids, 0, 0);
         Assert.assertEquals(SAMPLE_IMAGE_URL, results.get(0));
     }
 
     @Test
     public void should_return_listUrlsWithSize_When_GetFilesWithSize() {
-        when(repository.findAllById(idsAsLong)).thenReturn(attachements);
+        when(repository.findAllById(idsAsLong)).thenReturn(attachments);
         List<String> results = fileUploadService.getFiles(ids, size, size);
         Assert.assertEquals(SAMPLE_IMAGE_SIZE_URL, results.get(0));
     }
@@ -82,9 +82,9 @@ public class AwsS3ServiceImplTest {
         return Arrays.asList(ids);
     }
 
-    private List<Attachement> prepareAttachments() {
-        List<Attachement> attachments = new ArrayList<>();
-        Attachement attachement = new Attachement();
+    private List<Attachment> prepareAttachments() {
+        List<Attachment> attachments = new ArrayList<>();
+        Attachment attachement = new Attachment();
         attachement.setPath(SAMPLE_IMAGE_URL);
         attachments.add(attachement);
         return attachments;

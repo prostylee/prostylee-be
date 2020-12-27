@@ -8,11 +8,11 @@ import vn.prostylee.media.entity.Attachment;
 import java.util.List;
 
 /**
- * Repository for domain model class Attachement.
+ * Repository for domain model class Attachment.
  * @see Attachment;
  * @author prostylee
  */
 @Repository
-public interface AttachementRepository extends BaseRepository<Attachment, Long> {
-    void deleteAttachementsByIdIn(List<Long> Ids);
+public interface AttachmentRepository extends BaseRepository<Attachment, Long> {
+    void deleteAttachmentsByIdIn(List<Long> Ids);
 }

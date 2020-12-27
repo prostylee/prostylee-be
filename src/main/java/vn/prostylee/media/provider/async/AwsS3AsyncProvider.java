@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.response.AttachmentResponse;
-import vn.prostylee.media.entity.Attachement;
-import vn.prostylee.media.repository.AttachementRepository;
+import vn.prostylee.media.entity.Attachment;
+import vn.prostylee.media.repository.AttachmentRepository;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,13 +35,13 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
     private static final String SEPARATOR = "/";
     private final AmazonS3 s3Client;
     private final String bucketName;
-    private final AttachementRepository attachmentRepository;
+    private final AttachmentRepository attachmentRepository;
 
     @Autowired
     public AwsS3AsyncProvider(
             AmazonS3 s3Client,
             @Value("${app.aws.bucket}") String bucketName,
-            AttachementRepository attachmentRepository) {
+            AttachmentRepository attachmentRepository) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.attachmentRepository = attachmentRepository;
@@ -61,7 +61,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
         String fileName = folder + generateUniqueName();
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
-        Attachement attachment = saveUploadFiles(storedUrl, file);
+        Attachment attachment = saveUploadFiles(storedUrl, file);
         AttachmentResponse attachmentDto = BeanUtil.copyProperties(attachment, AttachmentResponse.class);
         return new AsyncResult<>(attachmentDto);
     }
@@ -109,11 +109,11 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
         return objectMetadata;
     }
 
-    private Attachement saveUploadFiles(URL fileUrl, MultipartFile file) {
+    private Attachment saveUploadFiles(URL fileUrl, MultipartFile file) {
         if (fileUrl == null) {
             return null;
         }
-        Attachement attachment = new Attachement();
+        Attachment attachment = new Attachment();
         attachment.setType(file.getContentType());
         attachment.setPath(fileUrl.toString());
         attachment.setName(fileUrl.getFile().replaceAll("/", ""));
