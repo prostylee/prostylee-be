@@ -1,17 +1,15 @@
 package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
-import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.core.dto.filter.BaseFilter;
-import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 
 public interface UserFollowerService {
 
-    long count(BaseFilter baseFilter, TargetType type, Long id);
+    long count(BaseFilter baseFilter, UserFollowerRequest request);
 
-    Page<UserFollowerResponse> findAll(BaseFilter baseFilter, TargetType type, Long id, Long userId);
+    Page<UserFollowerResponse> findAll(BaseFilter baseFilter, UserFollowerRequest request);
 
     UserFollowerResponse follow(Long id, UserFollowerRequest request);
 
