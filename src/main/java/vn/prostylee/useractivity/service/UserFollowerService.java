@@ -1,17 +1,17 @@
 package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
-import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
 import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
+import vn.prostylee.useractivity.dto.response.UserActivityResponse;
 
 public interface UserFollowerService {
 
-    long count(UserActivityRequest request, UserFollowerFilter filter);
+    long count(UserActivityRequest request, UserActivityFilter filter);
 
-    Page<UserFollowerResponse> findAll(UserActivityRequest request, UserFollowerFilter filter);
+    Page<UserActivityResponse> findAll(UserActivityRequest request, UserActivityFilter filter);
 
-    UserFollowerResponse follow(UserActivityRequest request);
+    UserActivityResponse follow(UserActivityRequest request);
 
     boolean unfollow(Long id);
 }
