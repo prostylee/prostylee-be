@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.useractivity.dto.filter.UserActivityFilter;
-import vn.prostylee.useractivity.dto.request.UserActivityRequest;
-import vn.prostylee.useractivity.dto.response.UserActivityResponse;
+import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
+import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
 @RestController
@@ -16,24 +16,24 @@ public class UserFollowerController {
 
     private final UserFollowerService service;
 
-    @GetMapping("/findAll")
-    public Page<UserActivityResponse> findAll(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
-        return service.findAll(request,filter);
+    @GetMapping()
+    public Page<UserFollowerResponse> findAll(UserFollowerFilter filter) {
+        return service.findAll(filter);
     }
 
     @GetMapping("/count")
-    public long count(@RequestBody UserActivityRequest request, UserActivityFilter filter) {
-        return service.count(request, filter);
+    public long count(UserFollowerFilter filter) {
+        return service.count(filter);
     }
 
     @PostMapping("/follow")
-    public UserActivityResponse follow(@RequestBody UserActivityRequest request) {
+    public UserFollowerResponse follow(@RequestBody UserFollowerRequest request) {
         return service.follow(request);
     }
 
-    @DeleteMapping("/unfollow/{id}")
-    public boolean unfollow(@PathVariable Long id) {
-        return service.unfollow(id);
+    @PutMapping("/unfollow")
+    public boolean unfollow(@RequestBody UserFollowerRequest request) {
+        return service.unfollow(request);
     }
 
 }
