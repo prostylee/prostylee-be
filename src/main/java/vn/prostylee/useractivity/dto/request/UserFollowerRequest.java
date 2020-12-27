@@ -8,9 +8,14 @@ import java.util.Date;
 @Data
 public class UserFollowerRequest {
     private Date createdAt;
+
     private Long createdBy;
+
     @NotNull
     private Long targetId;
+
     @NotNull
     private String targetType;
+
+    private Long userId;
 }
