@@ -18,9 +18,9 @@ public class UserLikeFilter extends BaseFilter {
     @Override
     public String[] getSortableFields() {
         return new String[] {
-                "user_id",
-                "target_id",
-                "created_at"
+                "createdBy",
+                "targetId",
+                "createdAt"
         };
     }
 }
