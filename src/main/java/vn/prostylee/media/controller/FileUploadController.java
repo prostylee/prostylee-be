@@ -16,7 +16,7 @@ import java.util.List;
  * At the moment, the application just support Google Drive.
  */
 @RestController
-@RequestMapping(ApiUrl.FILE_UPLOADER)
+@RequestMapping(ApiUrl.MEDIA)
 public class FileUploadController {
 
 	private static final String WIDTH = "w";
@@ -29,10 +29,10 @@ public class FileUploadController {
 	}
 
 	@GetMapping(value = "/files/{fileIds}")
-	public List<String> getFileUrl(
+	public List<String> getFileUrls(
 			@RequestParam(required = false, name = WIDTH, defaultValue = "0") int width,
 			@RequestParam(required = false, name = HEIGHT, defaultValue = "0") int height,
-			@PathVariable(value = "fileIds") List<String> fileIds
+			@PathVariable(value = "fileIds") List<Long> fileIds
 	) {
 		return fileUploadService.getFiles(fileIds, width, height);
 	}
@@ -42,8 +42,8 @@ public class FileUploadController {
 		return fileUploadService.uploadFiles(files);
 	}
 
-	@DeleteMapping(value = "/files/{fileId}")
-	public boolean delete(@PathVariable(value = "fileId") List<String> fileIds) {
+	@DeleteMapping(value = "/files/{fileIds}")
+	public boolean delete(@PathVariable(value = "fileIds") List<Long> fileIds) {
 		return fileUploadService.deleteFiles(fileIds);
 	}
 

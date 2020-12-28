@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * AWS S3 File Upload Service
@@ -35,21 +34,17 @@ public class AwsS3ServiceImpl implements FileUploadService {
 
     @Autowired
     public AwsS3ServiceImpl(
-            @Value("${app.aws.bucket}") String bucketName,
-            @Value("${app.aws.region}") String region,
+            @Value("${app.aws.s3Url}") String fileUrlPrefix,
             AwsS3AsyncProvider awsS3AsyncProvider,
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.fileUrlPrefix = AppConstant.IMAGE_URL_PREFIX_FORMAT
-                .replace(AppConstant.BUCKET_NAME_KEY, bucketName)
-                .replace(AppConstant.REGION_KEY, region);
+        this.fileUrlPrefix = fileUrlPrefix;
     }
 
     @Override
-    public List<String> getFiles(List<String> fileIds, int width, int height) {
-        List<Long> fileIdsAsLong = fileIds.stream().map(Long::valueOf).collect(Collectors.toList());
-        List<Attachment> attachments = attachmentRepository.findAllById(fileIdsAsLong);
+    public List<String> getFiles(List<Long> fileIds, int width, int height) {
+        List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
         List<String> urls = new ArrayList<>();
         for(Attachment attachment : attachments) {
             urls.add(addSizeForFile(attachment.getPath(), width, height));
@@ -103,15 +98,14 @@ public class AwsS3ServiceImpl implements FileUploadService {
     }
 
     @Override
-    public boolean deleteFiles(List<String> fileIds) {
+    public boolean deleteFiles(List<Long> fileIds) {
         try {
             List<String> fileNames = new ArrayList<>();
-            for(String fileId : fileIds) {
-                final Attachment attachment = getAttachment(Long.valueOf(fileId));
+            for(Long fileId : fileIds) {
+                final Attachment attachment = getAttachment(fileId);
                 fileNames.add(attachment.getName());
             }
-            List<Long> fileIdsAsLong = fileIds.stream().map(Long::valueOf).collect(Collectors.toList());
-            attachmentRepository.deleteAttachmentsByIdIn(fileIdsAsLong);
+            attachmentRepository.deleteAttachmentsByIdIn(fileIds);
             awsS3AsyncProvider.deleteFiles(fileNames);
             return true;
         } catch (IllegalArgumentException | AmazonClientException e) {

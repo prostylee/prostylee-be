@@ -118,6 +118,7 @@ app:
     region: ap-southeast-1
     accessKey: AKIAZVNNPQGLWGFMYF6X
     secretKey: 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
+    s3Url: https://${app.aws.bucket}.s3.${app.aws.region}.amazonaws.com/
 
 spring:
   application:

@@ -16,7 +16,7 @@ public interface FileUploadService {
      * @param height height
      * @return The list file's url
      */
-    List<String> getFiles(List<String> fileIds, int width, int height);
+    List<String> getFiles(List<Long> fileIds, int width, int height);
 
     /**
      * Upload files to the default folder id
@@ -42,6 +42,6 @@ public interface FileUploadService {
      * @param fileIds The files will be deleted
      * @return true if deleted successfully, otherwise false
      */
-    boolean deleteFiles(List<String> fileIds);
+    boolean deleteFiles(List<Long> fileIds);
 
 }

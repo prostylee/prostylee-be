@@ -32,7 +32,7 @@ public class AwsS3ServiceImplTest {
     private static final int size = 30;
     private static final String IMAGE_PNG = "image/png";
     private static final String IMAGE_NAME = "b94ce7c3-ed51-4a5e-97a4-59824baf286c";
-    private static final String BUCKET_HOST_NAME = "https://testaws.s3.amazonaws.com/";
+    private static final String BUCKET_HOST_NAME = "https://testaws.s3.ap-southeast-1.amazonaws.com/";
     private static final String SAMPLE_IMAGE_URL = BUCKET_HOST_NAME + IMAGE_NAME;
     private static final String SAMPLE_IMAGE_SIZE_URL = BUCKET_HOST_NAME + size + "x" + size + "/" + IMAGE_NAME;
 
@@ -44,14 +44,13 @@ public class AwsS3ServiceImplTest {
     @Mock
     private AwsS3AsyncProvider provider;
     private MockMultipartFile image;
-    private final List<String> ids = prepareIdsAsString();
-    private final List<Long> idsAsLong = prepareIdsAsLong();
+    private final List<Long> ids = prepareIds();
     private final List<Attachment> attachments = prepareAttachments();
 
     @BeforeEach
     void setUp() throws MalformedURLException {
         openMocks(this);
-        fileUploadService = new AwsS3ServiceImpl(BUCKET_NAME, provider, repository);
+        fileUploadService = new AwsS3ServiceImpl(BUCKET_NAME, REGION, provider, repository);
         image = new MockMultipartFile("IMAGE_UPLOAD_PARAM_NAME", "test.png",
                 IMAGE_PNG, "1234567890".getBytes());
         URL url = new URL(SAMPLE_IMAGE_URL);
@@ -60,24 +59,19 @@ public class AwsS3ServiceImplTest {
 
     @Test
     public void should_return_listUrlsWithoutSize_When_GetFilesWithZeroSize() {
-        when(repository.findAllById(idsAsLong)).thenReturn(attachments);
+        when(repository.findAllById(ids)).thenReturn(attachments);
         List<String> results = fileUploadService.getFiles(ids, 0, 0);
         Assert.assertEquals(SAMPLE_IMAGE_URL, results.get(0));
     }
 
     @Test
     public void should_return_listUrlsWithSize_When_GetFilesWithSize() {
-        when(repository.findAllById(idsAsLong)).thenReturn(attachments);
+        when(repository.findAllById(ids)).thenReturn(attachments);
         List<String> results = fileUploadService.getFiles(ids, size, size);
         Assert.assertEquals(SAMPLE_IMAGE_SIZE_URL, results.get(0));
     }
 
-    private List<String> prepareIdsAsString() {
-        String[] ids = new String[] {"1","2","3"};
-        return Arrays.asList(ids);
-    }
-
-    private List<Long> prepareIdsAsLong() {
+    private List<Long> prepareIds() {
         Long[] ids = new Long[] {1L,2L,3L};
         return Arrays.asList(ids);
     }

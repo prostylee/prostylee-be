@@ -17,7 +17,7 @@ import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
-import vn.prostylee.media.repository.AttachmentRepository;
+import vn.prostylee.media.service.AttachmentService;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,16 +35,16 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
 
     private final AmazonS3 s3Client;
     private final String bucketName;
-    private final AttachmentRepository attachmentRepository;
+    private final AttachmentService attachmentService;
 
     @Autowired
     public AwsS3AsyncProvider(
             AmazonS3 s3Client,
             @Value("${app.aws.bucket}") String bucketName,
-            AttachmentRepository attachmentRepository) {
+            AttachmentService attachmentService) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
-        this.attachmentRepository = attachmentRepository;
+        this.attachmentService = attachmentService;
     }
 
     /**
@@ -69,7 +69,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
         String fileName = folder + generateUniqueName();
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
-        Attachment attachment = saveUploadFiles(storedUrl, file);
+        Attachment attachment = attachmentService.saveAttachmentByUploadFile(storedUrl, file);
         AttachmentResponse attachmentDto = BeanUtil.copyProperties(attachment, AttachmentResponse.class);
         return new AsyncResult<>(attachmentDto);
     }
@@ -104,16 +104,4 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
         return objectMetadata;
     }
 
-    private Attachment saveUploadFiles(URL fileUrl, MultipartFile file) {
-        if (fileUrl == null) {
-            return null;
-        }
-        Attachment attachment = new Attachment();
-        attachment.setType(file.getContentType());
-        attachment.setPath(fileUrl.toString());
-        attachment.setName(fileUrl.getFile().replaceAll("/", ""));
-        attachment.setDisplayName(file.getOriginalFilename());
-        attachment.setSizeInKb(file.getSize() / 1024);
-        return attachmentRepository.save(attachment);
-    }
 }
