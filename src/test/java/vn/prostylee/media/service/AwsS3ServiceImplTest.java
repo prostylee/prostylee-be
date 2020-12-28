@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.mock.web.MockMultipartFile;
+import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.provider.async.AwsS3AsyncProvider;
 import vn.prostylee.media.repository.AttachmentRepository;
@@ -27,11 +28,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
  */
 public class AwsS3ServiceImplTest {
 
-    private static final String BUCKET_NAME = "testaws";
-    private static final String REGION = "ap-southeast-1";
     private static final int size = 30;
     private static final String IMAGE_PNG = "image/png";
     private static final String IMAGE_NAME = "b94ce7c3-ed51-4a5e-97a4-59824baf286c";
+    private static final String BUCKET_NAME = "testaws";
     private static final String BUCKET_HOST_NAME = "https://testaws.s3.ap-southeast-1.amazonaws.com/";
     private static final String SAMPLE_IMAGE_URL = BUCKET_HOST_NAME + IMAGE_NAME;
     private static final String SAMPLE_IMAGE_SIZE_URL = BUCKET_HOST_NAME + size + "x" + size + "/" + IMAGE_NAME;
@@ -43,6 +43,7 @@ public class AwsS3ServiceImplTest {
     private AttachmentRepository repository;
     @Mock
     private AwsS3AsyncProvider provider;
+    private AWSS3Properties awss3Properties = prepareAwsS3Props();
     private MockMultipartFile image;
     private final List<Long> ids = prepareIds();
     private final List<Attachment> attachments = prepareAttachments();
@@ -50,7 +51,7 @@ public class AwsS3ServiceImplTest {
     @BeforeEach
     void setUp() throws MalformedURLException {
         openMocks(this);
-        fileUploadService = new AwsS3ServiceImpl(BUCKET_NAME, REGION, provider, repository);
+        fileUploadService = new AwsS3ServiceImpl(awss3Properties, provider, repository);
         image = new MockMultipartFile("IMAGE_UPLOAD_PARAM_NAME", "test.png",
                 IMAGE_PNG, "1234567890".getBytes());
         URL url = new URL(SAMPLE_IMAGE_URL);
@@ -82,5 +83,12 @@ public class AwsS3ServiceImplTest {
         attachment.setPath(SAMPLE_IMAGE_URL);
         attachments.add(attachment);
         return attachments;
+    }
+
+    private AWSS3Properties prepareAwsS3Props() {
+        AWSS3Properties props = new AWSS3Properties();
+        props.setBucket(BUCKET_NAME);
+        props.setHostname(BUCKET_HOST_NAME);
+        return props;
     }
 }

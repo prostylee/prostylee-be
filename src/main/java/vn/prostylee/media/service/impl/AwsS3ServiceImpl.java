@@ -3,11 +3,11 @@ package vn.prostylee.media.service.impl;
 import com.amazonaws.AmazonClientException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
@@ -29,17 +29,19 @@ public class AwsS3ServiceImpl implements FileUploadService {
     private static final String FILE_UPLOAD_ERROR = "Uploading file to S3 bucket was failed";
     private static final String FILE_DELETE_ERROR = "Deleting file from S3 bucket was failed";
     private final AwsS3AsyncProvider awsS3AsyncProvider;
+    private final AWSS3Properties awss3Properties;
     private final AttachmentRepository attachmentRepository;
-    private final String fileUrlPrefix;
+    private final String hostname;
 
     @Autowired
     public AwsS3ServiceImpl(
-            @Value("${app.aws.s3Url}") String fileUrlPrefix,
+            AWSS3Properties awss3Properties,
             AwsS3AsyncProvider awsS3AsyncProvider,
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.fileUrlPrefix = fileUrlPrefix;
+        this.awss3Properties = awss3Properties;
+        this.hostname = awss3Properties.getHostname();
     }
 
     @Override
@@ -55,8 +57,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
     private String addSizeForFile(String path, int width, int height) {
         String modifiedPath = path;
         if (width > 0 && height > 0) {
-            modifiedPath = path.replace(fileUrlPrefix,
-                    fileUrlPrefix + width + "x" + height + AppConstant.PATH_SEPARATOR);
+            modifiedPath = path.replace(hostname,
+                    hostname + width + "x" + height + AppConstant.PATH_SEPARATOR);
         }
         return modifiedPath;
     }

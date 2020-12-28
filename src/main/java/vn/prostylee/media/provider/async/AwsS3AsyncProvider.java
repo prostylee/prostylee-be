@@ -8,13 +8,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
@@ -34,16 +34,18 @@ import java.util.concurrent.Future;
 public class AwsS3AsyncProvider extends BaseAsyncProvider {
 
     private final AmazonS3 s3Client;
-    private final String bucketName;
+    private final AWSS3Properties awss3Properties;
     private final AttachmentService attachmentService;
+    private final String bucketName;
 
     @Autowired
     public AwsS3AsyncProvider(
             AmazonS3 s3Client,
-            @Value("${app.aws.bucket}") String bucketName,
+            AWSS3Properties awss3Properties,
             AttachmentService attachmentService) {
         this.s3Client = s3Client;
-        this.bucketName = bucketName;
+        this.awss3Properties = awss3Properties;
+        this.bucketName = this.awss3Properties.getBucket();
         this.attachmentService = attachmentService;
     }
 

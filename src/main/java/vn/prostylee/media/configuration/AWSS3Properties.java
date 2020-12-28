@@ -28,4 +28,9 @@ public class AWSS3Properties {
      * Secret key
      */
     private String secretKey;
+
+    /**
+     * AWS Hostname
+     */
+    private String hostname;
 }
