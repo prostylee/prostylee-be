@@ -55,13 +55,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse save(UserRequest userRequest) {
         User user = BeanUtil.copyProperties(userRequest, User.class);
-        user.setEmail(user.getUsername());
-        user.setPassword(EncrytedPasswordUtils.encryptPassword(userRequest.getPassword()));
-        user.setRoles(this.getRoles(userRequest.getRoles()));
+        if (StringUtils.isNotBlank(userRequest.getPassword())) {
+            user.setPassword(EncrytedPasswordUtils.encryptPassword(userRequest.getPassword()));
+        }
         if (user.getAllowNotification() == null) {
             user.setAllowNotification(true);
         }
-        User savedUser = userRepository.save(user);
+        user.setRoles(this.getRoles(userRequest.getRoles()));
+        User savedUser = this.save(user);
         return BeanUtil.copyProperties(savedUser, UserResponse.class);
     }
 
@@ -78,7 +79,6 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(Long id, UserRequest userRequest) {
         User user = getById(id);
         BeanUtil.mergeProperties(userRequest, user);
-        user.setEmail(user.getUsername());
         user.setRoles(this.getRoles(userRequest.getRoles()));
         if (StringUtils.isNotBlank(userRequest.getPassword())) {
             user.setPassword(EncrytedPasswordUtils.encryptPassword(userRequest.getPassword()));
@@ -150,6 +150,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public boolean isExistsUserByEmail(String email) {
+        return userRepository.findActivatedUserByEmail(email).isPresent();
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findActivatedUserByEmail(email);
     }
 
 }
