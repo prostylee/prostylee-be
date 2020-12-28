@@ -16,7 +16,7 @@ public class UserLikeController {
 
     private final UserLikeService service;
 
-    @GetMapping()
+    @GetMapping
     public Page<UserLikeResponse> findAll(UserLikeFilter filter) {
         return service.findAll(filter);
     }

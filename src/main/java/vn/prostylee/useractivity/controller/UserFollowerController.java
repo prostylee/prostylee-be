@@ -16,7 +16,7 @@ public class UserFollowerController {
 
     private final UserFollowerService service;
 
-    @GetMapping()
+    @GetMapping
     public Page<UserFollowerResponse> findAll(UserFollowerFilter filter) {
         return service.findAll(filter);
     }
