@@ -1,91 +1,55 @@
 package vn.prostylee.auth.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import vn.prostylee.auth.configure.properties.SecurityProperties;
-import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
-import vn.prostylee.auth.dto.response.UserTempResponse;
-import vn.prostylee.auth.entity.User;
-import vn.prostylee.auth.exception.InvalidJwtToken;
-import vn.prostylee.auth.repository.UserRepository;
+import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.service.*;
-import vn.prostylee.auth.token.AccessToken;
-import vn.prostylee.auth.token.factory.JwtTokenFactory;
-import vn.prostylee.auth.token.parser.TokenParser;
-import vn.prostylee.auth.token.verifier.TokenVerifier;
-import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.core.utils.EncrytedPasswordUtils;
+import vn.prostylee.notification.configure.event.EmailEvent;
+import vn.prostylee.notification.configure.event.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.MailTemplateConfig;
-import vn.prostylee.notification.dto.response.EmailTemplateResponse;
-import vn.prostylee.notification.service.EmailService;
-import vn.prostylee.notification.service.EmailTemplateService;
 
 import java.util.Collections;
 
-@Service
 @Slf4j
-public class AuthServiceImpl extends AuthenticationServiceCommon implements AuthService {
+@Service
+@RequiredArgsConstructor
+public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenFactory tokenFactory;
+    private final UserAuthTokenService userAuthTokenService;
 
-    @Autowired
-    private TokenVerifier tokenVerifier;
+    private final UserPasswordService userPasswordService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
 
-    @Autowired
-    private SecurityProperties securityProperties;
+    private final AuthServiceFactory authServiceFactory;
 
-    @Autowired
-    private TokenParser tokenParser;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private EmailTemplateService emailTemplateService;
-
-    @Autowired
-    private UserTempService userTempService;
-
-    @Autowired
-    private AuthenticatedProvider authenticatedProvider;
-
-    @Autowired
-    private AuthenticationServiceFactory authenticationServiceFactory;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public JwtAuthenticationToken login(LoginRequest loginRequest) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        return this.createResponse((AuthUserDetails) auth.getPrincipal());
+        return userAuthTokenService.createToken((AuthUserDetails) auth.getPrincipal());
     }
 
     @Override
     public JwtAuthenticationToken loginWithSocial(LoginSocialRequest request) {
-        AuthenticationService authenticationService = authenticationServiceFactory.getService(request.getProviderType());
-        return authenticationService.login(request);
+        SocialAuthService socialAuthService = authServiceFactory.getService(request.getProviderType());
+        AuthUserDetails authUserDetails = socialAuthService.login(request);
+        return userAuthTokenService.createToken(authUserDetails);
     }
 
     @Override
@@ -107,63 +71,33 @@ public class AuthServiceImpl extends AuthenticationServiceCommon implements Auth
 
     @Override
     public JwtAuthenticationToken refreshToken(RefreshTokenRequest request) {
-        if (tokenVerifier.verify(request.getRefreshToken()) && checkRefreshTokenScope(request.getRefreshToken())) {
-            Long userId = tokenParser.getUserIdFromJWT(request.getRefreshToken(), securityProperties.getJwt().getTokenSigningKey());
-            User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User is not exists by getting with id " + userId));
-            AuthUserDetails userDetail = new AuthUserDetails(user, this.getFeatures(user));
-            AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
-
-            return JwtAuthenticationToken.builder()
-                    .accessToken(accessToken.getToken())
-                    .refreshToken(request.getRefreshToken())
-                    .tokenType(AuthConstants.BEARER_PREFIX)
-                    .build();
-        }
-        throw new InvalidJwtToken("The refresh token is invalid");
+        return userAuthTokenService.refreshToken(request);
     }
 
     @Override
     public boolean forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findActivatedUserByEmail(request.getEmail()).orElseThrow(() ->
-                new ResourceNotFoundException("User is not exists by getting with email " + request.getEmail()));
-
-        EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(EmailTemplateType.FORGOT_PASSWORD.name());
-        MailTemplateConfig config = MailTemplateConfig.builder()
-                .mailContent(emailTemplateResponse.getContent())
-                .mailSubject(emailTemplateResponse.getTitle())
-                .mailIsHtml(true)
-                .build();
-
-        UserTempResponse userTempResponse = userTempService.createUserTemp(request.getEmail());
-
-        MailInfo mailInfo = new MailInfo();
-        mailInfo.addTo(request.getEmail());
-        emailService.sendAsync(mailInfo, config, userTempResponse);
-        return true;
+        return userPasswordService.forgotPassword(request);
     }
 
     @Override
     public JwtAuthenticationToken changePassword(ChangePasswordRequest request) {
-        String email = request.getEmail();
-        final User user = userRepository.findActivatedUserByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User is not exists by getting with email " + email));
-
-        if ((authenticatedProvider.getUserId().isPresent() && EncrytedPasswordUtils.isMatched(request.getPassword(), user.getPassword())) ||
-                userTempService.isValid(email, request.getPassword())) {
-            // Save a new password
-            user.setPassword(EncrytedPasswordUtils.encryptPassword(request.getNewPassword()));
-            userRepository.save(user);
-
-            // Delete temp account
-            userTempService.delete(email);
-
-            // Return token
+        boolean isSuccess = userPasswordService.changePassword(request);
+        if (isSuccess) {
             LoginRequest loginRequest = LoginRequest.builder()
-                    .username(email)
+                    .username(request.getEmail())
                     .password(request.getNewPassword())
                     .build();
             return login(loginRequest);
         }
-        throw new ResourceNotFoundException("Incorrect password or password is expired");
+        throw new AuthenticationException("Can not change the password");
+    }
+
+    protected void sendEmailWelcome(String email, RegisterRequest registerRequest) {
+        EmailEventDto<?> eventDto = EmailEventDto.builder()
+                .emailTemplateType(EmailTemplateType.WELCOME)
+                .email(email)
+                .data(registerRequest)
+                .build();
+        eventPublisher.publishEvent(new EmailEvent(eventDto));
     }
 }
