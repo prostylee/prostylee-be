@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
@@ -30,9 +31,8 @@ import java.util.concurrent.Future;
  */
 @Component
 @Slf4j
-public class AwsS3AsyncProvider extends BaseAsyncProvider  {
+public class AwsS3AsyncProvider extends BaseAsyncProvider {
 
-    private static final String SEPARATOR = "/";
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final AttachmentRepository attachmentRepository;
@@ -48,16 +48,24 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
     }
 
     /**
+     * This method generates unique file name.
+     *
+     * @return unique file name
+     */
+    private static String generateUniqueName() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
      * Upload files to AWS S3 asynchronous
      *
      * @param folderId The Google folder id will contains the uploaded file
-     * @param file The {@link MultipartFile}
+     * @param file     The {@link MultipartFile}
      * @return The {@link AttachmentResponse}
-     *
      */
     @Async
     public Future<AttachmentResponse> uploadFile(String folderId, MultipartFile file) throws IOException {
-        String folder = StringUtils.isEmpty(folderId) ? "" : folderId + SEPARATOR;
+        String folder = StringUtils.isEmpty(folderId) ? "" : folderId + AppConstant.PATH_SEPARATOR;
         String fileName = folder + generateUniqueName();
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
@@ -75,25 +83,12 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider  {
     @Async
     public Future<Boolean> deleteFiles(List<String> fileNames) {
         List<KeyVersion> keys = new ArrayList<>();
-        for(String fileName : fileNames) {
+        for (String fileName : fileNames) {
             keys.add(new KeyVersion(fileName));
         }
         DeleteObjectsRequest requests = new DeleteObjectsRequest(bucketName).withKeys(keys);
         DeleteObjectsResult results = s3Client.deleteObjects(requests);
-        boolean isSuccessfulDelete = false;
-        if(results.getDeletedObjects().size() == fileNames.size()) {
-            isSuccessfulDelete = true;
-        }
-        return new AsyncResult<>(isSuccessfulDelete);
-    }
-
-    /**
-     * This method generates unique file name.
-     *
-     * @return unique file name
-     */
-    private static String generateUniqueName() {
-        return UUID.randomUUID().toString();
+        return new AsyncResult<>(results.getDeletedObjects().size() == fileNames.size());
     }
 
     /**

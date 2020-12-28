@@ -7,7 +7,7 @@ import vn.prostylee.media.constant.ApiUrl;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.service.FileUploadService;
 
-import java.util.Arrays;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -32,19 +32,19 @@ public class FileUploadController {
 	public List<String> getFileUrl(
 			@RequestParam(required = false, name = WIDTH, defaultValue = "0") int width,
 			@RequestParam(required = false, name = HEIGHT, defaultValue = "0") int height,
-			@PathVariable(value = "fileIds") String... fileIds
+			@PathVariable(value = "fileIds") List<String> fileIds
 	) {
-		return fileUploadService.getFiles(Arrays.asList(fileIds), width, height);
+		return fileUploadService.getFiles(fileIds, width, height);
 	}
 
 	@PostMapping(value = "/files")
-	public List<AttachmentResponse> upload(@RequestParam("file") MultipartFile[] files) {
-		return fileUploadService.uploadFiles(Arrays.asList(files));
+	public List<AttachmentResponse> upload(@NotEmpty @RequestParam("file") List<MultipartFile> files) {
+		return fileUploadService.uploadFiles(files);
 	}
 
 	@DeleteMapping(value = "/files/{fileId}")
-	public Boolean delete(@PathVariable(value = "fileId") String... fileIds) {
-		return fileUploadService.deleteFiles(Arrays.asList(fileIds));
+	public boolean delete(@PathVariable(value = "fileId") List<String> fileIds) {
+		return fileUploadService.deleteFiles(fileIds);
 	}
 
 }

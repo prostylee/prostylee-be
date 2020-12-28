@@ -27,10 +27,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class AwsS3ServiceImpl implements FileUploadService {
-
-    private static final String IMAGE_URL_PREFIX_FORMAT = "https://##BUCKET_NAME##.s3.amazonaws.com/";
-    private static final String BUCKET_NAME_KEY = "##BUCKET_NAME##";
-    private static final String SEPARATOR = "/";
     private static final String FILE_UPLOAD_ERROR = "Uploading file to S3 bucket was failed";
     private static final String FILE_DELETE_ERROR = "Deleting file from S3 bucket was failed";
     private final AwsS3AsyncProvider awsS3AsyncProvider;
@@ -40,11 +36,14 @@ public class AwsS3ServiceImpl implements FileUploadService {
     @Autowired
     public AwsS3ServiceImpl(
             @Value("${app.aws.bucket}") String bucketName,
+            @Value("${app.aws.region}") String region,
             AwsS3AsyncProvider awsS3AsyncProvider,
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.fileUrlPrefix = IMAGE_URL_PREFIX_FORMAT.replace(BUCKET_NAME_KEY, bucketName);
+        this.fileUrlPrefix = AppConstant.IMAGE_URL_PREFIX_FORMAT
+                .replace(AppConstant.BUCKET_NAME_KEY, bucketName)
+                .replace(AppConstant.REGION_KEY, region);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         String modifiedPath = path;
         if (width > 0 && height > 0) {
             modifiedPath = path.replace(fileUrlPrefix,
-                    fileUrlPrefix + width + "x" + height + SEPARATOR);
+                    fileUrlPrefix + width + "x" + height + AppConstant.PATH_SEPARATOR);
         }
         return modifiedPath;
     }
@@ -108,8 +107,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
         try {
             List<String> fileNames = new ArrayList<>();
             for(String fileId : fileIds) {
-                final Attachment attachement = getAttachment(Long.valueOf(fileId));
-                fileNames.add(attachement.getName());
+                final Attachment attachment = getAttachment(Long.valueOf(fileId));
+                fileNames.add(attachment.getName());
             }
             List<Long> fileIdsAsLong = fileIds.stream().map(Long::valueOf).collect(Collectors.toList());
             attachmentRepository.deleteAttachmentsByIdIn(fileIdsAsLong);

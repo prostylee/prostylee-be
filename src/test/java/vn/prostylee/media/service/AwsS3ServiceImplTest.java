@@ -84,9 +84,9 @@ public class AwsS3ServiceImplTest {
 
     private List<Attachment> prepareAttachments() {
         List<Attachment> attachments = new ArrayList<>();
-        Attachment attachement = new Attachment();
-        attachement.setPath(SAMPLE_IMAGE_URL);
-        attachments.add(attachement);
+        Attachment attachment = new Attachment();
+        attachment.setPath(SAMPLE_IMAGE_URL);
+        attachments.add(attachment);
         return attachments;
     }
 }

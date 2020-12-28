@@ -16,6 +16,11 @@ public final class AppConstant {
     public static final String CONSUME_ZIP = "application/zip";
     public static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
 
+    // Constant for AWS configuration
+    public static final String IMAGE_URL_PREFIX_FORMAT = "https://##BUCKET_NAME##.s3.##REGION##.amazonaws.com/";
+    public static final String BUCKET_NAME_KEY = "##BUCKET_NAME##";
+    public static final String REGION_KEY = "##REGION##";
+
     private AppConstant() {
         super();
     }
