@@ -98,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
 
     private Page<CommentResponse> getCommentResponses(Long id, BaseFilter baseFilter, CommentDestinationType type) {
         Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type.getType());
         Specification<Comment> idComment = (root, query, cb) -> cb.equal(root.get("id"), id);
         searchable = searchable.and(additionalSpec).and(idComment);
         Pageable pageable = baseFilterSpecs.page(baseFilter);

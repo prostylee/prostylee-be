@@ -25,12 +25,12 @@ public class CommentController extends CrudController<CommentRequest, CommentRes
     }
 
     @GetMapping("/stores/{storeId}")
-    public Page<CommentResponse> getAllByStore(@PathVariable Long id,@RequestBody CommentFilter baseFilter) {
-        return service.getCommentsByStoreId(id ,baseFilter);
+    public Page<CommentResponse> getAllByStore(@PathVariable Long storeId,@RequestBody CommentFilter baseFilter) {
+        return service.getCommentsByStoreId(storeId ,baseFilter);
     }
 
     @GetMapping("/products/{productId}")
-    public Page<CommentResponse> getAllByProduct(@PathVariable Long id,@RequestBody CommentFilter baseFilter) {
-        return service.getAllByProduct(id, baseFilter);
+    public Page<CommentResponse> getAllByProduct(@PathVariable Long productId,@RequestBody CommentFilter baseFilter) {
+        return service.getAllByProduct(productId, baseFilter);
     }
 }
