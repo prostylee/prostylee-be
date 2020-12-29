@@ -83,7 +83,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            return commentRepo.softDelete(id) > 0;
+            commentRepo.softDelete(id);
+            return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
