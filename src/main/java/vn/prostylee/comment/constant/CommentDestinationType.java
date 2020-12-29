@@ -10,5 +10,5 @@ public enum CommentDestinationType {
     STORE("store");
 
     @Getter
-    private String status;
+    private String type;
 }
