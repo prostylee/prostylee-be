@@ -1,18 +1,11 @@
 package vn.prostylee.auth.service.impl;
 
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.TcpClient;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.constant.SocialProviderType;
 import vn.prostylee.auth.converter.ZaloConverter;
@@ -33,7 +26,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,16 +41,24 @@ public class ZaloAuthServiceImpl implements SocialAuthService {
     private static final String REQUIRED_FIELDS_FOR_PARAMS = "id,birthday,name,gender,picture.type(large)";
     private static final String ACCESS_TOKEN_KEY = "access_token";
     private static final String FIELDS_KEY = "fields";
-    private static final String ZALO_VERSION = "v2.0";
-    private static final String ZALO_ENDPOINT_GET_PROFILE = "me";
-    private static final String ZALO_MAIN_API = "https://graph.zalo.me";
-    private static final String ZALO = "zalo";
+    private static final String PROVIDER_NAME = "zalo";
+
+    @Value("${services.zalo.endpoint}")
+    private String endpoint;
+
+    @Value("${services.zalo.version}")
+    private String version;
+
+    @Value("${services.zalo.path.profile}")
+    private String profilePath;
 
     private final UserLinkAccountService userLinkAccountService;
 
     private final UserService userService;
 
     private final RoleRepository roleRepository;
+
+    private final WebClient client;
 
     @Override
     public boolean canHandle(SocialProviderType type) {
@@ -67,8 +67,6 @@ public class ZaloAuthServiceImpl implements SocialAuthService {
 
     @Override
     public AuthUserDetails login(LoginSocialRequest request) {
-        TcpClient tcpClient = getTcpClient();
-        WebClient client = getWebClient(tcpClient);
         ZaloResponse response = call(client, request.getIdToken());
         if (Objects.isNull(response)) {
             throw new AuthenticationException("Can not login to the system, Please contact administrator!");
@@ -123,7 +121,7 @@ public class ZaloAuthServiceImpl implements SocialAuthService {
         UserLinkAccount userLinkAccount = UserLinkAccount.builder()
                 .user(user)
                 .providerId(zaloResponse.getId())
-                .providerName(ZALO)
+                .providerName(PROVIDER_NAME)
                 .build();
         set.add(userLinkAccount);
         return set;
@@ -131,29 +129,12 @@ public class ZaloAuthServiceImpl implements SocialAuthService {
 
     private ZaloResponse call(WebClient client, String idToken) {
         return client.method(HttpMethod.GET)
-                .uri(uriBuilder -> uriBuilder.path("/{version}/{endpoint}")
+                .uri(uriBuilder -> uriBuilder.path(endpoint + "/{version}/{endpoint}")
                         .queryParam(ACCESS_TOKEN_KEY, idToken)
                         .queryParam(FIELDS_KEY, REQUIRED_FIELDS_FOR_PARAMS)
-                        .build(ZALO_VERSION, ZALO_ENDPOINT_GET_PROFILE))
+                        .build(version, profilePath))
                 .retrieve()
                 .bodyToMono(ZaloResponse.class)
                 .block();
-    }
-
-    private WebClient getWebClient(TcpClient tcpClient) {
-        return WebClient.builder().baseUrl(ZALO_MAIN_API)
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
-                .defaultCookie("cookieKey", "cookieValue")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-    }
-
-    private TcpClient getTcpClient() {
-        return TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .doOnConnected(connection -> {
-                    connection.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS));
-                    connection.addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS));
-                });
     }
 }

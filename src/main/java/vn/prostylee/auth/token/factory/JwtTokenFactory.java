@@ -48,7 +48,7 @@ public class JwtTokenFactory {
         Claims claims = Jwts.claims().setSubject(JsonUtils.toJson(subject));
         claims.put(TOKEN_SCOPES_KEY, scopes);
 
-        String token = createToken(claims, securityProperties.getJwt().getAccessTokenExpirationInMs());
+        String token = createToken(claims, securityProperties.getJwt().getAccessTokenExpirationInMinutes());
         return new AccessToken(token, subject);
     }
 
@@ -67,15 +67,15 @@ public class JwtTokenFactory {
         Claims claims = Jwts.claims().setSubject(JsonUtils.toJson(subject));
         claims.put(TOKEN_SCOPES_KEY, scopes);
 
-        String token = createToken(claims, securityProperties.getJwt().getRefreshTokenExpirationInMs());
+        String token = createToken(claims, securityProperties.getJwt().getRefreshTokenExpirationInMinutes());
         return new RefreshToken(token);
     }
 
-    private String createToken(Claims claims, int expirationInMs) {
+    private String createToken(Claims claims, int expirationInMinutes) {
         LocalDateTime currentTime = LocalDateTime.now();
         Date issueAt = Date.from(currentTime.atZone(ZoneId.systemDefault()).toInstant());
         Date expirationAt = Date.from(currentTime
-                .plusMinutes(expirationInMs)
+                .plusMinutes(expirationInMinutes)
                 .atZone(ZoneId.systemDefault()).toInstant());
 
         return Jwts.builder()

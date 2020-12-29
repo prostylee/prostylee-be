@@ -17,12 +17,12 @@ public class JwtProperties {
     /**
      * JwtToken will expire after this time.
      */
-    private int accessTokenExpirationInMs;
+    private int accessTokenExpirationInMinutes;
 
     /**
      * Use this token to get a new JwtToken when access token expired
      */
-    private int refreshTokenExpirationInMs;
+    private int refreshTokenExpirationInMinutes;
 
     /**
      * Token issuer
