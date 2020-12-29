@@ -2,7 +2,7 @@ package vn.prostylee.comment.dto.response;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class CommentImageResponse {
@@ -10,7 +10,7 @@ public class CommentImageResponse {
     private Long attachmentId;
     private Long order;
     private Long updatedBy;
-    private LocalDateTime updatedAt;
+    private Date updatedAt;
     private Long createdBy;
-    private LocalDateTime createdAt;
+    private Date createdAt;
 }
