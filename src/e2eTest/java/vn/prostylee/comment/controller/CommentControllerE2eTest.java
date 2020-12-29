@@ -1,5 +1,6 @@
 package vn.prostylee.comment.controller;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,20 +16,26 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class CommentControllerE2eTest extends BaseRestControllerE2eTest {
 
+    private String accessToken;
+
+    @BeforeAll
+    public void beforeAll() {
+        accessToken = getAccessToken();
+    }
+
     @Test
-    void update_Successfully() {
+    void create_Successfully() {
         given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .body(createRequest())
                 .when()
-                .put("/v1/comments")
+                .post("/v1/comments")
                 .then()
                 .log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("accessToken", is(notNullValue()))
-                .body("refreshToken", is(notNullValue()))
-                .body("tokenType", is("Bearer"))
+                .statusCode(HttpStatus.CREATED.value())
+                .body("id", is(notNullValue()))
         ;
     }
 

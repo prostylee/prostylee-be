@@ -23,10 +23,8 @@ public class RegisterRequest {
     @Size(min = 1, max = 128)
     private String fullName;
 
-    @NotBlank
     @Size(min = 1, max = 20)
     private String phoneNumber;
-
 
     @Unique(service = UserService.class)
     @NotBlank
