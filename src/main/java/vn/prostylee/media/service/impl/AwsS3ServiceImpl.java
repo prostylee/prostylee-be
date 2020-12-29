@@ -1,12 +1,13 @@
 package vn.prostylee.media.service.impl;
 
 import com.amazonaws.AmazonClientException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
-import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
@@ -26,10 +27,8 @@ import java.util.concurrent.Future;
  */
 @Service
 public class AwsS3ServiceImpl implements FileUploadService {
-    private static final String FILE_UPLOAD_ERROR = "Uploading file to S3 bucket was failed";
-    private static final String FILE_DELETE_ERROR = "Deleting file from S3 bucket was failed";
+
     private final AwsS3AsyncProvider awsS3AsyncProvider;
-    private final AWSS3Properties awss3Properties;
     private final AttachmentRepository attachmentRepository;
     private final String hostname;
 
@@ -40,7 +39,6 @@ public class AwsS3ServiceImpl implements FileUploadService {
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.awss3Properties = awss3Properties;
         this.hostname = awss3Properties.getHostname();
     }
 
@@ -71,7 +69,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
     @Override
     public List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files) {
         List<AttachmentResponse> attachments = new ArrayList<>();
-        if (files == null || files.size() < 1) {
+        if (CollectionUtils.isEmpty(files)) {
             return attachments;
         }
         try {
@@ -94,7 +92,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
                 attachments.add(future.get());
             }
         } catch (AmazonClientException | InterruptedException | ExecutionException | IOException e) {
-            throw new FileUploaderException(FILE_UPLOAD_ERROR, e);
+            throw new FileUploaderException(ErrorResponseStatus.FILE_UPLOAD_ERROR.getCode(), e);
         }
         return attachments;
     }
@@ -103,21 +101,16 @@ public class AwsS3ServiceImpl implements FileUploadService {
     public boolean deleteFiles(List<Long> fileIds) {
         try {
             List<String> fileNames = new ArrayList<>();
-            for(Long fileId : fileIds) {
-                final Attachment attachment = getAttachment(fileId);
+            List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+            for(Attachment attachment : attachments) {
                 fileNames.add(attachment.getName());
             }
             attachmentRepository.deleteAttachmentsByIdIn(fileIds);
             awsS3AsyncProvider.deleteFiles(fileNames);
             return true;
         } catch (IllegalArgumentException | AmazonClientException e) {
-            throw new FileUploaderException(FILE_DELETE_ERROR, e);
+            throw new FileUploaderException(ErrorResponseStatus.FILE_DELETE_ERROR.getCode(), e);
         }
-    }
-
-    private Attachment getAttachment(Long fileId) {
-        return attachmentRepository.findById(fileId)
-                .orElseThrow(() -> new ResourceNotFoundException("Attachment is not exists by getting with id " + fileId));
     }
 
 }

@@ -61,7 +61,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
     /**
      * Upload files to AWS S3 asynchronous
      *
-     * @param folderId The Google folder id will contains the uploaded file
+     * @param folderId The AWS S3 folder id will contain the uploaded file
      * @param file     The {@link MultipartFile}
      * @return The {@link AttachmentResponse}
      */
