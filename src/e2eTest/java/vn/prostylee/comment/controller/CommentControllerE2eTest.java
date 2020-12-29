@@ -36,7 +36,7 @@ public class CommentControllerE2eTest extends BaseRestControllerE2eTest {
         return UpdateRequestTest.builder()
                 .attachmentId(Arrays.asList(Long.valueOf(100),Long.valueOf(101),Long.valueOf(102)))
                 .targetId(Long.valueOf(1))
-                .targetType(CommentDestinationType.STORE.getStatus())
+                .targetType(CommentDestinationType.STORE.getType())
                 .content("This is test e2e Content")
                 .parentId(Long.valueOf(1))
                 .build();

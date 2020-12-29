@@ -11,23 +11,14 @@ import java.util.Set;
 public class CommentResponse {
 
     private Long id;
-
     private String content;
-
     private Long parentId;
-
     private Long targetId;
-
     private String targetType;
-
     private Date deletedAt;
-
     private Date createdAt;
-
     private Long createdBy;
-
-    private Set<CommentImage> commentImages;
-
+    private Set<CommentImageResponse> commentImages;
     private User user;
 
 }
