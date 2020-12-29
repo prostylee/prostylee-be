@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import vn.prostylee.auth.controller.RoleController;
 import vn.prostylee.comment.constant.CommentDestinationType;
+import vn.prostylee.comment.dto.response.CommentImageResponse;
 import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.comment.entity.CommentImage;
 import vn.prostylee.comment.service.impl.CommentServiceImpl;
@@ -76,16 +77,16 @@ public class CommentControllerTest {
         CommentResponse response = new CommentResponse();
         response.setId(id);
         response.setContent("This is content");
-        response.setTargetType(CommentDestinationType.STORE.getStatus());
+        response.setTargetType(CommentDestinationType.STORE.getType());
         response.setCommentImages(mockResponseCommentImage());
         return  response;
     }
-    private Set<CommentImage> mockResponseCommentImage() {
-        Set<CommentImage> images =  new HashSet<>();
-        CommentImage item =  new CommentImage();
+    private Set<CommentImageResponse> mockResponseCommentImage() {
+        Set<CommentImageResponse> images =  new HashSet<>();
+        CommentImageResponse item =  new CommentImageResponse();
         item.setId(Long.valueOf(120921039));
         item.setAttachmentId(Long.valueOf(112323));
-        item.setOrder(1);
+        item.setOrder(Long.valueOf(1));
         images.add(item);
         return images;
     }
