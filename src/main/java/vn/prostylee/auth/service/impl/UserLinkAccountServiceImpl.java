@@ -14,7 +14,7 @@ public class UserLinkAccountServiceImpl implements UserLinkAccountService {
     private final UserLinkAccountRepository userLinkAccountRepository;
 
     @Override
-    public Optional<UserLinkAccount> getUserLinkAccountBy(String Id) {
-        return userLinkAccountRepository.getByProviderId(Id);
+    public Optional<UserLinkAccount> getUserLinkAccountBy(String providerId) {
+        return userLinkAccountRepository.getByProviderId(providerId);
     }
 }

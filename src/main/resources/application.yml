@@ -8,6 +8,12 @@ services:
     database-url: https://prostylee-9c568.firebaseio.com/
     admin-sdk: google/prostylee-9c568-firebase-adminsdk-rh0b8-f2d09f23d5.json
 
+  zalo:
+    endpoint: https://graph.zalo.me
+    version: 2.0
+    path:
+      profile: me
+
   email:
     receive-contact: stylee.common@gmail.com
     reply-to: support@prostylee.vn
@@ -69,10 +75,10 @@ app:
     ## JWT Authentication config
     jwt:
       # The access token will be expired in 4 hours
-      accessTokenExpirationInMs: 14400000
+      accessTokenExpirationInMinutes: 240
 
       # The access token will be expired in 7 days
-      refreshTokenExpirationInMs: 604800000
+      refreshTokenExpirationInMinutes: 10080
 
       # The issuer
       tokenIssuer: https://prostylee.vn/
@@ -119,6 +125,12 @@ app:
     accessKey: AKIAZVNNPQGLWGFMYF6X
     secretKey: 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
     hostname: https://${app.aws.bucket}.s3.${app.aws.region}.amazonaws.com/
+  http:
+    connectTimeout: 5000
+    responseTimeout: 5000
+    httpUseProxy: false
+    proxyHost: localhost
+    proxyPort: 3128
 
 spring:
   application:
@@ -177,9 +189,10 @@ spring:
     port: 587
     username: stylee.common@gmail.com
     password: ENC(Gh1K+Paii8f4Bujro1UUFMcNnqLkkmTYso119r5j1oU=)
+    default-encoding: UTF-8
     properties:
       mail:
-        debug: true
+        debug: false
         smtp:
           auth: true
           starttls:

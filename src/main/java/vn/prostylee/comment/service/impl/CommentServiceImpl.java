@@ -1,6 +1,5 @@
 package vn.prostylee.comment.service.impl;
 
-import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,7 +19,6 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -85,7 +83,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            return commentRepo.softDelete(id) > 0;
+            commentRepo.softDelete(id);
+            return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
@@ -98,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
 
     private Page<CommentResponse> getCommentResponses(Long id, BaseFilter baseFilter, CommentDestinationType type) {
         Specification<Comment> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type);
+        Specification<Comment> additionalSpec = (root, query, cb) -> cb.equal(root.get(TARGET_TYPE), type.getType());
         Specification<Comment> idComment = (root, query, cb) -> cb.equal(root.get("id"), id);
         searchable = searchable.and(additionalSpec).and(idComment);
         Pageable pageable = baseFilterSpecs.page(baseFilter);

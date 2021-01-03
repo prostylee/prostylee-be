@@ -21,7 +21,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user_follower")
-public class UserFollower extends AuditEntity {
+public class 	UserFollower extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,9 +30,6 @@ public class UserFollower extends AuditEntity {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_follower_seq")
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
-
-	@Column(name = "user_id")
-	private Long userId;
 
 	@Column(name = "target_id")
 	private Long targetId;

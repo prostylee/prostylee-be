@@ -3,75 +3,67 @@ package vn.prostylee.auth.service.impl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
 import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.Scope;
 import vn.prostylee.auth.dto.AuthUserDetails;
-import vn.prostylee.auth.dto.request.RegisterRequest;
+import vn.prostylee.auth.dto.request.RefreshTokenRequest;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.exception.InvalidJwtToken;
+import vn.prostylee.auth.repository.UserRepository;
+import vn.prostylee.auth.service.UserAuthTokenService;
 import vn.prostylee.auth.token.AccessToken;
 import vn.prostylee.auth.token.factory.JwtTokenFactory;
 import vn.prostylee.auth.token.parser.TokenParser;
+import vn.prostylee.auth.token.verifier.TokenVerifier;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.notification.constant.EmailTemplateType;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.MailTemplateConfig;
-import vn.prostylee.notification.dto.response.EmailTemplateResponse;
-import vn.prostylee.notification.service.EmailService;
-import vn.prostylee.notification.service.EmailTemplateService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+@Service
 @RequiredArgsConstructor
-public class AuthenticationServiceCommon {
-    @Autowired
-    private JwtTokenFactory tokenFactory;
+public class UserAuthTokenServiceImpl implements UserAuthTokenService {
 
-    @Autowired
-    private TokenParser tokenParser;
+    private final JwtTokenFactory tokenFactory;
 
-    @Autowired
-    private SecurityProperties securityProperties;
+    private final TokenVerifier tokenVerifier;
 
-    @Autowired
-    private EmailService emailService;
+    private final TokenParser tokenParser;
 
-    @Autowired
-    private EmailTemplateService emailTemplateService;
+    private final SecurityProperties securityProperties;
 
-    protected JwtAuthenticationToken createResponse(AuthUserDetails userDetail) {
+    private final UserRepository userRepository;
+
+    @Override
+    public JwtAuthenticationToken createToken(AuthUserDetails userDetail) {
         AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
-        JwtAuthenticationToken token = JwtAuthenticationToken.builder()
+        return JwtAuthenticationToken.builder()
                 .accessToken(accessToken.getToken())
                 .refreshToken(tokenFactory.createRefreshToken(userDetail).getToken())
                 .tokenType(AuthConstants.BEARER_PREFIX)
                 .build();
-        return token;
     }
 
-    protected void sendEmailWelcome(String email, RegisterRequest registerRequest) {
-        try {
-            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(EmailTemplateType.WELCOME.name());
-            MailTemplateConfig config = MailTemplateConfig.builder()
-                    .mailContent(emailTemplateResponse.getContent())
-                    .mailSubject(emailTemplateResponse.getTitle())
-                    .mailIsHtml(true)
-                    .build();
+    @Override
+    public JwtAuthenticationToken refreshToken(RefreshTokenRequest request) {
+        if (tokenVerifier.verify(request.getRefreshToken()) && checkRefreshTokenScope(request.getRefreshToken())) {
+            Long userId = tokenParser.getUserIdFromJWT(request.getRefreshToken(), securityProperties.getJwt().getTokenSigningKey());
+            User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User is not exists by getting with id " + userId));
+            AuthUserDetails userDetail = new AuthUserDetails(user, this.getFeatures(user));
+            AccessToken accessToken = tokenFactory.createAccessToken(userDetail);
 
-            MailInfo mailInfo = new MailInfo();
-            mailInfo.addTo(email);
-            emailService.sendAsync(mailInfo, config, registerRequest);
-        } catch(ResourceNotFoundException e) {
-            log.warn("There is no email template for sending a welcome email to a new user");
+            return JwtAuthenticationToken.builder()
+                    .accessToken(accessToken.getToken())
+                    .refreshToken(request.getRefreshToken())
+                    .tokenType(AuthConstants.BEARER_PREFIX)
+                    .build();
         }
+        throw new InvalidJwtToken("The refresh token is invalid");
     }
 
     protected boolean checkRefreshTokenScope(String refreshToken) {
@@ -94,5 +86,4 @@ public class AuthenticationServiceCommon {
         user.getRoles().forEach(role -> features.addAll(role.getFeatures()));
         return features;
     }
-
 }

@@ -22,3 +22,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+
+  ## Config
+  mail:
+    host: localhost
+    port: 2525
+    username: test
+    password: secret
+    default-encoding: UTF-8
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: false
+            required: false
+        transport:
+          protocol: smtp
+    test-connection: false

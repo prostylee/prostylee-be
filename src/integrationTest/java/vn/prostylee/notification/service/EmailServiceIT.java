@@ -1,6 +1,5 @@
 package vn.prostylee.notification.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import vn.prostylee.IntegrationTest;
+import vn.prostylee.extension.SmtpServerExtension;
 import vn.prostylee.notification.dto.MailData;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.SimpleMailInfo;
@@ -19,8 +19,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @IntegrationTest
-public class EmailServiceIT {
+public class EmailServiceIT extends SmtpServerExtension {
 
     @Autowired
     private EmailService emailService;
@@ -33,6 +36,7 @@ public class EmailServiceIT {
 
     @BeforeEach
     public void setup() {
+        super.beforeEach();
         MockMvcBuilders.webAppContextSetup(webAppContext).build();// Standalone context
     }
 
@@ -42,8 +46,9 @@ public class EmailServiceIT {
         mailInfo.addTo("gpcodervn@gmail.com");
         mailInfo.setContent("This is an email content");
         mailInfo.setSubject("Test send mail from prostylee system");
-        boolean result = emailService.send(mailInfo);
-        Assertions.assertTrue(result);
+
+        assertTrue(emailService.send(mailInfo));
+        assertEquals(1, getSmtpServer().getReceivedMessages().length);
     }
 
     @Test
@@ -64,8 +69,11 @@ public class EmailServiceIT {
         mailInfo.setSubject("Test send mail from prostylee system");
         mailInfo.addAttachment(resourceFile.getFile().getName(), resourceFile.getFile(), false, true);
         mailInfo.setHtml(true);
+
         boolean result = emailService.send(mailInfo, "html/mail-template-forgot-password.tpl.html", data);
-        Assertions.assertTrue(result);
+
+        assertTrue(result);
+        assertEquals(1, getSmtpServer().getReceivedMessages().length);
     }
 
 }

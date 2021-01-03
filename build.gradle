@@ -142,6 +142,9 @@ dependencies {
 	// Wiremock will only be available in integration tests, but not in unit tests
 	testImplementation 'com.github.tomakehurst:wiremock:2.27.2'
 
+	// Email Test Server
+	compile 'com.icegreen:greenmail-spring:1.6.1'
+
 }
 
 // For TESTING
