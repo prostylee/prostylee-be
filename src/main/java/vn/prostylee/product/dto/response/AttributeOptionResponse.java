@@ -8,4 +8,5 @@ public class AttributeOptionResponse {
     private String name;
     private String value;
     private String label;
+    private String languageCode;
 }

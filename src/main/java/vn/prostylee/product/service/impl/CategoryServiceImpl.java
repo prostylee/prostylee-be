@@ -3,6 +3,7 @@ package vn.prostylee.product.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
+        log.info("Find all category base on filter parameters");
         CategoryFilter categoryFilter = (CategoryFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
         Page<Category> page = this.categoryRepository.findAllActive(pageable);
@@ -50,23 +52,22 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse findById(Long id) {
+        log.info("Find category by id [{}]", id);
         return this.toResponse(this.getById(id));
     }
 
     @Override
     public CategoryResponse save(CategoryRequest request) {
+        log.info("Save category with request parameters");
         Category category = BeanUtil.copyProperties(request, Category.class);
-        category.setActive(true);
         this.setAttributes(category, request.getAttributes());
-        return toResponse(categoryRepository.save(category));
+        return toResponse(categoryRepository.saveAndFlush(category));
     }
 
     @Override
     public CategoryResponse update(Long id, CategoryRequest request) {
-        Category category = getById(id);
-        if (Objects.isNull(category)) {
-            return new CategoryResponse();
-        }
+        log.info("Update category with id [{}]", id);
+        Category category = this.getById(id);
         BeanUtil.mergeProperties(request, category);
         this.updateAttribute(category, request.getAttributes());
 
@@ -75,7 +76,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public boolean deleteById(Long id) {
-        return this.categoryRepository.softDelete(id) > 0 ? true : false;
+        try {
+            this.categoryRepository.softDelete(id);
+            log.info("Category with id [{}] deleted successfully", id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Category is not found with id [" + id + "]");
+        }
     }
 
     @Override
@@ -105,10 +112,10 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private void setAttributeOptions(Attribute attribute, Set<AttributeOptionRequest> attributeOptionRequest) {
-        if (Objects.nonNull(attributeOptionRequest)) {
+    private void setAttributeOptions(Attribute attribute, Set<AttributeOptionRequest> attributeOptionRequests) {
+        if (Objects.nonNull(attributeOptionRequests)) {
             Set<AttributeOption> attributeOptions = new HashSet<>();
-            attributeOptionRequest.forEach(option -> {
+            attributeOptionRequests.forEach(option -> {
                 AttributeOption attributeOption = BeanUtil.copyProperties(option, AttributeOption.class);
                 attributeOption.setAttribute(attribute);
                 attributeOptions.add(attributeOption);
@@ -134,7 +141,7 @@ public class CategoryServiceImpl implements CategoryService {
                 this.attributeRepository.saveAll(attributes);
             }
         });
-        category.setAttributes(new HashSet<>(attributes));
+        category.getAttributes().addAll(attributes);
     }
 
     private void updateAttributeOptions(Attribute attribute, Set<AttributeOptionRequest> attributeOptionRequest) {
@@ -153,7 +160,8 @@ public class CategoryServiceImpl implements CategoryService {
                 this.attrOptionRepository.saveAll(attrOptions);
             }
         });
-        attribute.setAttributeOptions(new HashSet<>(attrOptions));
+        attribute.getAttributeOptions().addAll(attrOptions);
+
     }
 
     private Category getById(Long id) {

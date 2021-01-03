@@ -13,4 +13,6 @@ public class AttributeOptionRequest {
     private String value;
     @NotBlank
     private String label;
+
+    private String languageCode;
 }
