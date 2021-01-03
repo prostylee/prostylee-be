@@ -23,6 +23,8 @@ public class AttributeResponse {
     @NotNull
     private Integer type;
 
+    private String languageCode;
+
     @NotNull
     private Set<AttributeOptionResponse> attributeOptions;
 }

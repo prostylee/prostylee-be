@@ -12,5 +12,6 @@ public class CategoryResponse {
     private Integer order;
     private String icon;
     private Boolean active;
+    private String languageCode;
     private Set<AttributeResponse> attributes;
 }
