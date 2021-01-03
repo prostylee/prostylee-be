@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
@@ -21,4 +22,15 @@ public class UserRatingController extends CrudController<UserRatingRequest, User
         super(userRatingService);
         this.userRatingService = userRatingService;
     }
+
+    @GetMapping("/count")
+    public long count(UserRatingFilter filter) {
+        return userRatingService.count(filter);
+    }
+
+    @GetMapping("/average")
+    public double average(UserRatingFilter filter) {
+        return userRatingService.average(filter);
+    }
+
 }

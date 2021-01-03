@@ -12,6 +12,6 @@ public class UserRatingResponse {
     private Date updatedAt;
     private Long updatedBy;
     private Long targetId;
-    private Long targetType;
+    private String targetType;
     private Integer value;
 }
