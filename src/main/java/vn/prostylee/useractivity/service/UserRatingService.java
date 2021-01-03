@@ -1,8 +1,6 @@
 package vn.prostylee.useractivity.service;
 
-import org.springframework.data.jpa.repository.Query;
 import vn.prostylee.core.service.CrudService;
-import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;
 import vn.prostylee.useractivity.dto.response.UserRatingResponse;
 
