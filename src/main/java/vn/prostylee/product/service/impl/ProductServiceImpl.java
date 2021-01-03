@@ -2,6 +2,7 @@ package vn.prostylee.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductResponse;
@@ -45,22 +47,26 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse save(ProductRequest productRequest) {
         Product product = BeanUtil.copyProperties(productRequest, Product.class);
-        //product.setStatus(Product.Status.PUBLISHED);
+        product.setStatus(ProductStatus.PUBLISHED);
         return toResponse(this.productRepository.save(product));
     }
 
     @Override
     public ProductResponse update(Long id, ProductRequest productRequest) {
         Product product = this.getById(id);
-        if (Objects.nonNull(product)) {
-            BeanUtil.mergeProperties(productRequest, product);
-        }
+        BeanUtil.mergeProperties(productRequest, product);
         return toResponse(this.productRepository.save(product));
     }
 
     @Override
     public boolean deleteById(Long id) {
-        return this.productRepository.softDelete(id) > 0 ? true : false;
+        try {
+            this.productRepository.softDelete(id);
+            log.info("Product with id [{}] deleted successfully", id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Product is not found with id [" + id + "]");
+        }
     }
 
     @Override
@@ -79,6 +85,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Product getById(Long id) {
         return this.productRepository.findOneActive(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category is not found with id [" + id + "]"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id [" + id + "]"));
     }
 }
