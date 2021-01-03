@@ -219,7 +219,7 @@ spring:
 
 
 # Swagger config
-# @See https://springdoc.org/springdoc-properties.html
+# @See https://springdoc.org
 springdoc:
   api-docs:
     # /api-docs endpoint custom path
