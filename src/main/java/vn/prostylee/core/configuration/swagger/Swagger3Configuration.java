@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @Configuration
-@Profile(value = { "dev", "test" })
+@Profile(value = { "dev", "test", "staging" })
 public class Swagger3Configuration {
 
 	private static final String TOKEN_HEADER = "JWT-Token";
