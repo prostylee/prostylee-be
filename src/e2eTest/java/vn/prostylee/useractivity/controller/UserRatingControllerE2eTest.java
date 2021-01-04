@@ -1,5 +1,6 @@
 package vn.prostylee.useractivity.controller;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,19 +12,43 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class UserRatingControllerE2eTest extends BaseRestControllerE2eTest {
+    private String accessToken;
+
+    @BeforeAll
+    public void beforeAll() {
+        accessToken = getAccessToken();
+    }
 
     @Test
     void create_Successfully() {
-        given().log().all()
+        given()
+                .log().all()
+                .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .body(createRequest())
-                .when().post("/v1/user-ratings")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("accessToken", is(notNullValue()))
-                .body("refreshToken", is(notNullValue()))
-                .body("tokenType", is("Bearer"));
+        .when()
+                .post("/v1/user-ratings")
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .body("id", is(notNullValue()));
+    }
+
+    @Test
+    void update_Successfully() {
+        given()
+                .log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .body(createRequest())
+        .when()
+                .put("/v1/user-ratings/1")
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .body("id", is(notNullValue()));
     }
 
     private UserRatingRequestTest createRequest() {
