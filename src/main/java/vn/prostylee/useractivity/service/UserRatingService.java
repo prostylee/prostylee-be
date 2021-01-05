@@ -19,6 +19,5 @@ public interface UserRatingService extends CrudService<UserRatingRequest, UserRa
      * @param filter
      * @return
      */
-    @Query(value = "SELECT avg(price) FROM Product")
     double average(UserRatingFilter filter);
 }
