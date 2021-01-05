@@ -94,9 +94,9 @@ public class UserRatingServiceImpl implements UserRatingService {
             searchable = searchable.and(targetId);
         }
 
-        if(filter.getLevel() != null){
+        if(filter.getValue() != null){
             Specification<UserRating> targetId = (root, query, cb) ->
-                    cb.equal(root.get(UserActivityConstant.LEVEL), filter.getLevel());
+                    cb.equal(root.get(UserActivityConstant.VALUE), filter.getValue());
             searchable = searchable.and(targetId);
         }
         return searchable;

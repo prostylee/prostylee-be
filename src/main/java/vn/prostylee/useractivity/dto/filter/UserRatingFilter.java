@@ -7,7 +7,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class UserRatingFilter extends BaseFilter {
     private Long targetId;
     private String targetType;
-    private Integer level;
+    private Integer value;
 
     @Override
     public String[] getSearchableFields() {
