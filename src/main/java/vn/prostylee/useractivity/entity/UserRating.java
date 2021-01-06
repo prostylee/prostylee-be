@@ -31,11 +31,11 @@ public class UserRating extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "user_id")
-	private Long userId;
+	@Column(name = "target_id")
+	private Long targetId;
 
-	@Column(name = "product_id")
-	private Long productId;
+	@Column(name = "target_type", length = 512)
+	private String targetType;
 
 	@Column(name = "value")
 	private Integer value;

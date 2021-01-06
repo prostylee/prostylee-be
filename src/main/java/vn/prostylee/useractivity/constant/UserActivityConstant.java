@@ -5,4 +5,5 @@ public class UserActivityConstant {
     public static final String TARGET_TYPE = "targetType";
     public static final String CREATED_BY = "createdBy";
     public static final String USER_ID = "userId";
+    public static final String VALUE = "value"; // In DB column name is value
 }
