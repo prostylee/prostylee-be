@@ -126,3 +126,23 @@ java -Dspring.profiles.active=staging -jar ./build/libs/prostylee-be-1.0.0-SNAPS
 ### Deploy the application to AWS
 
 TODO
+
+### How to build and run docker image
+
+- Package the application
+
+```shell
+./gradlew build
+```
+
+- Build docker image
+
+```shell
+docker build -t prostylee-be -f ./src/main/docker/Dockerfile .
+```
+
+- Run docker image
+
+```shell
+docker run -p 8090:8090 --env SPRING_ACTIVE_PROFILE=staging prostylee-be:latest
+```
