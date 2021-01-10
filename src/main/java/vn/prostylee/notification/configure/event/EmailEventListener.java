@@ -44,7 +44,7 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
             mailInfo.addTo(emailEventDto.getEmail());
             emailService.sendAsync(mailInfo, config, emailEventDto.getData());
         } catch(ResourceNotFoundException e) {
-            log.warn("There is no email template for sending a welcome email to a new user");
+            log.warn("There is no email template for sending an email type {}", event.getSource(), e);
         }
     }
 }
