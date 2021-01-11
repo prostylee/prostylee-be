@@ -5,10 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import vn.prostylee.auth.dto.response.RoleResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.repository.RoleRepository;
 import vn.prostylee.auth.service.impl.RoleServiceImpl;
+import vn.prostylee.core.dto.filter.MasterDataFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,11 +31,11 @@ class RoleServiceImplTest {
     void findAll_ReturnRoles() {
         when(roleRepository.findAll()).thenReturn(Collections.singletonList(createRole()));
 
-        List<RoleResponse> roleResponses = roleService.findAll();
-        assertEquals(1, roleResponses.size());
-        assertEquals("ADMIN", roleResponses.get(0).getCode());
-        assertEquals("Administrator", roleResponses.get(0).getName());
-        assertEquals(1L, roleResponses.get(0).getId());
+        Page<RoleResponse> roleResponses = roleService.findAll(new MasterDataFilter());
+        assertEquals(1, roleResponses.getSize());
+        assertEquals("ADMIN", roleResponses.getContent().get(0).getCode());
+        assertEquals("Administrator", roleResponses.getContent().get(0).getName());
+        assertEquals(1L, roleResponses.getContent().get(0).getId());
     }
 
     private Role createRole() {
