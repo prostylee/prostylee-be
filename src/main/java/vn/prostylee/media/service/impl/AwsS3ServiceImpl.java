@@ -30,7 +30,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
 
     private final AwsS3AsyncProvider awsS3AsyncProvider;
     private final AttachmentRepository attachmentRepository;
-    private final String hostname;
+    private final String bucketUrl;
+    private final String cloudfrontUrl;
 
     @Autowired
     public AwsS3ServiceImpl(
@@ -39,7 +40,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.hostname = awss3Properties.getHostname();
+        this.bucketUrl = awss3Properties.getBucketUrl();
+        this.cloudfrontUrl = awss3Properties.getCloudFrontUrl();
     }
 
     @Override
@@ -55,8 +57,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
     private String addSizeForFile(String path, int width, int height) {
         String modifiedPath = path;
         if (width > 0 && height > 0) {
-            modifiedPath = path.replace(hostname,
-                    hostname + width + "x" + height + AppConstant.PATH_SEPARATOR);
+            modifiedPath = path.replace(bucketUrl,
+                    cloudfrontUrl + width + "x" + height + AppConstant.PATH_SEPARATOR);
         }
         return modifiedPath;
     }

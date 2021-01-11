@@ -45,9 +45,9 @@ import static vn.prostylee.ConfigTestUtils.files;
 public class AwsS3ServiceImplTest {
 
     private static final int size = 30;
-    private static final String IMAGE_NAME = "b94ce7c3-ed51-4a5e-97a4-59824baf286c";
-    private static final String SAMPLE_IMAGE_URL = ConfigTestUtils.BUCKET_HOST_NAME + IMAGE_NAME;
-    private static final String SAMPLE_IMAGE_SIZE_URL = ConfigTestUtils.BUCKET_HOST_NAME + size + "x" + size + "/" + IMAGE_NAME;
+    private static final String IMAGE_NAME = "b94ce7c3-ed51-4a5e-97a4-59824baf286c.png";
+    private static final String SAMPLE_IMAGE_URL = ConfigTestUtils.BUCKET_URL + IMAGE_NAME;
+    private static final String SAMPLE_IMAGE_SIZE_URL = ConfigTestUtils.CLOUDFRONT_URL + size + "x" + size + "/" + IMAGE_NAME;
 
     private FileUploadService fileUploadService;
     @Mock

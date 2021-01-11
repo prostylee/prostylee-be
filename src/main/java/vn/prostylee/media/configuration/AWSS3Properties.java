@@ -30,7 +30,17 @@ public class AWSS3Properties {
     private String secretKey;
 
     /**
-     * AWS Hostname
+     * AWS bucket url
      */
-    private String hostname;
+    private String bucketUrl;
+
+    /**
+     * AWS cloudfront id
+     */
+    private String cloudFrontId;
+
+    /**
+     * AWS cloudfront url
+     */
+    private String cloudFrontUrl;
 }

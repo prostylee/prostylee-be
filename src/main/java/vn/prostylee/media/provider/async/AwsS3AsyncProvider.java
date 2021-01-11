@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 public class AwsS3AsyncProvider extends BaseAsyncProvider {
 
     private final AmazonS3 s3Client;
-    private final AWSS3Properties awss3Properties;
     private final AttachmentService attachmentService;
     private final String bucketName;
 
@@ -44,8 +43,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
             AWSS3Properties awss3Properties,
             AttachmentService attachmentService) {
         this.s3Client = s3Client;
-        this.awss3Properties = awss3Properties;
-        this.bucketName = this.awss3Properties.getBucket();
+        this.bucketName = awss3Properties.getBucket();
         this.attachmentService = attachmentService;
     }
 
@@ -68,12 +66,21 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
     @Async
     public Future<AttachmentResponse> uploadFile(String folderId, MultipartFile file) throws IOException {
         String folder = StringUtils.isEmpty(folderId) ? "" : folderId + AppConstant.PATH_SEPARATOR;
-        String fileName = folder + generateUniqueName();
+        String fileName = generateFileName(file, folder);
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
         Attachment attachment = attachmentService.saveAttachmentByUploadFile(storedUrl, file);
         AttachmentResponse attachmentDto = BeanUtil.copyProperties(attachment, AttachmentResponse.class);
         return new AsyncResult<>(attachmentDto);
+    }
+
+    private String generateFileName(MultipartFile file, String folder) {
+        String fileOrgName = file.getOriginalFilename();
+        String extension = "";
+        if (StringUtils.isNotBlank(fileOrgName)) {
+            extension = fileOrgName.substring(fileOrgName.indexOf("."));
+        }
+        return folder + generateUniqueName() + extension;
     }
 
     /**

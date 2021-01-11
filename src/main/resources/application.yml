@@ -124,7 +124,9 @@ app:
     region: ap-southeast-1
     accessKey: AKIAZVNNPQGLWGFMYF6X
     secretKey: 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
-    hostname: https://${app.aws.bucket}.s3.${app.aws.region}.amazonaws.com/
+    bucketUrl: https://${app.aws.bucket}.s3.${app.aws.region}.amazonaws.com/
+    cloudFrontId: d257kiz92yvhbo
+    cloudFrontUrl: https://${app.aws.cloudFrontId}.cloudfront.net/fit-in/
   http:
     connectTimeout: 5000
     responseTimeout: 5000
