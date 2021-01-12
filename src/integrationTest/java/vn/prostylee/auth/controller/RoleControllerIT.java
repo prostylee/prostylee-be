@@ -2,51 +2,58 @@ package vn.prostylee.auth.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import vn.prostylee.auth.dto.response.RoleResponse;
-import vn.prostylee.auth.service.RoleService;
-import vn.prostylee.core.dto.filter.MasterDataFilter;
-
-import java.util.Collections;
-import java.util.List;
+import org.springframework.web.context.WebApplicationContext;
+import vn.prostylee.IntegrationTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
-class RoleControllerTest {
-    private static final int totalOfRecords = 1;
-    private static final int pageSize = 1;
+@IntegrationTest
+@WebAppConfiguration
+@Sql(
+        scripts = { "/data/database/roles.sql" },
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+        config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
+)
+@Sql(
+        statements = { "DELETE FROM role" },
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD,
+        config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
+)
+public class RoleControllerIT {
+    private static final String ENDPOINT = "/v1/roles";
+
     private MockMvc mockMvc;
 
-    @Mock
-    private RoleService roleService;
+    @Autowired
+    private WebApplicationContext wac;
 
     @BeforeEach
     public void setup() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new RoleController(roleService)).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
     @Test
-    void getAllRoles_Successfully() throws Exception {
-        List<RoleResponse> responses = Collections.singletonList(mockResponse());
-        Page<RoleResponse> page = new PageImpl<>(responses);
-        when(roleService.findAll(new MasterDataFilter())).thenReturn(page);
+    void getAll_Successfully() throws Exception {
+        final int totalOfRecords = 5;
+        final int pageSize = 5;
 
         MvcResult mvcResult = this.mockMvc
-                .perform(get("/v1/roles"))
+                .perform(get(ENDPOINT)
+                        .param("page", "0")
+                        .param("limit", pageSize + "")
+                )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(totalOfRecords))
@@ -55,12 +62,5 @@ class RoleControllerTest {
                 .andReturn();
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
     }
-
-    private RoleResponse mockResponse() {
-        return RoleResponse.builder()
-                .id(1L)
-                .code("ADMIN")
-                .name("Administrator")
-                .build();
-    }
+    
 }
