@@ -1,6 +1,8 @@
 package vn.prostylee.media.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.constant.ApiUrl;
@@ -29,22 +31,26 @@ public class FileUploadController {
 	}
 
 	@GetMapping(value = "/files/{fileIds}")
-	public List<String> getFileUrls(
+	public ResponseEntity<List<String>> getFileUrls(
 			@RequestParam(required = false, name = WIDTH, defaultValue = "0") int width,
 			@RequestParam(required = false, name = HEIGHT, defaultValue = "0") int height,
 			@PathVariable(value = "fileIds") List<Long> fileIds
 	) {
-		return fileUploadService.getFiles(fileIds, width, height);
+		List<String> fileUrls = fileUploadService.getFiles(fileIds, width, height);
+		if(fileUrls.size() < fileIds.size()) {
+			return new ResponseEntity<>(fileUrls, HttpStatus.PARTIAL_CONTENT);
+		}
+		return new ResponseEntity<>(fileUrls, HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/files")
-	public List<AttachmentResponse> upload(@NotEmpty @RequestParam("file") List<MultipartFile> files) {
-		return fileUploadService.uploadFiles(files);
+	public ResponseEntity<List<AttachmentResponse>> upload(@NotEmpty @RequestParam("file") List<MultipartFile> files) {
+		return ResponseEntity.ok(fileUploadService.uploadFiles(files));
 	}
 
 	@DeleteMapping(value = "/files/{fileIds}")
-	public boolean delete(@PathVariable(value = "fileIds") List<Long> fileIds) {
-		return fileUploadService.deleteFiles(fileIds);
+	public ResponseEntity<Boolean> delete(@PathVariable(value = "fileIds") List<Long> fileIds) {
+		return ResponseEntity.ok(fileUploadService.deleteFiles(fileIds));
 	}
 
 }

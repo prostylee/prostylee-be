@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -65,8 +66,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
      */
     @Async
     public Future<AttachmentResponse> uploadFile(String folderId, MultipartFile file) throws IOException {
-        String folder = StringUtils.isEmpty(folderId) ? "" : folderId + AppConstant.PATH_SEPARATOR;
-        String fileName = generateFileName(file, folder);
+        String fileName = generateFileName(file, folderId);
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
         Attachment attachment = attachmentService.saveAttachmentByUploadFile(storedUrl, file);
@@ -74,13 +74,11 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
         return new AsyncResult<>(attachmentDto);
     }
 
-    private String generateFileName(MultipartFile file, String folder) {
-        String fileOrgName = file.getOriginalFilename();
-        String extension = "";
-        if (StringUtils.isNotBlank(fileOrgName)) {
-            extension = fileOrgName.substring(fileOrgName.indexOf("."));
-        }
-        return folder + generateUniqueName() + extension;
+    private String generateFileName(MultipartFile file, String folderId) {
+        String folder = StringUtils.isEmpty(folderId) ? "" : folderId + AppConstant.PATH_SEPARATOR;
+        String fileExt = FilenameUtils.getExtension(file.getOriginalFilename());
+        String extPath = StringUtils.isEmpty(fileExt) ? "" : FilenameUtils.EXTENSION_SEPARATOR_STR + fileExt;
+        return folder + generateUniqueName() + extPath;
     }
 
     /**

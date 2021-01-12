@@ -1,6 +1,7 @@
 package vn.prostylee.media.service.impl;
 
 import com.amazonaws.AmazonClientException;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.constant.ErrorResponseStatus;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
@@ -50,6 +52,9 @@ public class AwsS3ServiceImpl implements FileUploadService {
         List<String> urls = new ArrayList<>();
         for(Attachment attachment : attachments) {
             urls.add(addSizeForFile(attachment.getPath(), width, height));
+        }
+        if(Collections.isEmpty(urls)) {
+            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
         return urls;
     }
