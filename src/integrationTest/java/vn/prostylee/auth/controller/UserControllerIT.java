@@ -167,3 +167,4 @@ class UserControllerIT {
         return StringUtils.join("user", userId, "@prostylee.vn");
     }
 }
+
