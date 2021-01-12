@@ -1,6 +1,7 @@
 package vn.prostylee.core.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import vn.prostylee.core.dto.filter.MasterDataFilter;
 
 /**
  * The base service for master data
@@ -8,5 +9,5 @@ import java.util.List;
  */
 public interface MasterDataService<R> {
 
-    List<R> findAll();
+    Page<R> findAll(MasterDataFilter filter);
 }
