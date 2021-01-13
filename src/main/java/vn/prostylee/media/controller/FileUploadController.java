@@ -44,7 +44,7 @@ public class FileUploadController {
 	}
 
 	@PostMapping(value = "/files")
-	public ResponseEntity<List<AttachmentResponse>> upload(@NotEmpty @RequestParam("file") List<MultipartFile> files) {
+	public ResponseEntity<List<AttachmentResponse>> upload(@NotEmpty @RequestParam("files") List<MultipartFile> files) {
 		return ResponseEntity.ok(fileUploadService.uploadFiles(files));
 	}
 

@@ -49,12 +49,12 @@ public class AwsS3ServiceImpl implements FileUploadService {
     @Override
     public List<String> getFiles(List<Long> fileIds, int width, int height) {
         List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+        if(Collections.isEmpty(attachments)) {
+            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
+        }
         List<String> urls = new ArrayList<>();
         for(Attachment attachment : attachments) {
             urls.add(addSizeForFile(attachment.getPath(), width, height));
-        }
-        if(Collections.isEmpty(urls)) {
-            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
         return urls;
     }
@@ -62,8 +62,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
     private String addSizeForFile(String path, int width, int height) {
         String modifiedPath = path;
         if (width > 0 && height > 0) {
-            modifiedPath = path.replace(bucketUrl,
-                    cloudfrontUrl + width + "x" + height + AppConstant.PATH_SEPARATOR);
+            modifiedPath = path.replace(bucketUrl, String.format("%s%dx%d%s", cloudfrontUrl, width, height, AppConstant.PATH_SEPARATOR));
         }
         return modifiedPath;
     }
