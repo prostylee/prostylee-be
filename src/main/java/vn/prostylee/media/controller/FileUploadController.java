@@ -30,13 +30,13 @@ public class FileUploadController {
 		this.fileUploadService = fileUploadService;
 	}
 
-	@GetMapping(value = "/files/{fileIds}")
+	@GetMapping(value = "/images/{ids}")
 	public ResponseEntity<List<String>> getFileUrls(
 			@RequestParam(required = false, name = WIDTH, defaultValue = "0") int width,
 			@RequestParam(required = false, name = HEIGHT, defaultValue = "0") int height,
-			@PathVariable(value = "fileIds") List<Long> fileIds
+			@PathVariable(value = "ids") List<Long> fileIds
 	) {
-		List<String> fileUrls = fileUploadService.getFiles(fileIds, width, height);
+		List<String> fileUrls = fileUploadService.getImageUrls(fileIds, width, height);
 		if(fileUrls.size() < fileIds.size()) {
 			return new ResponseEntity<>(fileUrls, HttpStatus.PARTIAL_CONTENT);
 		}

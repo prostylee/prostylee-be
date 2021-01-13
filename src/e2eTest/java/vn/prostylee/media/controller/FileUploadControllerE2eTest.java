@@ -28,6 +28,7 @@ public class FileUploadControllerE2eTest extends BaseRestControllerE2eTest {
 
     private static final String FILE1 = "images/img-test-01.png";
     private static final String UPLOAD_URL = "/v1/media/files";
+    private static final String GET_IMAGE_URL = "/v1/media/images";
     private static final String IMAGE_CONDITION = "?w=150&h=150";
 
     @BeforeAll
@@ -60,7 +61,7 @@ public class FileUploadControllerE2eTest extends BaseRestControllerE2eTest {
         Response urls = given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .when()
-                .get(UPLOAD_URL+"/"+idsAsString+IMAGE_CONDITION);
+                .get(GET_IMAGE_URL + "/" + idsAsString + IMAGE_CONDITION);
         List<String> paths = urls.jsonPath().get();
 
         // Verify

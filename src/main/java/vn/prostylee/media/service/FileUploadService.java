@@ -12,11 +12,19 @@ public interface FileUploadService {
      * Get list file's url
      *
      * @param  fileIds The list of file ids will be get
-     * @param width width
-     * @param height height
      * @return The list file's url
      */
-    List<String> getFiles(List<Long> fileIds, int width, int height);
+    List<String> getFileUrls(List<Long> fileIds);
+
+    /**
+     * Get list image's url
+     *
+     * @param  fileIds The list of image ids will be get
+     * @param width width
+     * @param height height
+     * @return The list image's url
+     */
+    List<String> getImageUrls(List<Long> fileIds, int width, int height);
 
     /**
      * Upload files to the default folder id

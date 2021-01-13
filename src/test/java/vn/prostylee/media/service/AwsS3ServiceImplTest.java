@@ -73,14 +73,14 @@ public class AwsS3ServiceImplTest {
     @Test
     public void should_return_listUrlsWithoutSize_when_getFilesWithZeroSize() {
         when(attachmentRepository.findAllById(attachmentIds)).thenReturn(attachments);
-        List<String> results = fileUploadService.getFiles(attachmentIds, 0, 0);
+        List<String> results = fileUploadService.getImageUrls(attachmentIds, 0, 0);
         Assert.assertEquals(SAMPLE_IMAGE_URL, results.get(0));
     }
 
     @Test
     public void should_return_listUrlsWithSize_when_getFilesWithSize() {
         when(attachmentRepository.findAllById(attachmentIds)).thenReturn(attachments);
-        List<String> results = fileUploadService.getFiles(attachmentIds, size, size);
+        List<String> results = fileUploadService.getImageUrls(attachmentIds, size, size);
         Assert.assertEquals(SAMPLE_IMAGE_SIZE_URL, results.get(0));
     }
     @Test
