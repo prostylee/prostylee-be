@@ -12,7 +12,8 @@ public class ConfigTestUtils {
 
     public static final String FOLDER = "test-folder";
     public static final String BUCKET_NAME = "testaws";
-    public static final String BUCKET_HOST_NAME = "https://testaws.s3.ap-southeast-1.amazonaws.com/";
+    public static final String BUCKET_URL = "https://testaws.s3.ap-southeast-1.amazonaws.com/";
+    public static final String CLOUDFRONT_URL = "https://d257kiz92yvhbo.cloudfront.net/fit-in/";
     private static final String IMAGE_PNG = "image/png";
     public static final MockMultipartFile mockMultipartFile =
             new MockMultipartFile("IMAGE_UPLOAD_PARAM_NAME", "test.png",IMAGE_PNG, "1234567890".getBytes());
@@ -22,7 +23,8 @@ public class ConfigTestUtils {
     public static AWSS3Properties prepareAwsS3Props() {
         AWSS3Properties props = new AWSS3Properties();
         props.setBucket(BUCKET_NAME);
-        props.setHostname(BUCKET_HOST_NAME);
+        props.setBucketUrl(BUCKET_URL);
+        props.setCloudFrontUrl(CLOUDFRONT_URL);
         return props;
     }
 

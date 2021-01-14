@@ -1,6 +1,7 @@
 package vn.prostylee.media.service.impl;
 
 import com.amazonaws.AmazonClientException;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.constant.ErrorResponseStatus;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.configuration.AWSS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
@@ -30,7 +32,8 @@ public class AwsS3ServiceImpl implements FileUploadService {
 
     private final AwsS3AsyncProvider awsS3AsyncProvider;
     private final AttachmentRepository attachmentRepository;
-    private final String hostname;
+    private final String bucketUrl;
+    private final String cloudfrontUrl;
 
     @Autowired
     public AwsS3ServiceImpl(
@@ -39,26 +42,42 @@ public class AwsS3ServiceImpl implements FileUploadService {
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
         this.attachmentRepository = attachmentRepository;
-        this.hostname = awss3Properties.getHostname();
+        this.bucketUrl = awss3Properties.getBucketUrl();
+        this.cloudfrontUrl = awss3Properties.getCloudFrontUrl();
     }
 
     @Override
-    public List<String> getFiles(List<Long> fileIds, int width, int height) {
+    public List<String> getFileUrls(List<Long> fileIds) {
+        return getUrls(fileIds, 0, 0);
+    }
+
+    @Override
+    public List<String> getImageUrls(List<Long> fileIds, int width, int height) {
+        return getUrls(fileIds, width, height);
+    }
+
+    private List<String> getUrls(List<Long> fileIds, int width, int height) {
         List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+        if(Collections.isEmpty(attachments)) {
+            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
+        }
+        return generateUrlsByDimension(width, height, attachments);
+    }
+
+    private List<String> generateUrlsByDimension(int width, int height, List<Attachment> attachments) {
         List<String> urls = new ArrayList<>();
         for(Attachment attachment : attachments) {
-            urls.add(addSizeForFile(attachment.getPath(), width, height));
+            if (width > 0 && height > 0) {
+                urls.add(addSizeForFile(attachment.getPath(), width, height));
+            } else {
+                urls.add(attachment.getPath());
+            }
         }
         return urls;
     }
 
     private String addSizeForFile(String path, int width, int height) {
-        String modifiedPath = path;
-        if (width > 0 && height > 0) {
-            modifiedPath = path.replace(hostname,
-                    hostname + width + "x" + height + AppConstant.PATH_SEPARATOR);
-        }
-        return modifiedPath;
+        return path.replace(bucketUrl, String.format("%s%dx%d%s", cloudfrontUrl, width, height, AppConstant.PATH_SEPARATOR));
     }
 
     @Override
