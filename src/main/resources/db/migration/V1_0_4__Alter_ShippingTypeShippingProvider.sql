@@ -1,5 +1,5 @@
 ALTER TABLE shipping_type RENAME TO shipping_method;
-
+DROP TABLE IF EXISTS shipping_address;
 create table if not exists shipping_provider
 (
     id bigint not null
@@ -10,7 +10,8 @@ create table if not exists shipping_provider
     updated_by bigint,
     description varchar(512),
     name varchar(512),
-    price double precision
+    price double precision,
+    shipping_method_id bigint not null constraint "FK_shipping_method_shipping_provider" references shipping_type
 );
 
 alter table shipping_provider owner to postgres;
