@@ -1,6 +1,6 @@
 ALTER TABLE IF EXISTS shipping_type RENAME TO shipping_method;
-alter table shipping_method rename constraint shipping_type_pkey to shipping_method_pkey;
-alter index shipping_type_pkey rename to shipping_method_pkey;
+alter table IF EXISTS shipping_method rename constraint shipping_type_pkey to shipping_method_pkey;
+alter index IF EXISTS shipping_type_pkey rename to shipping_method_pkey;
 DROP TABLE IF EXISTS shipping_address;
 create table if not exists shipping_provider
 (
