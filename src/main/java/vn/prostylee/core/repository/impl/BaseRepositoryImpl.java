@@ -1,6 +1,6 @@
 package vn.prostylee.core.repository.impl;
 
-import vn.prostylee.core.repository.BaseRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.Assert;
+import vn.prostylee.core.repository.BaseRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.io.Serializable;
@@ -60,7 +60,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
         if (specs == null) {
             return super.findAll(notDeleted(), pageable);
         }
-        return super.findAll(Specification.where(specs.and(new DeletedIsNull<T>())), pageable);
+        return super.findAll(Specification.where(specs.and(new DeletedIsNull<>())), pageable);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
     @Override
     public Optional<T> findOneActive(ID id) {
         return super.findOne(
-                Specification.where(new ByIdSpecification<T, ID>(entityInformation, id)).and(notDeleted()));
+                Specification.where(new ByIdSpecification<>(entityInformation, id)).and(notDeleted()));
     }
 
     @Override
@@ -134,8 +134,8 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
     private int softDelete(ID id, Date dateTime) {
         Assert.notNull(id, "The given id must not be null!");
 
-        T entity = findOneActive(id).orElseThrow(() -> new NoResultException(
-                String.format("No %s entity with id %s exists!", entityInformation.getJavaType(), id)));
+        T entity = findOneActive(id).orElseThrow(() -> new EmptyResultDataAccessException(
+                String.format("No %s entity with id %s exists!", entityInformation.getJavaType(), id), 1));
 
         return softDelete(entity, dateTime);
     }
@@ -225,7 +225,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
      * @return
      */
     private static <T> Specification<T> notDeleted() {
-        return Specification.where(new DeletedIsNull<T>()).or(new DeletedTimeGreaterThanNow<T>());
+        return Specification.where(new DeletedIsNull<T>()).or(new DeletedTimeGreaterThanNow<>());
     }
 
     /**

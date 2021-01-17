@@ -42,6 +42,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     private Long getLoggedInUserId() {
-        return authenticatedProvider.getUserId().get();
+        return authenticatedProvider.getUserIdValue();
     }
 }
