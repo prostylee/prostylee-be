@@ -16,7 +16,6 @@ create table if not exists shipping_provider
     shipping_method_id bigint not null constraint "FK_shipping_method_shipping_provider" references shipping_method
 );
 
-alter table shipping_provider owner to postgres;
 insert into shipping_method (id, created_at, description, name) values (1, '2020-12-11 16:09:49', 'Grab Express', 'GRAB');
 
 insert into shipping_provider (id, created_at, description, name, price, shipping_method_id) values (10010, '2020-12-11 16:09:49', 'Grab Express', 'GRAB', 25000, 1);
