@@ -43,4 +43,6 @@ public class UserTracking extends AuditEntity {
 	@Column(name = "search_keyword", length = 512)
 	private String searchKeyword;
 
+	@Column(name = "path")
+	private String path;
 }

@@ -1,0 +1,1 @@
+ALTER TABLE user_tracking ADD COLUMN path text;
