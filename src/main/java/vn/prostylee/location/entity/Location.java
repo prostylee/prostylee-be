@@ -34,8 +34,11 @@ public class Location extends AuditEntity {
 	@Column(name = "address", length = 512)
 	private String address;
 
-	@Column(name = "latlng", length = 512)
-	private String latlng;
+	@Column(name = "latitude", length = 512)
+	private Double latitude;
+
+	@Column(name = "longitude", length = 512)
+	private Double longitude;
 
 	@Column(name = "state", length = 512)
 	private String state;
