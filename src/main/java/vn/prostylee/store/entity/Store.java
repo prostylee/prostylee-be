@@ -42,6 +42,9 @@ public class Store extends AuditEntity {
 	@Column(name = "name", length = 512)
 	private String name;
 
+	@Column(name = "description", length = 4096)
+	private String description;
+
 	@Column(name = "address", length = 512)
 	private String address;
 
