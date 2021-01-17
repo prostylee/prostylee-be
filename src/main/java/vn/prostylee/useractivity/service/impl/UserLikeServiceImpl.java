@@ -48,7 +48,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     @Override
     public boolean unlike(UserLikeRequest request) {
         try {
-            repository.unlike(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserId().get());
+            repository.unlike(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue());
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;

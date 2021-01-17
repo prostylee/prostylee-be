@@ -23,7 +23,7 @@ public class TransactionAdviceInterceptor {
 
 	private static final Integer TX_METHOD_TIMEOUT = -1; // Never timeout (-1)
 
-	private static final String AOP_POINTCUT_EXPRESSION = "execution(public * vn.prostylee..*.controller..*.*(..))";
+	private static final String AOP_POINTCUT_EXPRESSION = "execution(public * vn.prostylee.*.*.controller..*.*(..))";
 
 	private final TransactionManager transactionManager;
 

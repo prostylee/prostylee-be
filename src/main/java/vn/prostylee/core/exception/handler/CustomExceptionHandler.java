@@ -18,10 +18,25 @@ import javax.servlet.http.HttpServletRequest;
 public class CustomExceptionHandler {
 
     // Resource Not Found Exception
-    @ExceptionHandler({ ResourceNotFoundException.class, ValidatingException.class})
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ ResourceNotFoundException.class})
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
     public ResponseEntity<ApiErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
-        log.error("KlgResourceNotFoundException: ", ex);
+        log.error("ResourceNotFoundException: ", ex);
+        //
+        ApiErrorResponse response = new ApiErrorResponse();
+        response.setCode(HttpStatus.NOT_FOUND.value());
+        response.setMessage(ex.getMessage());
+        response.setTrace(buildTrace(ex));
+        response.setPath(request.getRequestURL().toString());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    // Resource Not Found Exception
+    @ExceptionHandler({ ValidatingException.class})
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiErrorResponse> handleValidatingException(ResourceNotFoundException ex, HttpServletRequest request) {
+        log.error("ValidatingException: ", ex);
         //
         ApiErrorResponse response = new ApiErrorResponse();
         response.setCode(HttpStatus.BAD_REQUEST.value());
@@ -36,7 +51,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(ApplicationException.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ApiErrorResponse> handleBadCredentialsException(ApplicationException ex, HttpServletRequest request) {
-        log.error("KlgApplicationException: ", ex);
+        log.error("ApplicationException: ", ex);
         //
         ApiErrorResponse response = new ApiErrorResponse();
         response.setCode(ex.getErrorStatus().value());

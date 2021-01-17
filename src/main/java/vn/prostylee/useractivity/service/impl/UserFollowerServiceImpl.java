@@ -48,7 +48,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     @Override
     public boolean unfollow(UserFollowerRequest request) {
         try {
-            repository.unfollow(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserId().get());
+            repository.unfollow(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue());
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;

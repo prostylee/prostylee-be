@@ -56,7 +56,7 @@ public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
         }
         Sort sort = sorts.get(0);
         for (int i = 1; i < sorts.size(); i++) {
-            sort.and(sorts.get(i));
+            sort = sort.and(sorts.get(i));
         }
         return sort;
     }

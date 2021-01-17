@@ -31,7 +31,7 @@ public class PushNotificationTokenServiceImpl implements PushNotificationTokenSe
     public boolean subscribe(SubscribePushNotificationRequest request) {
         if (!pushNotificationTokenRepository.findByToken(request.getToken()).isPresent()) {
             PushNotificationToken pushNotificationToken = BeanUtil.copyProperties(request, PushNotificationToken.class);
-            pushNotificationToken.setUserId(authenticatedProvider.getUserId().get());
+            pushNotificationToken.setUserId(authenticatedProvider.getUserIdValue());
             pushNotificationTokenRepository.save(pushNotificationToken);
         }
         return true;

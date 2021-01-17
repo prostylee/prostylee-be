@@ -45,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<NotificationResponse> findAll(BaseFilter baseFilter) {
         Specification<Notification> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Notification> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserId().get());
+        Specification<Notification> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserIdValue());
         searchable = searchable.and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<Notification> page = notificationRepository.findAll(searchable, pageable);
@@ -104,7 +104,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public boolean markAllAsRead() {
-        Long userId = authenticatedProvider.getUserId().get();
+        Long userId = authenticatedProvider.getUserIdValue();
         notificationRepository.markAllAsReadByUserId(userId, LocalDateTime.now());
         return true;
     }
@@ -120,7 +120,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public boolean deleteAll() {
-        Long userId = authenticatedProvider.getUserId().get();
+        Long userId = authenticatedProvider.getUserIdValue();
         notificationRepository.deleteAllByUserId(userId);
         return true;
     }
@@ -133,7 +133,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public int countUnreadNotification() {
-        Long userId = authenticatedProvider.getUserId().get();
+        Long userId = authenticatedProvider.getUserIdValue();
         return notificationRepository.countUnreadNotification(userId);
     }
 
