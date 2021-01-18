@@ -20,7 +20,6 @@ import java.util.Optional;
 @Aspect
 @Component
 @Slf4j
-@ConditionalOnExpression("${aspect.enabled:true}")
 @RequiredArgsConstructor
 public class UserTrackingAspect {
     public static final String KEYWORD = "keyword";
@@ -33,12 +32,23 @@ public class UserTrackingAspect {
 
     private final UserTrackingService userTrackingService;
 
-    @Before("@annotation(vn.prostylee.core.configuration.monitor.annotation.TrackUserBehavior)")
-    public void executionTime(JoinPoint joinPoint) {
+    @Before("@annotation(vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking)")
+    public void trackingUserBehavior(JoinPoint joinPoint) {
+        Long categoryId = null;
+        Long productId = null;
+        Long  storeId = null;
 
-        Long  categoryId = Long.valueOf(Optional.ofNullable(getParameterBy(CATEGORY_ID)).orElse(ZERO));
-        Long  productId = Long.valueOf(Optional.ofNullable(getParameterBy(PRODUCT_ID)).orElse(ZERO));
-        Long  storeId = Long.valueOf(Optional.ofNullable(getParameterBy(STORE_ID)).orElse(ZERO));
+        if(getParameterBy(CATEGORY_ID) != null ){
+            categoryId = Long.valueOf(getParameterBy(CATEGORY_ID));
+        }
+
+        if(getParameterBy(PRODUCT_ID) != null ){
+            productId = Long.valueOf(getParameterBy(PRODUCT_ID));
+        }
+
+        if(getParameterBy(STORE_ID) != null ){
+            productId = Long.valueOf(getParameterBy(STORE_ID));
+        }
 
         UserTrackingRequest requestDto = UserTrackingRequest.builder()
                 .categoryId(categoryId)

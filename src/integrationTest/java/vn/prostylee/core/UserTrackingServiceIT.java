@@ -10,6 +10,7 @@ import vn.prostylee.IntegrationTest;
 import vn.prostylee.useractivity.dto.request.UserTrackingRequest;
 import vn.prostylee.useractivity.dto.response.UserTrackingResponse;
 import vn.prostylee.useractivity.service.UserTrackingService;
+
 @IntegrationTest
 public class UserTrackingServiceIT {
 
@@ -25,13 +26,14 @@ public class UserTrackingServiceIT {
     }
 
     @Test
-    public void tesTracking() {
+    public void testTracking() {
         UserTrackingRequest request = UserTrackingRequest.builder()
                 .productId(1L)
                 .storeId(2L)
                 .categoryId(3L)
-                .path("ThisIsAPath")
-                .searchKeyword("ThisIsSearchKeyword").build();
+                .path("http://localhost:8090/api/v1/shippings/methods")
+                .searchKeyword("Iphone 12 Pro max")
+                .build();
 
         UserTrackingResponse responses = service.storeTracking(request);
 
