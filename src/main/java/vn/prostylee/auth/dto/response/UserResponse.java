@@ -35,4 +35,6 @@ public class UserResponse {
     private Date lastModifiedAt;
 
     private Boolean allowNotification;
+
+    private String avatar;
 }
