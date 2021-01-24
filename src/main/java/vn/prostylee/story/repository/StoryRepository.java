@@ -1,10 +1,9 @@
 package vn.prostylee.story.repository;
 
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.story.dto.response.StoryResponse;
 import vn.prostylee.story.entity.Story;
 
 import java.util.List;
@@ -17,10 +16,5 @@ import java.util.List;
 @Repository
 public interface StoryRepository extends BaseRepository<Story, Long> {
 
-    @Query("SELECT targetId Story WHERE targetId IN :ids AND targetType=:targetType")
-    @Modifying
-    void getStoriesBy(
-            @Param("targetId") List<Long> ids,
-            @Param("targetType") String targetType
-    );
+    Page<StoryResponse> getStoryByTargetIdInAndTargetType(List<Long> ids, String targetType);
 }

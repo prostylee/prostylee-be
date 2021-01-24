@@ -7,10 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.comment.constant.CommentDestinationType;
-import vn.prostylee.comment.dto.response.CommentResponse;
-import vn.prostylee.comment.entity.Comment;
-import vn.prostylee.comment.entity.CommentImage;
+import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
@@ -21,7 +20,6 @@ import vn.prostylee.story.dto.request.StoryRequest;
 import vn.prostylee.story.dto.response.StoryResponse;
 import vn.prostylee.story.entity.Story;
 import vn.prostylee.story.entity.StoryImage;
-import vn.prostylee.story.repository.StoryImageRepository;
 import vn.prostylee.story.repository.StoryRepository;
 import vn.prostylee.story.service.StoryService;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
@@ -42,43 +40,46 @@ public class StoryServiceImpl implements StoryService {
     private final BaseFilterSpecs<Story> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
     private final UserFollowerService userFollowerService;
+    private final UserProfileService userProfileService;
 
-    //Get story cua chinh no
     @Override
     public Page<StoryResponse> findAll(BaseFilter baseFilter) {
         return getStoryResponses(baseFilter, null);
     }
 
-    //Get user story mà nó follow
     @Override
     public Page<StoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
-        // lay list follow (follow user) của thang login .
-        // Check xem list nay co thang nao có story ko
-        // neu co add vao list story trả về
-
-        Long id = authenticatedProvider.getUserIdValue();
-        //Get List follower by createdBy
-        //Because when you following someone you have  a record in DB with createdBy you.
-        UserFollowerFilter userFilter = UserFollowerFilter.builder()
-                .userId(id)
-                .targetType("user")
-                .build();
-        List<Long> idFollows = userFollowerService.findAll(userFilter)
-                .map(UserFollowerResponse::getTargetId)
-                .stream()
-                .collect(Collectors.toList());
-
-        //
-        Page<StoryResponse> storyResponses = getStoryResponses(baseFilter, StoryDestinationType.USER);
+        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue());
+        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, StoryDestinationType.USER.getType());
+        storyResponses.getContent().forEach(response -> {
+            //TODO response.setProduct(new Product());
+            response.setUser(this.getUserBy(response.getId()));
+        });
         return storyResponses;
     }
 
-    //Get store story mà nó follow
     @Override
     public Page<StoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
-        return getStoryResponses(baseFilter , StoryDestinationType.STORE);
+        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue());
+        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, StoryDestinationType.STORE.getType());
+        storyResponses.getContent().forEach(response -> {
+            //TODO response.setProduct(new Product());
+            response.setUser(this.getUserBy(response.getId()));
+        });
+        return storyResponses;
     }
 
+    private User getUserBy(Long id) {
+        UserResponse profileBy = userProfileService.getProfileBy(id);
+        return BeanUtil.copyProperties(profileBy, User.class);
+    }
+
+    private List<Long> getFollowsBy(Long id) {
+        UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(StoryDestinationType.USER.getType()).build();
+        return userFollowerService.findAll(userFilter)
+                .map(UserFollowerResponse::getTargetId)
+                .stream().collect(Collectors.toList());
+    }
 
     private Page<StoryResponse> getStoryResponses(BaseFilter baseFilter, StoryDestinationType type) {
         Specification<Story> searchable = baseFilterSpecs.search(baseFilter);
@@ -89,6 +90,7 @@ public class StoryServiceImpl implements StoryService {
         Page<Story> page = storyRepository.findAllActive(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, StoryResponse.class));
     }
+
     @Override
     public StoryResponse findById(Long id) {
         Story story = getById(id);
