@@ -1,6 +1,7 @@
 package vn.prostylee.story.repository;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.story.dto.response.StoryResponse;
@@ -16,5 +17,5 @@ import java.util.List;
 @Repository
 public interface StoryRepository extends BaseRepository<Story, Long> {
 
-    Page<StoryResponse> getStoryByTargetIdInAndTargetType(List<Long> ids, String targetType);
+    Page<StoryResponse> getStoryByTargetIdInAndTargetType(List<Long> ids, String targetType, Pageable pageable);
 }

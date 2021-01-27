@@ -1,4 +1,10 @@
 package vn.prostylee.story.service;
 
-public class StoryImageService {
+import vn.prostylee.story.entity.StoryImage;
+
+import java.util.Set;
+
+public interface StoryImageService {
+
+    Set<StoryImage> getStoryImagesById(Long Id);
 }
