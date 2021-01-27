@@ -38,9 +38,7 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class StoryServiceImpl implements StoryService {
-    private static final String TARGET_TYPE = "targetType";
     private final StoryRepository storyRepository;
-    private final StoryImageService storyImageService;
     private final BaseFilterSpecs<Story> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
     private final UserFollowerService userFollowerService;
@@ -54,25 +52,22 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public Page<StoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.USER.getType();
-        StoryFilter userFilter = (StoryFilter) baseFilter;
-        Pageable pageable = baseFilterSpecs.page(userFilter);
-        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
-        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, type, pageable);
-        
-        storyResponses.getContent().forEach(response -> {
-            response.setUser(this.getUserBy(response.getId()));
-        });
-        return storyResponses;
+        StoryFilter filter = (StoryFilter) baseFilter;
+        return getStoryResponses(filter, type);
     }
 
     @Override
     public Page<StoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.STORE.getType();
-        StoryFilter userFilter = (StoryFilter) baseFilter;
-        Pageable pageable = baseFilterSpecs.page(userFilter);
-        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+        StoryFilter filter = (StoryFilter) baseFilter;
+        return getStoryResponses(filter, type);
+    }
 
-        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, type, pageable);
+    private Page<StoryResponse> getStoryResponses(StoryFilter filter, String type) {
+        Pageable pageable = baseFilterSpecs.page(filter);
+        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, type, pageable)
+                .map(entity -> BeanUtil.copyProperties(entity, StoryResponse.class));
         storyResponses.getContent().forEach(response -> {
             response.setUser(this.getUserBy(response.getId()));
         });

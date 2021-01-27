@@ -17,5 +17,5 @@ import java.util.List;
 @Repository
 public interface StoryRepository extends BaseRepository<Story, Long> {
 
-    Page<StoryResponse> getStoryByTargetIdInAndTargetType(List<Long> ids, String targetType, Pageable pageable);
+    Page<Story> getStoryByTargetIdInAndTargetType(List<Long> ids, String targetType, Pageable pageable);
 }
