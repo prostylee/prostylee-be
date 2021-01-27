@@ -18,7 +18,7 @@ public class CommentResponse {
     private Date deletedAt;
     private Date createdAt;
     private Long createdBy;
-    private Set<CommentImageResponse> commentImages;
+    private Set<CommentImage> commentImages;
     private User user;
 
 }
