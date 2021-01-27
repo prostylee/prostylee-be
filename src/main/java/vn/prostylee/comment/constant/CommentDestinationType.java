@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum CommentDestinationType {
 
     PRODUCT("product"),
-    STORE("store");
+    STORE("store"),
+    USER("user");
 
     @Getter
     private String type;
