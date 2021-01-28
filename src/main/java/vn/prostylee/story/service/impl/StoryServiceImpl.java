@@ -63,10 +63,10 @@ public class StoryServiceImpl implements StoryService {
     private Page<StoryResponse> getStoryResponses(StoryFilter filter, String type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
-        Page<StoryResponse> storyResponses = storyRepository.getStoryByTargetIdInAndTargetType(idFollows, type, pageable)
+        Page<StoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, StoryResponse.class));
         storyResponses.getContent().forEach(response -> {
-            response.setUser(this.getUserBy(response.getId()));
+            response.setUser(this.getUserBy(response.getCreatedBy()));
         });
         return storyResponses;
     }
