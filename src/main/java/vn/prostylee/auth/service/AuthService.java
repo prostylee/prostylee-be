@@ -1,8 +1,5 @@
 package vn.prostylee.auth.service;
 
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
-import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 
@@ -15,6 +12,8 @@ public interface AuthService {
     JwtAuthenticationToken refreshToken(RefreshTokenRequest request);
 
     boolean forgotPassword(ForgotPasswordRequest request);
+
+    boolean verifyOtp(OtpVerificationRequest request);
 
     JwtAuthenticationToken changePassword(ChangePasswordRequest request);
 

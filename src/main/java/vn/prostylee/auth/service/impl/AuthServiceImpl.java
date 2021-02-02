@@ -80,6 +80,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public boolean verifyOtp(OtpVerificationRequest request) {
+        return userPasswordService.verifyOtp(request);
+    }
+
+    @Override
     public JwtAuthenticationToken changePassword(ChangePasswordRequest request) {
         boolean isSuccess = userPasswordService.changePassword(request);
         if (isSuccess) {

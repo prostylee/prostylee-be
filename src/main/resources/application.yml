@@ -69,8 +69,8 @@ app:
   ## Security config
   security:
     reset-password-policies:
-      expiredInMinutes: 10
-      length: 8
+      expiredInMinutes: 5
+      length: 5
 
     ## JWT Authentication config
     jwt:
@@ -145,6 +145,7 @@ spring:
     locations: db/migration
     check-location: false
     enabled: true
+    placeholderReplacement: false
 
   datasource:
     driver-class-name: org.postgresql.Driver
