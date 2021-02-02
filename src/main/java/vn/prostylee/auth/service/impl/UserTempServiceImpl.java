@@ -27,7 +27,7 @@ public class UserTempServiceImpl implements UserTempService {
 
     @Override
     public UserTempResponse createUserTemp(String username) {
-        String rawPassword = RandomStringUtils.randomAlphanumeric(securityProperties.getResetPasswordPolicies().getLength());
+        String rawPassword = RandomStringUtils.randomNumeric(securityProperties.getResetPasswordPolicies().getLength());
         String encryptedPassword = EncrytedPasswordUtils.encryptPassword(rawPassword);
         Date expiredAt = Date.from(LocalDateTime.now()
                 .plusMinutes(securityProperties.getResetPasswordPolicies().getExpiredInMinutes())

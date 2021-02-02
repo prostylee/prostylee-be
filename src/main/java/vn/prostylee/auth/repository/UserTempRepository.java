@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public interface UserTempRepository extends BaseRepository<UserTemp, Long> {
 
-    @Query("select e from #{#entityName} e where e.username=?1 AND e.expiredAt>=?1")
+    @Query("select e from #{#entityName} e where e.username=?1 AND e.expiredAt>=?2")
     Optional<List<UserTemp>> getUserTemps(String username, Date beforeExpiredDate);
 
     void deleteByUsername(String username);

@@ -49,6 +49,12 @@ public class AuthController {
         return authService.forgotPassword(request);
     }
 
+    @PostMapping("/verify-otp")
+    @ResponseStatus(code = HttpStatus.OK)
+    public Boolean verifyOtp(@Valid @RequestBody OtpVerificationRequest request) {
+        return authService.verifyOtp(request);
+    }
+
     @PutMapping("/change-password")
     @ResponseStatus(code = HttpStatus.OK)
     public JwtAuthenticationToken changePassword(@Valid @RequestBody ChangePasswordRequest request) {
