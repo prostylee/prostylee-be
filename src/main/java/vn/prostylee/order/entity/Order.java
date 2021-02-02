@@ -35,8 +35,8 @@ public class Order extends AuditEntity {
 	@Column(name = "total_money")
 	private Double totalMoney;
 
-	@Column(name = "status", length = 512)
-	private String status;
+	@Column(name = "status")
+	private Integer status;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
