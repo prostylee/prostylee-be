@@ -50,7 +50,7 @@ public class Product extends AuditEntity {
 	private String description;
 
 	@Column(name = "status")
-	private ProductStatus status;
+	private Integer status;
 
 	@Column(name = "location_id", length = 512)
 	private String locationId;
