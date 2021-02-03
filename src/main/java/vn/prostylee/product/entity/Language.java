@@ -1,16 +1,11 @@
 package vn.prostylee.product.entity;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 public class Language extends AuditEntity {

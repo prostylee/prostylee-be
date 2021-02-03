@@ -2,7 +2,7 @@ package vn.prostylee.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Qualifier
 @AllArgsConstructor
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
@@ -43,7 +42,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
-        log.info("Find all category base on filter parameters");
         CategoryFilter categoryFilter = (CategoryFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
         Page<Category> page = this.categoryRepository.findAllActive(pageable);
@@ -52,13 +50,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse findById(Long id) {
-        log.info("Find category by id [{}]", id);
         return this.toResponse(this.getById(id));
     }
 
     @Override
     public CategoryResponse save(CategoryRequest request) {
-        log.info("Save category with request parameters");
         Category category = BeanUtil.copyProperties(request, Category.class);
         this.setAttributes(category, request.getAttributes());
         return toResponse(categoryRepository.saveAndFlush(category));
@@ -66,7 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse update(Long id, CategoryRequest request) {
-        log.info("Update category with id [{}]", id);
         Category category = this.getById(id);
         BeanUtil.mergeProperties(request, category);
         this.updateAttribute(category, request.getAttributes());
@@ -78,21 +73,11 @@ public class CategoryServiceImpl implements CategoryService {
     public boolean deleteById(Long id) {
         try {
             this.categoryRepository.softDelete(id);
-            log.info("Category with id [{}] deleted successfully", id);
             return true;
         } catch (EmptyResultDataAccessException e) {
-            throw new ResourceNotFoundException("Category is not found with id [" + id + "]");
+            log.debug("Category id {} does not exists", id);
+            return false;
         }
-    }
-
-    @Override
-    public boolean isEntityExists(Long aLong, Map<String, Object> uniqueValues) {
-        return false;
-    }
-
-    @Override
-    public boolean isFieldValueExists(String fieldName, Object value) {
-        return false;
     }
 
     private CategoryResponse toResponse(Category category) {
@@ -100,7 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void setAttributes(Category category, Set<AttributeRequest> attributeRequests) {
-        if (Objects.nonNull(attributeRequests)) {
+        if (CollectionUtils.isNotEmpty(attributeRequests)) {
             Set<Attribute> attributes = new HashSet<>();
             attributeRequests.forEach(item -> {
                 Attribute attribute = BeanUtil.copyProperties(item, Attribute.class);
@@ -113,7 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void setAttributeOptions(Attribute attribute, Set<AttributeOptionRequest> attributeOptionRequests) {
-        if (Objects.nonNull(attributeOptionRequests)) {
+        if (CollectionUtils.isNotEmpty(attributeOptionRequests)) {
             Set<AttributeOption> attributeOptions = new HashSet<>();
             attributeOptionRequests.forEach(option -> {
                 AttributeOption attributeOption = BeanUtil.copyProperties(option, AttributeOption.class);
@@ -171,14 +156,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     private List<Long> getAttrOptionsRequestIds(Set<AttributeOptionRequest> attributeOptionRequests) {
         if (Objects.isNull(attributeOptionRequests)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return attributeOptionRequests.stream().map(AttributeOptionRequest::getId).collect(Collectors.toList());
     }
 
     private List<Long> getAttrRequestIds(Set<AttributeRequest> attributeRequests) {
         if (Objects.isNull(attributeRequests)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return attributeRequests.stream().map(AttributeRequest::getId).collect(Collectors.toList());
     }
