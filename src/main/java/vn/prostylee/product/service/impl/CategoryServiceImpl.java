@@ -11,6 +11,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.EntityUtils;
 import vn.prostylee.product.dto.filter.CategoryFilter;
 import vn.prostylee.product.dto.request.AttributeOptionRequest;
 import vn.prostylee.product.dto.request.AttributeRequest;
@@ -56,7 +57,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse save(CategoryRequest request) {
         Category category = BeanUtil.copyProperties(request, Category.class);
-        this.setAttributes(category, request.getAttributes());
+        if (category.getOrder() == null) {
+            category.setOrder(1);
+        }
+        this.setAttributes(category, request.getAttributeRequests());
         return toResponse(categoryRepository.saveAndFlush(category));
     }
 
@@ -64,9 +68,12 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = this.getById(id);
         BeanUtil.mergeProperties(request, category);
-        this.updateAttribute(category, request.getAttributes());
+        if (category.getOrder() == null) {
+            category.setOrder(1);
+        }
+        this.updateAttribute(category, request.getAttributeRequests());
 
-        return BeanUtil.copyProperties(this.categoryRepository.save(category), CategoryResponse.class);
+        return toResponse(this.categoryRepository.save(category));
     }
 
     @Override
@@ -85,16 +92,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void setAttributes(Category category, Set<AttributeRequest> attributeRequests) {
-        if (CollectionUtils.isNotEmpty(attributeRequests)) {
-            Set<Attribute> attributes = new HashSet<>();
-            attributeRequests.forEach(item -> {
-                Attribute attribute = BeanUtil.copyProperties(item, Attribute.class);
-                attribute.setCategory(category);
-                this.setAttributeOptions(attribute, item.getAttributeOptions());
-                attributes.add(attribute);
-            });
-            category.setAttributes(attributes);
+        if (category.getAttributes() == null) {
+            category.setAttributes(new HashSet<>());
         }
+        Set<Attribute> mergedAttributes = EntityUtils.merge(category.getAttributes(), attributeRequests, "id", Attribute.class);
+        mergedAttributes.forEach(attribute -> attribute.setCategory(category));
+        category.setAttributes(mergedAttributes);
+
+        // TODO impl logic for attribute options
+
+//        if (CollectionUtils.isNotEmpty(attributeRequests)) {
+//            Set<Attribute> attributes = new HashSet<>();
+//            attributeRequests.forEach(item -> {
+//                Attribute attribute = BeanUtil.copyProperties(item, Attribute.class);
+//                attribute.setCategory(category);
+//                this.setAttributeOptions(attribute, item.getAttributeOptionRequests());
+//                attributes.add(attribute);
+//            });
+//            category.setAttributes(attributes);
+//        }
     }
 
     private void setAttributeOptions(Attribute attribute, Set<AttributeOptionRequest> attributeOptionRequests) {
@@ -120,7 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
                 attributes.forEach(attr -> {
                     if (attr.getId().equals(item.getId())) {
                         BeanUtil.mergeProperties(item, attr);
-                        this.updateAttributeOptions(attr, item.getAttributeOptions());
+                        this.updateAttributeOptions(attr, item.getAttributeOptionRequests());
                     }
                 });
                 this.attributeRepository.saveAll(attributes);

@@ -12,9 +12,13 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.product.dto.filter.CategoryFilter;
+import vn.prostylee.product.service.CategoryService;
+import vn.prostylee.store.dto.filter.StoreCategoryFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.CompanyResponse;
+import vn.prostylee.store.dto.response.StoreProductResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
@@ -33,6 +37,8 @@ public class StoreServiceImpl implements StoreService {
     private final BaseFilterSpecs<Store> baseFilterSpecs;
 
     private final AuthenticatedProvider authenticatedProvider;
+
+    private final CategoryService categoryService;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -114,5 +120,18 @@ public class StoreServiceImpl implements StoreService {
             log.debug("Delete a store without existing in database", e);
             return false;
         }
+    }
+
+    @Override
+    public Page<StoreProductResponse> getTopStoreCategories(StoreCategoryFilter storeCategoryFilter) {
+        Page<StoreResponse> storeResponses = findAll(storeCategoryFilter);
+        return storeResponses.map(storeResponse -> {
+            StoreProductResponse storeProductResponse = BeanUtil.copyProperties(storeResponses, StoreProductResponse.class);
+            CategoryFilter categoryFilter = new CategoryFilter();
+            categoryFilter.setLimit(storeCategoryFilter.getNumberOfCategory());
+            categoryFilter.setSorts(new String[] {"order"});
+//            storeProductResponse.setProducts(categoryService.findAll(categoryFilter).getContent());
+            return storeProductResponse;
+        });
     }
 }
