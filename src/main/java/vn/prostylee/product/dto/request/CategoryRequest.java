@@ -14,13 +14,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryRequest {
+
     @NotBlank
     private String name;
+
     private String description;
+
     @NotNull
     private Integer order;
+
     private String icon;
+
     private Boolean active;
+
     private String languageCode;
+
     private Set<AttributeRequest> attributes;
 }
