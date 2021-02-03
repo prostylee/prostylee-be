@@ -1,1 +1,0 @@
-ALTER TABLE product ADD COLUMN status varchar(50);

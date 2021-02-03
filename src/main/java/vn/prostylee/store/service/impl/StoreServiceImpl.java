@@ -12,13 +12,13 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.product.dto.filter.CategoryFilter;
-import vn.prostylee.product.service.CategoryService;
-import vn.prostylee.store.dto.filter.StoreCategoryFilter;
+import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.dto.filter.StoreFilter;
+import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.CompanyResponse;
-import vn.prostylee.store.dto.response.StoreProductResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
@@ -26,6 +26,7 @@ import vn.prostylee.store.repository.StoreRepository;
 import vn.prostylee.store.service.StoreService;
 
 import javax.persistence.criteria.Join;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class StoreServiceImpl implements StoreService {
 
     private final AuthenticatedProvider authenticatedProvider;
 
-    private final CategoryService categoryService;
+    private final ProductService productService;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -123,15 +124,20 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Page<StoreProductResponse> getTopStoreCategories(StoreCategoryFilter storeCategoryFilter) {
-        Page<StoreResponse> storeResponses = findAll(storeCategoryFilter);
+    public Page<StoreResponse> getTopProductsByStores(StoreProductFilter storeProductFilter) {
+        Page<StoreResponse> storeResponses = findAll(storeProductFilter);
         return storeResponses.map(storeResponse -> {
-            StoreProductResponse storeProductResponse = BeanUtil.copyProperties(storeResponses, StoreProductResponse.class);
-            CategoryFilter categoryFilter = new CategoryFilter();
-            categoryFilter.setLimit(storeCategoryFilter.getNumberOfCategory());
-            categoryFilter.setSorts(new String[] {"order"});
-//            storeProductResponse.setProducts(categoryService.findAll(categoryFilter).getContent());
+            StoreResponse storeProductResponse = BeanUtil.copyProperties(storeResponse, StoreResponse.class);
+            storeProductResponse.setProducts(getProducts(storeResponse.getId(), storeProductFilter.getNumberOfProducts()));
             return storeProductResponse;
         });
+    }
+
+    private List<ProductResponse> getProducts(Long storeId, int numberOfProducts) {
+        ProductFilter productFilter = new ProductFilter();
+        productFilter.setLimit(numberOfProducts);
+        productFilter.setStoreId(storeId);
+        productFilter.setSorts(new String[] {"name"});
+        return productService.findAll(productFilter).getContent();
     }
 }
