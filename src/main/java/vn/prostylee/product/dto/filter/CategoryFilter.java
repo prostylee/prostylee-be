@@ -15,7 +15,7 @@ public class CategoryFilter extends BaseFilter {
 
     private Integer order;
 
-    List<Attribute> attributes;
+    private List<Attribute> attributes;
 
     @Override
     public String[] getSearchableFields() {

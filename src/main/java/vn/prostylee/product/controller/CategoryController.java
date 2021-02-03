@@ -1,7 +1,6 @@
 package vn.prostylee.product.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
@@ -16,7 +15,7 @@ import vn.prostylee.product.service.CategoryService;
 public class CategoryController extends CrudController<CategoryRequest, CategoryResponse, Long, CategoryFilter> {
 
     @Autowired
-    public CategoryController(@Qualifier CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService) {
         super(categoryService);
     }
 }
