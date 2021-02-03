@@ -10,6 +10,7 @@ import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.entity.UserTemp;
 import vn.prostylee.auth.repository.UserTempRepository;
 import vn.prostylee.auth.service.UserTempService;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
 import java.time.LocalDateTime;
@@ -61,7 +62,7 @@ public class UserTempServiceImpl implements UserTempService {
         try {
             userTempRepository.deleteByUsername(username);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Username {} does not exists", username);
             return false;
         }

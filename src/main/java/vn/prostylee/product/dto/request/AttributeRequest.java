@@ -33,5 +33,6 @@ public class AttributeRequest {
     private String languageCode;
 
     @NotNull
-    private Set<AttributeOptionRequest> attributeOptions;
+    private Set<AttributeOptionRequest> attributeOptionRequests
+            ;
 }

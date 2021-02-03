@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Data
@@ -20,7 +19,6 @@ public class CategoryRequest {
 
     private String description;
 
-    @NotNull
     private Integer order;
 
     private String icon;
@@ -29,5 +27,6 @@ public class CategoryRequest {
 
     private String languageCode;
 
-    private Set<AttributeRequest> attributes;
+    private Set<AttributeRequest> attributeRequests
+            ;
 }

@@ -148,7 +148,7 @@ public class CategoryServiceImplTest {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         attributeRequests.add(BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class));
-        request.setAttributes(attributeRequests);
+        request.setAttributeRequests(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -167,9 +167,9 @@ public class CategoryServiceImplTest {
         attributeOptionRequests.add(BeanUtil.copyProperties(this.mockAttributeOption(), AttributeOptionRequest.class));
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         AttributeRequest attributeRequest = BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class);
-        attributeRequest.setAttributeOptions(attributeOptionRequests);
+        attributeRequest.setAttributeOptionRequests(attributeOptionRequests);
         attributeRequests.add(attributeRequest);
-        request.setAttributes(attributeRequests);
+        request.setAttributeRequests(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -214,7 +214,7 @@ public class CategoryServiceImplTest {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         attributeRequests.add(BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class));
-        request.setAttributes(attributeRequests);
+        request.setAttributeRequests(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.findOneActive(1L)).thenReturn(Optional.of(mockCategory));
@@ -235,9 +235,9 @@ public class CategoryServiceImplTest {
         attributeOptionRequests.add(BeanUtil.copyProperties(this.mockAttributeOption(), AttributeOptionRequest.class));
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         AttributeRequest attributeRequest = BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class);
-        attributeRequest.setAttributeOptions(attributeOptionRequests);
+        attributeRequest.setAttributeOptionRequests(attributeOptionRequests);
         attributeRequests.add(attributeRequest);
-        request.setAttributes(attributeRequests);
+        request.setAttributeRequests(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         mockCategory.setAttributes(this.mockAttribute());
