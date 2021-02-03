@@ -110,7 +110,7 @@ public class StoreServiceImpl implements StoreService {
         try {
             storeRepository.softDelete(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Delete a store without existing in database", e);
             return false;
         }

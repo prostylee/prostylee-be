@@ -74,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         try {
             this.categoryRepository.softDelete(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Category id {} does not exists", id);
             return false;
         }
