@@ -41,6 +41,11 @@ public class UserProfileServiceImpl implements UserProfileService {
         return userService.update(userRequest.getId(), userRequest);
     }
 
+    @Override
+    public UserResponse getProfileBy(Long Id) {
+        return userService.findById(Id);
+    }
+
     private Long getLoggedInUserId() {
         return authenticatedProvider.getUserIdValue();
     }

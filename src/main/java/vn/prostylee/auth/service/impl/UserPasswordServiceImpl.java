@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.request.ChangePasswordRequest;
 import vn.prostylee.auth.dto.request.ForgotPasswordRequest;
+import vn.prostylee.auth.dto.request.OtpVerificationRequest;
 import vn.prostylee.auth.dto.response.UserTempResponse;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.UserPasswordService;
@@ -16,6 +17,8 @@ import vn.prostylee.core.utils.EncrytedPasswordUtils;
 import vn.prostylee.notification.configure.event.EmailEvent;
 import vn.prostylee.notification.configure.event.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
+
+import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,10 +53,15 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
+    public boolean verifyOtp(OtpVerificationRequest request) {
+        return userTempService.isValid(request.getEmail(), request.getOtp());
+    }
+
+    @Override
+    @Transactional // TODO fix can not open transaction
     public boolean changePassword(ChangePasswordRequest request) {
         String email = request.getEmail();
-        final User user = userService.getUserByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User is not exists by getting with email " + email));
+        final User user = getUserByEmail(email);
 
         if ((authenticatedProvider.getUserId().isPresent() && EncrytedPasswordUtils.isMatched(request.getPassword(), user.getPassword())) ||
                 userTempService.isValid(email, request.getPassword())) {
@@ -63,10 +71,15 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             userService.save(user);
 
             // Delete temp account
-            userTempService.delete(email);
+            userTempService.delete(email); // TODO investigate why can not open transaction
 
             return true;
         }
         throw new ResourceNotFoundException("Incorrect password or password is expired");
+    }
+
+    private User getUserByEmail(String email) {
+        return userService.getUserByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("User is not exists by getting with email " + email));
     }
 }

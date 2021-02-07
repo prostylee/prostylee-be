@@ -13,9 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import vn.prostylee.auth.controller.RoleController;
 import vn.prostylee.comment.constant.CommentDestinationType;
-import vn.prostylee.comment.dto.response.CommentImageResponse;
 import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.comment.entity.CommentImage;
 import vn.prostylee.comment.service.impl.CommentServiceImpl;
@@ -81,12 +79,12 @@ public class CommentControllerTest {
         response.setCommentImages(mockResponseCommentImage());
         return  response;
     }
-    private Set<CommentImageResponse> mockResponseCommentImage() {
-        Set<CommentImageResponse> images =  new HashSet<>();
-        CommentImageResponse item =  new CommentImageResponse();
+    private Set<CommentImage> mockResponseCommentImage() {
+        Set<CommentImage> images =  new HashSet<>();
+        CommentImage item =  new CommentImage();
         item.setId(Long.valueOf(120921039));
         item.setAttachmentId(Long.valueOf(112323));
-        item.setOrder(Long.valueOf(1));
+        item.setOrder(1);
         images.add(item);
         return images;
     }
