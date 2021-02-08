@@ -7,20 +7,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.response.UserResponse;
-import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.media.entity.Attachment;
+import vn.prostylee.media.service.AttachmentService;
+import vn.prostylee.store.dto.response.StoreResponse;
+import vn.prostylee.store.service.StoreService;
 import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
-import vn.prostylee.story.dto.response.StoryResponse;
+import vn.prostylee.story.dto.response.StoreForStoryResponse;
+import vn.prostylee.story.dto.response.StoreStoryResponse;
+import vn.prostylee.story.dto.response.UserForStoryResponse;
+import vn.prostylee.story.dto.response.UserStoryResponse;
 import vn.prostylee.story.entity.Story;
 import vn.prostylee.story.entity.StoryImage;
 import vn.prostylee.story.repository.StoryRepository;
+import vn.prostylee.story.service.StoryImageService;
 import vn.prostylee.story.service.StoryService;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
@@ -40,40 +47,77 @@ public class StoryServiceImpl implements StoryService {
     private final AuthenticatedProvider authenticatedProvider;
     private final UserFollowerService userFollowerService;
     private final UserProfileService userProfileService;
+    private final AttachmentService attachmentService;
+    private final StoryImageService storyImageService;
+    private final StoreService storeService;
 
     @Override
-    public Page<StoryResponse> findAll(BaseFilter baseFilter) {
+    public Page<UserStoryResponse> findAll(BaseFilter baseFilter) {
         return null;
     }
 
     @Override
-    public Page<StoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
+    public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.USER.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoryResponses(filter, type);
+        return getUserStoryResponses(filter, type);
     }
 
     @Override
-    public Page<StoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
+    public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.STORE.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoryResponses(filter, type);
+        return getStoreStoryResponses(filter, type);
     }
 
-    private Page<StoryResponse> getStoryResponses(StoryFilter filter, String type) {
+    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
-        Page<StoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
-                .map(entity -> BeanUtil.copyProperties(entity, StoryResponse.class));
+
+        Page<UserStoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
+                .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
+
         storyResponses.getContent().forEach(response -> {
-            response.setUser(this.getUserBy(response.getCreatedBy()));
+            Set<StoryImage> storyImages =  storyImageService.getStoryImagesById(response.getId());
+            List<Long> attachmentIds =  storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
+            Set<String> urls = attachmentService.getAttachmentsBy(attachmentIds).stream().map(Attachment::getPath).collect(Collectors.toSet());
+            response.setStoryImageUrls(urls);
+        });
+
+        storyResponses.getContent().forEach(response -> {
+            response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
+        });
+
+        return storyResponses;
+    }
+
+    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
+        Pageable pageable = baseFilterSpecs.page(filter);
+        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+        Page<StoreStoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
+                .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
+
+        storyResponses.getContent().forEach(response -> {
+            Set<StoryImage> storyImages =  storyImageService.getStoryImagesById(response.getId());
+            List<Long> attachmentIds =  storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
+            Set<String> urls = attachmentService.getAttachmentsBy(attachmentIds).stream().map(Attachment::getPath).collect(Collectors.toSet());
+            response.setStoryImageUrls(urls);
+        });
+
+        storyResponses.getContent().forEach(response -> {
+            response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
         });
         return storyResponses;
     }
 
-    private User getUserBy(Long id) {
+    private StoreForStoryResponse getStoreForStoryBy(Long id) {
+        StoreResponse profileBy = storeService.findById(id);
+        return BeanUtil.copyProperties(profileBy, StoreForStoryResponse.class);
+    }
+
+    private UserForStoryResponse getUserForStoryBy(Long id) {
         UserResponse profileBy = userProfileService.getProfileBy(id);
-        return BeanUtil.copyProperties(profileBy, User.class);
+        return BeanUtil.copyProperties(profileBy, UserForStoryResponse.class);
     }
 
     private List<Long> getFollowsBy(Long id, String typeName) {
@@ -84,22 +128,22 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public StoryResponse findById(Long id) {
+    public UserStoryResponse findById(Long id) {
         Story story = getById(id);
-        return BeanUtil.copyProperties(story, StoryResponse.class);
+        return BeanUtil.copyProperties(story, UserStoryResponse.class);
     }
 
     @Override
-    public StoryResponse save(StoryRequest req) {
+    public UserStoryResponse save(StoryRequest req) {
         Story entity = BeanUtil.copyProperties(req, Story.class);
         if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
             entity.setStoryImages(buildStoryImages(req.getAttachmentIds(), entity));
         Story savedEntity = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, StoryResponse.class);
+        return BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
     }
 
     @Override
-    public StoryResponse update(Long id, StoryRequest req) {
+    public UserStoryResponse update(Long id, StoryRequest req) {
         Story entity = getById(id);
         Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentIds());
         if (attachmentIds.isPresent()) {
@@ -110,7 +154,7 @@ public class StoryServiceImpl implements StoryService {
 
         BeanUtil.mergeProperties(req, entity);
         Story savedUser = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedUser, StoryResponse.class);
+        return BeanUtil.copyProperties(savedUser, UserStoryResponse.class);
     }
 
     @Override
