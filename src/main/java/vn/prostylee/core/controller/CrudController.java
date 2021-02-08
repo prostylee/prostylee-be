@@ -1,15 +1,23 @@
 package vn.prostylee.core.controller;
 
-import vn.prostylee.core.dto.filter.BaseFilter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.service.CrudService;
 
 import javax.validation.Valid;
 
+/**
+ * CRUD controller
+ *
+ * @param <T> The request type
+ * @param <R> The response type
+ * @param <ID> The primary key of entity
+ * @param <F> The filter type which extends from {@link BaseFilter}
+ */
 @RequiredArgsConstructor
 public class CrudController<T, R, ID, F extends BaseFilter> {
 
