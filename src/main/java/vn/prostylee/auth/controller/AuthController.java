@@ -8,6 +8,7 @@ import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.service.AuthService;
 import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.core.dto.response.SimpleResponse;
 
 import javax.validation.Valid;
 
@@ -45,14 +46,14 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     @ResponseStatus(code = HttpStatus.OK)
-    public Boolean forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
-        return authService.forgotPassword(request);
+    public SimpleResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return SimpleResponse.builder().data(authService.forgotPassword(request)).build();
     }
 
     @PostMapping("/verify-otp")
     @ResponseStatus(code = HttpStatus.OK)
-    public Boolean verifyOtp(@Valid @RequestBody OtpVerificationRequest request) {
-        return authService.verifyOtp(request);
+    public SimpleResponse verifyOtp(@Valid @RequestBody OtpVerificationRequest request) {
+        return SimpleResponse.builder().data(authService.verifyOtp(request)).build();
     }
 
     @PutMapping("/change-password")

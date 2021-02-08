@@ -54,14 +54,14 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // TODO query by new feeds
-        switch (productFilter.getNewFeedType()) {
-            case USER:
-                break;
-            case STORE:
-                break;
-            default:
-                break;
-        }
+//        switch (productFilter.getNewFeedType()) {
+//            case USER:
+//                break;
+//            case STORE:
+//                break;
+//            default:
+//                break;
+//        }
 
         return spec;
     }

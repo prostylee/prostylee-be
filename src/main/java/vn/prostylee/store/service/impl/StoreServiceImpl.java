@@ -2,6 +2,8 @@ package vn.prostylee.store.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +14,9 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.location.service.LocationService;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.service.ProductService;
@@ -26,6 +31,7 @@ import vn.prostylee.store.repository.StoreRepository;
 import vn.prostylee.store.service.StoreService;
 
 import javax.persistence.criteria.Join;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -40,6 +46,10 @@ public class StoreServiceImpl implements StoreService {
     private final AuthenticatedProvider authenticatedProvider;
 
     private final ProductService productService;
+
+    private final FileUploadService fileUploadService;
+
+    private final LocationService locationService;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -127,6 +137,16 @@ public class StoreServiceImpl implements StoreService {
     public Page<StoreResponse> getTopProductsByStores(StoreProductFilter storeProductFilter) {
         Page<StoreResponse> storeResponses = findAll(storeProductFilter);
         return storeResponses.map(storeResponse -> {
+            List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+            if (CollectionUtils.isNotEmpty(imageUrls)) {
+                storeResponse.setLogoUrl(imageUrls.get(0));
+            }
+            if (storeResponse.getId() % RandomUtils.nextInt(1,5) == 0) { // TODO get ads from ads table
+                storeResponse.setIsAdvertising(true);
+            }
+            if (storeResponse.getLocationId() != null) {
+                storeResponse.setLocation(locationService.findById(storeResponse.getLocationId()));
+            }
             StoreResponse storeProductResponse = BeanUtil.copyProperties(storeResponse, StoreResponse.class);
             storeProductResponse.setProducts(getProducts(storeResponse.getId(), storeProductFilter.getNumberOfProducts()));
             return storeProductResponse;
