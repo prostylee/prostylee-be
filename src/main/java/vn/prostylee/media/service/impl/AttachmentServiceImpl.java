@@ -1,13 +1,16 @@
 package vn.prostylee.media.service.impl;
 
+import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.repository.AttachmentRepository;
 import vn.prostylee.media.service.AttachmentService;
 
 import java.net.URL;
+import java.util.List;
 
 /**
  * Attachment Service
@@ -34,5 +37,15 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setSizeInKb(file.getSize() / 1024);
         return attachmentRepository.save(attachment);
     }
+
+    @Override
+    public List<Attachment> getAttachmentsBy(List<Long> fileIds) {
+        List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+        if(Collections.isEmpty(attachments)) {
+            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
+        }
+        return attachments;
+    }
+
 
 }
