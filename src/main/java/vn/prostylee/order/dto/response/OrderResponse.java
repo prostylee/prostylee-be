@@ -12,6 +12,8 @@ import java.util.List;
 @Data
 public class OrderResponse {
 
+    private Long id;
+
     @NotNull
     private String code;
 

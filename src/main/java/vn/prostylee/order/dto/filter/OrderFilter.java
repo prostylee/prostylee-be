@@ -11,15 +11,14 @@ public class OrderFilter extends BaseFilter  {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "name"
+                "status"
         };
     }
 
     @Override
     public String[] getSortableFields() {
         return new String[] {
-                "name",
-                "active"
+                "buyerId",
         };
     }
 }

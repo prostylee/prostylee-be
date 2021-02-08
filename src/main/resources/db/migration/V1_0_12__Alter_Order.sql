@@ -42,7 +42,7 @@ create table if not exists "order_detail"
             references "order"
 );
 
-create table "shipping_address"
+create table if not exists "shipping_address"
 (
     id bigint not null
         constraint shipping_address_pkey
@@ -78,3 +78,5 @@ ALTER TABLE "order" ADD COLUMN total_money double precision;
 ALTER TABLE "order" ADD COLUMN shipping_address_id bigint;
 ALTER TABLE "order" ADD COLUMN shipping_provider_id bigint;
 ALTER TABLE "order" RENAME COLUMN payment_type TO payment_type_id;
+ALTER TABLE "order" ALTER COLUMN buyer_id TYPE bigint USING payment_type_id::bigint;
+ALTER TABLE "order" ALTER COLUMN payment_type_id TYPE bigint USING payment_type_id::bigint;

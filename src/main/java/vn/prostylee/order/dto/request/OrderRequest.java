@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -24,6 +25,9 @@ public class OrderRequest {
     private Integer status;
 
     @NotNull
+    private Long paymentTypeId;
+
+    @NotNull
     private Long buyerId;
 
     @NotNull
@@ -32,7 +36,9 @@ public class OrderRequest {
     @NotNull
     private Long shippingProviderId;
 
+    @NotEmpty
     private List<OrderDetailRequest> orderDetails;
 
+    @NotNull
     private List<OrderDiscountRequest> orderDiscounts;
 }
