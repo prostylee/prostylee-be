@@ -1,12 +1,15 @@
 package vn.prostylee.story.dto.response;
 
 import lombok.Data;
+import vn.prostylee.auth.entity.User;
+import vn.prostylee.product.entity.Product;
+import vn.prostylee.story.entity.StoryImage;
 
 import java.util.Date;
 import java.util.Set;
 
 @Data
-public class UserStoryResponse {
+public class StoryResponse {
 
     private Long id;
     private Long targetId;
@@ -14,7 +17,7 @@ public class UserStoryResponse {
     private Date createdAt;
     private Date deletedAt;
     private Long createdBy;
-    private Set<String> storyImageUrls;
-    private UserForStoryResponse userForStoryResponse;
+    private Set<StoryImage> storyImages;
+    private User user;
     private Long productId;
 }

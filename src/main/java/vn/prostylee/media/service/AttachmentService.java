@@ -4,7 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.entity.Attachment;
 
 import java.net.URL;
-import java.util.List;
 
 public interface AttachmentService {
 
@@ -16,7 +15,5 @@ public interface AttachmentService {
      * @return The attachment
      */
     Attachment saveAttachmentByUploadFile(URL fileUrl, MultipartFile file);
-
-    List<Attachment> getAttachmentsBy(List<Long> fileIds);
 
 }
