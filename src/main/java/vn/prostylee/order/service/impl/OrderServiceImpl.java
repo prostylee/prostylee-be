@@ -13,6 +13,7 @@ import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
 import vn.prostylee.order.dto.response.OrderDiscountResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
+import vn.prostylee.order.dto.response.OrderResponseCollection;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
@@ -202,5 +203,26 @@ public class OrderServiceImpl implements OrderService {
         orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
         orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
         return orderResponse;
+    }
+
+    @Override
+    public OrderResponseCollection getOrdersByStatus(Integer statusId) {
+        List<Order> orders = orderRepository.findAllByStatus(statusId);
+        List<OrderResponse> ordersResponse = Optional.ofNullable(orders)
+                .orElseGet(ArrayList::new)
+                .stream().map(this::convertToResponse)
+                .collect(Collectors.toList());
+        OrderResponseCollection response = new OrderResponseCollection();
+        response.setOrders(ordersResponse);
+        return response;
+    }
+
+
+    @Override
+    public OrderResponse updateStatus(Long id, Integer statusId) {
+        Order order = getOrderById(id);
+        order.setStatus(statusId);
+        Order savedOrder = orderRepository.save(order);
+        return convertToResponse(savedOrder);
     }
 }
