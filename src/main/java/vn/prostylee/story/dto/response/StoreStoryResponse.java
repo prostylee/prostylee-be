@@ -5,6 +5,7 @@ import vn.prostylee.auth.entity.User;
 import vn.prostylee.store.entity.Store;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -16,7 +17,7 @@ public class StoreStoryResponse {
     private Date createdAt;
     private Date deletedAt;
     private Long createdBy;
-    private Set<String> storyImageUrls; //url
+    private List<String> storyImageUrls;
     private StoreForStoryResponse storeForStoryResponse;
     private Long productId;
 }

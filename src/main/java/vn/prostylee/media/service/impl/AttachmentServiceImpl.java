@@ -38,14 +38,4 @@ public class AttachmentServiceImpl implements AttachmentService {
         return attachmentRepository.save(attachment);
     }
 
-    @Override
-    public List<Attachment> getAttachmentsBy(List<Long> fileIds) {
-        List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
-        if(Collections.isEmpty(attachments)) {
-            throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
-        }
-        return attachments;
-    }
-
-
 }
