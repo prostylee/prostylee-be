@@ -17,6 +17,4 @@ public interface AttachmentService {
      */
     Attachment saveAttachmentByUploadFile(URL fileUrl, MultipartFile file);
 
-    List<Attachment> getAttachmentsBy(List<Long> fileIds);
-
 }

@@ -15,8 +15,10 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
+import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
+import vn.prostylee.story.constant.StoryConstant;
 import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
@@ -50,7 +52,7 @@ public class StoryServiceImpl implements StoryService {
     private final AttachmentService attachmentService;
     private final StoryImageService storyImageService;
     private final StoreService storeService;
-
+    private final FileUploadService fileUploadService;
     @Override
     public Page<UserStoryResponse> findAll(BaseFilter baseFilter) {
         return null;
@@ -74,40 +76,42 @@ public class StoryServiceImpl implements StoryService {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
 
-        Page<UserStoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
+        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
 
-        storyResponses.getContent().forEach(response -> {
-            Set<StoryImage> storyImages =  storyImageService.getStoryImagesById(response.getId());
-            List<Long> attachmentIds =  storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
-            Set<String> urls = attachmentService.getAttachmentsBy(attachmentIds).stream().map(Attachment::getPath).collect(Collectors.toSet());
-            response.setStoryImageUrls(urls);
+        responses.getContent().forEach(response -> {
+            response.setStoryImageUrls(fetchUrls(response.getId()));
         });
 
-        storyResponses.getContent().forEach(response -> {
+        responses.getContent().forEach(response -> {
             response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
         });
 
-        return storyResponses;
+        return responses;
     }
 
     private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
-        Page<StoreStoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
+
+        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
 
-        storyResponses.getContent().forEach(response -> {
-            Set<StoryImage> storyImages =  storyImageService.getStoryImagesById(response.getId());
-            List<Long> attachmentIds =  storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
-            Set<String> urls = attachmentService.getAttachmentsBy(attachmentIds).stream().map(Attachment::getPath).collect(Collectors.toSet());
-            response.setStoryImageUrls(urls);
+        responses.getContent().forEach(response -> {
+            response.setStoryImageUrls(fetchUrls(response.getId()));
         });
 
-        storyResponses.getContent().forEach(response -> {
+        responses.getContent().forEach(response -> {
             response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
         });
-        return storyResponses;
+
+        return responses;
+    }
+
+    private List<String> fetchUrls(Long storyId) {
+        Set<StoryImage> storyImages = storyImageService.getStoryImagesById(storyId);
+        List<Long> attachmentIds = storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
+        return fileUploadService.getImageUrls(attachmentIds, StoryConstant.WIDTH, StoryConstant.HEIGHT);
     }
 
     private StoreForStoryResponse getStoreForStoryBy(Long id) {
