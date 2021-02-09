@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 
 /**
  * CRUD service
+ *
  * @param <T> The request type
  * @param <R> The response type
  * @param <ID> The primary key of entity

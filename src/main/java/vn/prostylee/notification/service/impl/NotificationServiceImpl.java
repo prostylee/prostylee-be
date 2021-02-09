@@ -1,9 +1,21 @@
 package vn.prostylee.notification.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.UserToken;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.executor.ChunkServiceExecutor;
 import vn.prostylee.core.provider.AuthenticatedProvider;
+import vn.prostylee.core.specs.BaseFilterSpecs;
+import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.notification.constant.NotificationProvider;
 import vn.prostylee.notification.constant.NotificationType;
 import vn.prostylee.notification.dto.PushNotificationDto;
@@ -15,23 +27,13 @@ import vn.prostylee.notification.dto.response.NotificationResponse;
 import vn.prostylee.notification.entity.Notification;
 import vn.prostylee.notification.factory.PushNotificationServiceFactory;
 import vn.prostylee.notification.repository.NotificationRepository;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import vn.prostylee.core.executor.ChunkServiceExecutor;
-import vn.prostylee.core.specs.BaseFilterSpecs;
-import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.notification.service.NotificationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -89,7 +91,8 @@ public class NotificationServiceImpl implements NotificationService {
         try {
             notificationRepository.deleteById(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
+            log.debug("Delete a notification without existing in database", e);
             return false;
         }
     }

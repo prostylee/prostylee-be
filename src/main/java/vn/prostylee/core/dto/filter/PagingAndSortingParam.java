@@ -11,7 +11,7 @@ public abstract class PagingAndSortingParam implements SortingDefinitions {
     private int page = 0;
 
     @Min(value = 1)
-    private int limit = 50;
+    private int limit = 30;
 
     /**
      * Multiple sort request parameters.

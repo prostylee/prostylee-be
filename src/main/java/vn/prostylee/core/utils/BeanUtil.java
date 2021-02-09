@@ -1,12 +1,14 @@
 package vn.prostylee.core.utils;
 
-import vn.prostylee.core.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
+import vn.prostylee.core.exception.ApplicationException;
 
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
@@ -17,8 +19,15 @@ import java.util.stream.Stream;
 @Slf4j
 public final class BeanUtil {
 
+	private static final ModelMapper modelMapper;
+
+	static {
+		modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		modelMapper.getConfiguration().setAmbiguityIgnored(true);
+	}
+
 	private BeanUtil() {
-		super();
 	}
 
 	/**
@@ -34,7 +43,7 @@ public final class BeanUtil {
 		try {
 			Class<?> clazz = Class.forName(type.getName());
 			T desc = createNewInstance(clazz);
-			BeanUtils.copyProperties(source, desc);
+			modelMapper.map(source, desc);
 			return desc;
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			log.error("Error copy properties: ", e);
