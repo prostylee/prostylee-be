@@ -13,6 +13,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
@@ -35,6 +36,7 @@ import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,12 +46,12 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class StoryServiceImpl implements StoryService {
+    public static final int FIRST_INDEX = 0;
     private final StoryRepository storyRepository;
     private final BaseFilterSpecs<Story> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
     private final UserFollowerService userFollowerService;
     private final UserProfileService userProfileService;
-    private final AttachmentService attachmentService;
     private final StoryImageService storyImageService;
     private final StoreService storeService;
     private final FileUploadService fileUploadService;
@@ -111,12 +113,17 @@ public class StoryServiceImpl implements StoryService {
     private List<String> fetchUrls(Long storyId) {
         Set<StoryImage> storyImages = storyImageService.getStoryImagesById(storyId);
         List<Long> attachmentIds = storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
-        return fileUploadService.getImageUrls(attachmentIds, StoryConstant.WIDTH, StoryConstant.HEIGHT);
+        return fileUploadService.getImageUrls(attachmentIds, ImageSize.LARGE.getWidth(), ImageSize.LARGE.getHeight());
     }
 
     private StoreForStoryResponse getStoreForStoryBy(Long id) {
-        StoreResponse profileBy = storeService.findById(id);
-        return BeanUtil.copyProperties(profileBy, StoreForStoryResponse.class);
+        StoreResponse storeResponse = storeService.findById(id);
+        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
+                ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+        if (CollectionUtils.isNotEmpty(imageUrls)) {
+            storeResponse.setLogoUrl(imageUrls.get(FIRST_INDEX));
+        }
+        return BeanUtil.copyProperties(storeResponse, StoreForStoryResponse.class);
     }
 
     private UserForStoryResponse getUserForStoryBy(Long id) {
@@ -133,7 +140,7 @@ public class StoryServiceImpl implements StoryService {
 
     @Override
     public UserStoryResponse findById(Long id) {
-        Story story = getById(id);
+        Story story = this.getById(id);
         return BeanUtil.copyProperties(story, UserStoryResponse.class);
     }
 
