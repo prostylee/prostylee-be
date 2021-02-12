@@ -3,6 +3,7 @@ package vn.prostylee.order.entity;
 
 import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
+import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.payment.entity.PaymentType;
 import vn.prostylee.shipping.entity.ShippingAddress;
 import vn.prostylee.shipping.entity.ShippingProvider;
@@ -37,7 +38,8 @@ public class Order extends AuditEntity {
 	private Double totalMoney;
 
 	@Column(name = "status")
-	private Integer status;
+	@Enumerated(EnumType.ORDINAL)
+	private OrderStatus status;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

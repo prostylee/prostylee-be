@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -22,6 +23,8 @@ public class OrderRequest {
     @Min(1)
     private Double totalMoney;
 
+    @NotNull
+    @Range(min = 0, max = 2)
     private Integer status;
 
     @NotNull

@@ -5,32 +5,27 @@ import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
+import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
-import vn.prostylee.order.dto.response.OrderResponseCollection;
 import vn.prostylee.order.service.OrderService;
 
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(ApiVersion.API_V1 + "/orders")
 public class OrderController extends CrudController<OrderRequest, OrderResponse, Long, OrderFilter> {
 
-    public OrderService orderService;
+    public final OrderService orderService;
 
     public OrderController(OrderService orderService) {
         super(orderService);
         this.orderService = orderService;
     }
 
-    @GetMapping("status/{statusId}")
-    public OrderResponseCollection getStatus(@Min(0) @PathVariable Integer statusId) {
-        return orderService.getOrdersByStatus(statusId);
-    }
-
-    @PutMapping("{id}/status/{statusId}")
+    @PatchMapping("{id}")
     public OrderResponse updateStatus(@PathVariable Long id,
-                                      @Min(0) @PathVariable Integer statusId) {
-        return orderService.updateStatus(id, statusId);
+                                      @Valid @RequestBody OrderStatusRequest statusRequest) {
+        return orderService.updateStatus(id, statusRequest);
     }
 
 }

@@ -19,7 +19,7 @@ public enum OrderStatus {
         return Stream.of(OrderStatus.values())
                 .filter(storeStatus -> storeStatus.getValue() == value)
                 .findFirst()
-                .orElse(null);
+                .orElse(AWAITING_CONFIRMATION);
 
     }
 }

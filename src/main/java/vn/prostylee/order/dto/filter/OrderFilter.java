@@ -8,6 +8,8 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 @EqualsAndHashCode(callSuper = true)
 public class OrderFilter extends BaseFilter  {
 
+    private Integer status;
+
     @Override
     public String[] getSearchableFields() {
         return new String[] {
@@ -18,7 +20,7 @@ public class OrderFilter extends BaseFilter  {
     @Override
     public String[] getSortableFields() {
         return new String[] {
-                "buyerId",
+                "buyerId"
         };
     }
 }
