@@ -8,14 +8,14 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum OrderStatus {
 
-    AWAITING_CONFIRMATION(0),
-    IN_PROGRESS(1),
-    COMPLETE(2);
- 
-    @Getter
-    private final int value;
+    AWAITING_CONFIRMATION("AWAITING_CONFIRMATION"),
+    IN_PROGRESS("IN_PROGRESS"),
+    COMPLETE("COMPLETE");
 
-    public static final OrderStatus getByStatusValue(int value) {
+    @Getter
+    private final String value;
+
+    public static final OrderStatus getByStatusValue(String value) {
         return Stream.of(OrderStatus.values())
                 .filter(storeStatus -> storeStatus.getValue() == value)
                 .findFirst()

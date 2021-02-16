@@ -20,7 +20,7 @@ public class OrderResponse {
     @NotNull
     private Date createdAt;
 
-    private Integer status;
+    private String status;
 
     @NotNull
     @Min(1)

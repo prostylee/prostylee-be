@@ -24,8 +24,7 @@ public class OrderRequest {
     private Double totalMoney;
 
     @NotNull
-    @Range(min = 0, max = 2)
-    private Integer status;
+    private String status;
 
     @NotNull
     private Long paymentTypeId;

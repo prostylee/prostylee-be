@@ -1,6 +1,7 @@
 package vn.prostylee.order.dto.response;
 
 import lombok.Data;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -10,8 +11,7 @@ public class OrderDetailResponse {
 
     private Long id;
 
-    @NotNull
-    private Long productId;
+    private StoreResponseLite store;
 
     private Double productPrice;
 

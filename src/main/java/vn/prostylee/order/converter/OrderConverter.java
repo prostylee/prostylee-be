@@ -3,6 +3,7 @@ package vn.prostylee.order.converter;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.dto.request.OrderDetailRequest;
 import vn.prostylee.order.dto.request.OrderDiscountRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
@@ -22,6 +23,7 @@ import vn.prostylee.shipping.entity.ShippingAddress;
 import vn.prostylee.shipping.entity.ShippingProvider;
 import vn.prostylee.shipping.repository.ShippingAddressRepository;
 import vn.prostylee.shipping.repository.ShippingProviderRepository;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.repository.StoreRepository;
 
@@ -66,6 +68,7 @@ public class OrderConverter {
         order.setShippingProvider(sp);
         ShippingAddress sa = getShippingAddressById(request.getShippingAddressId());
         order.setShippingAddress(sa);
+        order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
 
         convertOrderDetails(request, order);
         convertOrderDiscounts(request, order);
@@ -147,7 +150,7 @@ public class OrderConverter {
         orderResponse.setOrderDetails(
                 Optional.ofNullable(order.getOrderDetails())
                         .orElseGet(HashSet::new)
-                        .stream().map(detail -> BeanUtil.copyProperties(detail, OrderDetailResponse.class))
+                        .stream().map(this::convertToOrderDetailResponse)
                         .collect(Collectors.toList())
         );
         orderResponse.setOrderDiscounts(
@@ -156,8 +159,16 @@ public class OrderConverter {
                         .stream().map(discount -> BeanUtil.copyProperties(discount, OrderDiscountResponse.class))
                         .collect(Collectors.toList())
         );
+        orderResponse.setStatus(order.getStatus().name());
         orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
         orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
         return orderResponse;
+    }
+
+    private OrderDetailResponse convertToOrderDetailResponse(OrderDetail detail) {
+        OrderDetailResponse detailResponse = BeanUtil.copyProperties(detail, OrderDetailResponse.class);
+        StoreResponseLite storeResponse = BeanUtil.copyProperties(detail.getStore(), StoreResponseLite.class);
+        detailResponse.setStore(storeResponse);
+        return detailResponse;
     }
 }

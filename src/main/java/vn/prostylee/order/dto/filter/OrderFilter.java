@@ -13,6 +13,7 @@ public class OrderFilter extends BaseFilter  {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
+                "code",
                 "status"
         };
     }
@@ -20,7 +21,7 @@ public class OrderFilter extends BaseFilter  {
     @Override
     public String[] getSortableFields() {
         return new String[] {
-                "buyerId"
+                "createdAt"
         };
     }
 }
