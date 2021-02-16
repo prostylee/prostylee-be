@@ -17,7 +17,7 @@ public enum OrderStatus {
 
     public static final OrderStatus getByStatusValue(String value) {
         return Stream.of(OrderStatus.values())
-                .filter(storeStatus -> storeStatus.getValue() == value)
+                .filter(storeStatus -> storeStatus.getValue().equals(value))
                 .findFirst()
                 .orElse(AWAITING_CONFIRMATION);
 

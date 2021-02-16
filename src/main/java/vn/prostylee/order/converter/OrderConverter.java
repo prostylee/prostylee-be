@@ -159,6 +159,7 @@ public class OrderConverter {
                         .stream().map(discount -> BeanUtil.copyProperties(discount, OrderDiscountResponse.class))
                         .collect(Collectors.toList())
         );
+        orderResponse.setPaymentType(order.getPaymentType().getName());
         orderResponse.setStatus(order.getStatus().name());
         orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
         orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
