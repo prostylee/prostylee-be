@@ -7,25 +7,36 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.response.UserResponse;
-import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.entity.Attachment;
+import vn.prostylee.media.service.AttachmentService;
+import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.store.dto.response.StoreResponse;
+import vn.prostylee.store.service.StoreService;
+import vn.prostylee.story.constant.StoryConstant;
 import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
-import vn.prostylee.story.dto.response.StoryResponse;
+import vn.prostylee.story.dto.response.StoreForStoryResponse;
+import vn.prostylee.story.dto.response.StoreStoryResponse;
+import vn.prostylee.story.dto.response.UserForStoryResponse;
+import vn.prostylee.story.dto.response.UserStoryResponse;
 import vn.prostylee.story.entity.Story;
 import vn.prostylee.story.entity.StoryImage;
 import vn.prostylee.story.repository.StoryRepository;
+import vn.prostylee.story.service.StoryImageService;
 import vn.prostylee.story.service.StoryService;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,45 +46,89 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class StoryServiceImpl implements StoryService {
+    public static final int FIRST_INDEX = 0;
     private final StoryRepository storyRepository;
     private final BaseFilterSpecs<Story> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
     private final UserFollowerService userFollowerService;
     private final UserProfileService userProfileService;
-
+    private final StoryImageService storyImageService;
+    private final StoreService storeService;
+    private final FileUploadService fileUploadService;
     @Override
-    public Page<StoryResponse> findAll(BaseFilter baseFilter) {
+    public Page<UserStoryResponse> findAll(BaseFilter baseFilter) {
         return null;
     }
 
     @Override
-    public Page<StoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
+    public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.USER.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoryResponses(filter, type);
+        return getUserStoryResponses(filter, type);
     }
 
     @Override
-    public Page<StoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
+    public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         String type = StoryDestinationType.STORE.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoryResponses(filter, type);
+        return getStoreStoryResponses(filter, type);
     }
 
-    private Page<StoryResponse> getStoryResponses(StoryFilter filter, String type) {
+    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
-        Page<StoryResponse> storyResponses = storyRepository.getStories(idFollows, type, pageable)
-                .map(entity -> BeanUtil.copyProperties(entity, StoryResponse.class));
-        storyResponses.getContent().forEach(response -> {
-            response.setUser(this.getUserBy(response.getCreatedBy()));
+
+        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+                .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
+
+        responses.getContent().forEach(response -> {
+            response.setStoryImageUrls(fetchUrls(response.getId()));
         });
-        return storyResponses;
+
+        responses.getContent().forEach(response -> {
+            response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
+        });
+
+        return responses;
     }
 
-    private User getUserBy(Long id) {
+    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
+        Pageable pageable = baseFilterSpecs.page(filter);
+        List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+
+        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+                .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
+
+        responses.getContent().forEach(response -> {
+            response.setStoryImageUrls(fetchUrls(response.getId()));
+        });
+
+        responses.getContent().forEach(response -> {
+            response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
+        });
+
+        return responses;
+    }
+
+    private List<String> fetchUrls(Long storyId) {
+        Set<StoryImage> storyImages = storyImageService.getStoryImagesById(storyId);
+        List<Long> attachmentIds = storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
+        return fileUploadService.getImageUrls(attachmentIds, ImageSize.LARGE.getWidth(), ImageSize.LARGE.getHeight());
+    }
+
+    private StoreForStoryResponse getStoreForStoryBy(Long id) {
+        StoreResponse storeResponse = storeService.findById(id);
+        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
+                ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+        if (CollectionUtils.isNotEmpty(imageUrls)) {
+            storeResponse.setLogoUrl(imageUrls.get(FIRST_INDEX));
+        }
+        return BeanUtil.copyProperties(storeResponse, StoreForStoryResponse.class);
+    }
+
+    private UserForStoryResponse getUserForStoryBy(Long id) {
         UserResponse profileBy = userProfileService.getProfileBy(id);
-        return BeanUtil.copyProperties(profileBy, User.class);
+        return BeanUtil.copyProperties(profileBy, UserForStoryResponse.class);
     }
 
     private List<Long> getFollowsBy(Long id, String typeName) {
@@ -84,22 +139,22 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public StoryResponse findById(Long id) {
-        Story story = getById(id);
-        return BeanUtil.copyProperties(story, StoryResponse.class);
+    public UserStoryResponse findById(Long id) {
+        Story story = this.getById(id);
+        return BeanUtil.copyProperties(story, UserStoryResponse.class);
     }
 
     @Override
-    public StoryResponse save(StoryRequest req) {
+    public UserStoryResponse save(StoryRequest req) {
         Story entity = BeanUtil.copyProperties(req, Story.class);
         if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
             entity.setStoryImages(buildStoryImages(req.getAttachmentIds(), entity));
         Story savedEntity = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, StoryResponse.class);
+        return BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
     }
 
     @Override
-    public StoryResponse update(Long id, StoryRequest req) {
+    public UserStoryResponse update(Long id, StoryRequest req) {
         Story entity = getById(id);
         Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentIds());
         if (attachmentIds.isPresent()) {
@@ -110,7 +165,7 @@ public class StoryServiceImpl implements StoryService {
 
         BeanUtil.mergeProperties(req, entity);
         Story savedUser = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedUser, StoryResponse.class);
+        return BeanUtil.copyProperties(savedUser, UserStoryResponse.class);
     }
 
     @Override

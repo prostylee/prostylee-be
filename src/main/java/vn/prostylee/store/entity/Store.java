@@ -67,4 +67,7 @@ public class Store extends AuditEntity {
 	@Column(name = "deleted_at", length = 19)
 	private Date deletedAt;
 
+	@Column(name = "logo")
+	private Long logo;
+
 }

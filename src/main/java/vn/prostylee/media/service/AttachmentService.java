@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.entity.Attachment;
 
 import java.net.URL;
+import java.util.List;
 
 public interface AttachmentService {
 
