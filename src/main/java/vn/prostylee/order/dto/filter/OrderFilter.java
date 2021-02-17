@@ -1,5 +1,6 @@
 package vn.prostylee.order.dto.filter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
@@ -9,6 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class OrderFilter extends BaseFilter  {
 
     private String status;
+    @JsonIgnore
     private Long loggedInUser;
 
     @Override

@@ -65,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void findByLoggedUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equals("id", orderFilter.getLoggedInUser());
+        queryBuilder.equals("createdBy", orderFilter.getLoggedInUser());
     }
 
     @Override

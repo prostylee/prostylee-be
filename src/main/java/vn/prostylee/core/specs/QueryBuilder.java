@@ -24,7 +24,7 @@ public class QueryBuilder<T> {
 
     public QueryBuilder likeIgnoreCase(String propertyPath, String value) {
         if (StringUtils.isNotBlank(value)) {
-            predicates.add(cb.like(cb.upper(root.get(propertyPath)), "%" + StringUtils.upperCase(value) + "%"));
+            predicates.add(cb.like(cb.upper(root.get(propertyPath).as(String.class)), "%" + StringUtils.upperCase(value) + "%"));
         }
         return this;
     }
