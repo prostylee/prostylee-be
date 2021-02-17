@@ -5,8 +5,6 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.order.entity.Order;
 
-import java.util.List;
-
 /**
  * Repository for domain model class Order.
  * @see Order;
@@ -15,5 +13,4 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends BaseRepository<Order, Long> {
 
-    List<Order> findAllByStatus(Integer statusId);
 }
