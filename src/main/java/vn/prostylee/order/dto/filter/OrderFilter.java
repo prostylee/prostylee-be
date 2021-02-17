@@ -8,7 +8,8 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 @EqualsAndHashCode(callSuper = true)
 public class OrderFilter extends BaseFilter  {
 
-    private Integer status;
+    private String status;
+    private Long loggedInUser;
 
     @Override
     public String[] getSearchableFields() {

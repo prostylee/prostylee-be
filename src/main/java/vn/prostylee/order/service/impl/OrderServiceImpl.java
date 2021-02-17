@@ -47,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
         Specification<Order> mainSpec = (root, query, cb) -> {
             QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
             findByStatus(orderFilter, queryBuilder);
+            findByLoggedUser(orderFilter, queryBuilder);
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
@@ -60,7 +61,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void findByStatus(OrderFilter orderFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equals("status", orderFilter.getStatus());
+        queryBuilder.equalsIgnoreCase("status", orderFilter.getStatus());
+    }
+
+    private void findByLoggedUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("id", orderFilter.getLoggedInUser());
     }
 
     @Override

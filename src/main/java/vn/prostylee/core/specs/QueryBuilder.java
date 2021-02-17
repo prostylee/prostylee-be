@@ -38,7 +38,7 @@ public class QueryBuilder<T> {
 
     public QueryBuilder equalsIgnoreCase(String propertyPath, String value) {
         if (StringUtils.isNotBlank(value)) {
-            predicates.add(cb.equal(cb.upper(root.get(propertyPath)), StringUtils.upperCase(value)));
+            predicates.add(cb.equal(cb.upper(root.get(propertyPath).as(String.class)), StringUtils.upperCase(value)));
         }
         return this;
     }
