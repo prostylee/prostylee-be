@@ -104,7 +104,7 @@ public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
 
     private QueryBuilder buildQueryForEachField(QueryBuilder queryBuilder, String searchByField, String keyWord) {
         if(searchByField.contains(ApiParamConstant.REF_OBJ_FIELD_SEPERATOR)) {
-            String[] fields = searchByField.split("\\"+ApiParamConstant.REF_OBJ_FIELD_SEPERATOR);
+            String[] fields = StringUtils.split(searchByField, ApiParamConstant.REF_OBJ_FIELD_SEPERATOR);
             queryBuilder = queryBuilder.likeIgnoreCaseRef(fields[0], fields[1], keyWord, JoinType.LEFT);
         } else {
             queryBuilder = queryBuilder.likeIgnoreCase(searchByField, keyWord);

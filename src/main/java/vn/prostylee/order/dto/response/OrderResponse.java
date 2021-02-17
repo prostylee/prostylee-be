@@ -4,8 +4,6 @@ import lombok.Data;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -14,19 +12,14 @@ public class OrderResponse {
 
     private Long id;
 
-    @NotNull
     private String code;
 
-    @NotNull
     private Date createdAt;
 
     private String status;
 
-    @NotNull
-    @Min(1)
     private Double totalMoney;
 
-    @NotNull
     private Long buyerId;
 
     private List<OrderDetailResponse> orderDetails;
@@ -35,10 +28,8 @@ public class OrderResponse {
 
     private String paymentType;
 
-    @NotNull
     private ShippingAddressResponse shippingAddress;
 
-    @NotNull
     private ShippingProviderResponse shippingProvider;
 
 }

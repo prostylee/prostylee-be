@@ -48,12 +48,12 @@ public class ShippingAddress extends AuditEntity {
     @Column(name = "state", length = 512)
     private String state;
 
-	@Column(name = "city", length = 512)
-	private String city;
+    @Column(name = "city", length = 512)
+    private String city;
 
-	@Column(name = "country", length = 512)
-	private String country;
+    @Column(name = "country", length = 512)
+    private String country;
 
-	@Column(name = "zipcode", length = 512)
-	private String zipcode;
+    @Column(name = "zipcode", length = 512)
+    private String zipcode;
 }

@@ -1,5 +1,6 @@
 package vn.prostylee.order.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import vn.prostylee.order.service.OrderService;
 import javax.persistence.criteria.Predicate;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -33,21 +35,13 @@ public class OrderServiceImpl implements OrderService {
 
     private final BaseFilterSpecs<Order> baseFilterSpecs;
 
-    public OrderServiceImpl(OrderRepository orderRepository,
-                            OrderConverter orderConverter,
-                            BaseFilterSpecs<Order> baseFilterSpecs) {
-        this.orderRepository = orderRepository;
-        this.orderConverter = orderConverter;
-        this.baseFilterSpecs = baseFilterSpecs;
-    }
-
     @Override
     public Page<OrderResponse> findAll(BaseFilter filter) {
         OrderFilter orderFilter = (OrderFilter) filter;
         Specification<Order> mainSpec = (root, query, cb) -> {
             QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
             findByStatus(orderFilter, queryBuilder);
-            findByLoggedUser(orderFilter, queryBuilder);
+            findByLoggedInUser(orderFilter, queryBuilder);
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
@@ -64,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         queryBuilder.equalsIgnoreCase("status", orderFilter.getStatus());
     }
 
-    private void findByLoggedUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {
+    private void findByLoggedInUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {
         queryBuilder.equals("createdBy", orderFilter.getLoggedInUser());
     }
 

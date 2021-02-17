@@ -11,7 +11,7 @@ create table if not exists "order_discount"
     amount double precision,
     description varchar(512),
     order_id bigint not null
-        constraint "FK_discount_order"
+        constraint "fk_discount_order"
             references "order"
 );
 
@@ -25,10 +25,10 @@ create table if not exists "order_detail"
     updated_at timestamp,
     updated_by bigint,
     store_id bigint not null
-        constraint "FK_order_detail_store"
+        constraint "fk_order_detail_store"
             references "store",
     product_id bigint not null
-        constraint "FK_order_detail_product"
+        constraint "fk_order_detail_product"
             references "product",
     product_price double precision,
     amount int,
@@ -38,7 +38,7 @@ create table if not exists "order_detail"
     product_size varchar(512),
     product_data varchar(4096),
     order_id bigint not null
-        constraint "FK_order_detail_order"
+        constraint "fk_order_detail_order"
             references "order"
 );
 

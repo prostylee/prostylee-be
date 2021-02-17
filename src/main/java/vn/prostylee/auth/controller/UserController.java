@@ -20,9 +20,7 @@ import vn.prostylee.order.service.OrderService;
 @RequestMapping(ApiVersion.API_V1 + "/users")
 public class UserController extends CrudController<UserRequest, UserResponse, Long, UserFilter> {
 
-    public final UserService userService;
-
-    public final OrderService orderService;
+    private final OrderService orderService;
 
     private final AuthenticatedProvider authenticatedProvider;
 
@@ -31,7 +29,6 @@ public class UserController extends CrudController<UserRequest, UserResponse, Lo
                           OrderService orderService,
                           AuthenticatedProvider authenticatedProvider) {
         super(userService);
-        this.userService = userService;
         this.orderService = orderService;
         this.authenticatedProvider = authenticatedProvider;
     }
