@@ -30,11 +30,13 @@ public class UserLikeController {
     }
 
     @GetMapping("/count")
-    public long count(UserLikeFilter filter) { return service.count(filter); }
+    public long count(UserLikeFilter filter) {
+        return service.count(filter);
+    }
 
     @PostMapping("/like")
     public SimpleResponse like(@RequestBody UserLikeRequest request) {
-        return  SimpleResponse.builder().data(service.like(request)).build();
+        return SimpleResponse.builder().data(service.like(request)).build();
     }
 
     @PutMapping("/unlike")
@@ -49,7 +51,7 @@ public class UserLikeController {
 
         if (CollectionUtils.isEmpty(existIds)) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.NO_CONTENT);
-        }else if(existIds.size() < targetIdListSize) {
+        } else if (existIds.size() < targetIdListSize) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.PARTIAL_CONTENT);
         }
 
