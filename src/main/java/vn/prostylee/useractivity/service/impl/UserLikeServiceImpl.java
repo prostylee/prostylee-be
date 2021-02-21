@@ -11,11 +11,14 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.request.CheckLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.entity.UserLike;
 import vn.prostylee.useractivity.repository.UserLikeRepository;
 import vn.prostylee.useractivity.service.UserLikeService;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -39,10 +42,14 @@ public class UserLikeServiceImpl implements UserLikeService {
     }
 
     @Override
-    public UserLikeResponse like(UserLikeRequest request) {
-        UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
-        UserLike savedEntity = repository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserLikeResponse.class);
+    public boolean like(UserLikeRequest request) {
+        try {
+            UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
+            repository.save(entity);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     @Override
@@ -53,6 +60,11 @@ public class UserLikeServiceImpl implements UserLikeService {
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
+    }
+
+    @Override
+    public List<Long> checkStatusLike(CheckLikeRequest request) {
+        return repository.checkStatusLike(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
     }
 
     private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter) {
