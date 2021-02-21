@@ -51,7 +51,7 @@ public class UserFollowerController {
 
         if (CollectionUtils.isEmpty(existIds)) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.NO_CONTENT);
-        }else if(existIds.size() < targetIdListSize) {
+        } else if (existIds.size() < targetIdListSize) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.PARTIAL_CONTENT);
         }
 
