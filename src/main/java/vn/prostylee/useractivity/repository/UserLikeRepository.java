@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.entity.UserLike;
 
+import java.util.List;
+
 /**
  * Repository for domain model class User Like.
  * @see UserLike ;
@@ -23,5 +25,14 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
             @Param("targetType") String targetType,
             @Param("createdBy") Long createdBy
     );
+    
+    @Query("SELECT e.targetId FROM UserLike e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
+    @Modifying
+    List<Long> loadStatusLikes(
+            @Param("targetIds") List<Long> targetIds,
+            @Param("targetType") String targetType,
+            @Param("createdBy") Long createdBy
+    );
+    
 }
 

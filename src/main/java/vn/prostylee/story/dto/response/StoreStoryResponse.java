@@ -17,7 +17,8 @@ public class StoreStoryResponse {
     private Date createdAt;
     private Date deletedAt;
     private Long createdBy;
-    private List<String> storyImageUrls;
+    private List<String> storySmallImageUrls;
+    private List<String> storyLargeImageUrls;
     private StoreForStoryResponse storeForStoryResponse;
     private Long productId;
 }

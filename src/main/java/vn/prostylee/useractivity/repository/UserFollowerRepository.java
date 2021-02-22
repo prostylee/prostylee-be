@@ -26,4 +26,12 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
             @Param("targetType") String targetType,
             @Param("createdBy") Long createdBy
     );
+
+    @Query("SELECT e.targetId FROM UserFollower e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
+    @Modifying
+    List<Long> loadStatusFollows(
+            @Param("targetIds") List<Long> targetIds,
+            @Param("targetType") String targetType,
+            @Param("createdBy") Long createdBy
+    );
 }

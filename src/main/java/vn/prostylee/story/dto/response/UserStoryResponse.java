@@ -15,7 +15,8 @@ public class UserStoryResponse {
     private Date createdAt;
     private Date deletedAt;
     private Long createdBy;
-    private List<String> storyImageUrls;
+    private List<String> storySmallImageUrls;
+    private List<String> storyLargeImageUrls;
     private UserForStoryResponse userForStoryResponse;
     private Long productId;
 }

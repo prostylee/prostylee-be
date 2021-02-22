@@ -11,11 +11,14 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.entity.UserFollower;
 import vn.prostylee.useractivity.repository.UserFollowerRepository;
 import vn.prostylee.useractivity.service.UserFollowerService;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,19 +58,24 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         }
     }
 
+    @Override
+    public List<Long> loadStatusFollows(StatusFollowRequest checkFollowRequest) {
+        return repository.loadStatusFollows(checkFollowRequest.getTargetIds(), checkFollowRequest.getTargetType(), authenticatedProvider.getUserIdValue());
+    }
+
     private Specification<UserFollower> getUserFollowerSpecification(UserFollowerFilter filter) {
         Specification<UserFollower> searchable = baseFilterSpecs.search(filter);
-        if(filter.getTargetType() != null) {
+        if (filter.getTargetType() != null) {
             Specification<UserFollower> targetType = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), filter.getTargetType());
             searchable = searchable.and(targetType);
         }
 
-        if(filter.getTargetId() != null){
+        if (filter.getTargetId() != null) {
             Specification<UserFollower> targetId = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_ID), filter.getTargetId());
             searchable = searchable.and(targetId);
         }
 
-        if(filter.getUserId() != null ) {
+        if (filter.getUserId() != null) {
             Specification<UserFollower> userIdParam = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.CREATED_BY), filter.getUserId());
             searchable = searchable.and(userIdParam);
         }

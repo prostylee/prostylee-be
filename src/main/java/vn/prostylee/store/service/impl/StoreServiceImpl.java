@@ -137,7 +137,7 @@ public class StoreServiceImpl implements StoreService {
     public Page<StoreResponse> getTopProductsByStores(StoreProductFilter storeProductFilter) {
         Page<StoreResponse> storeResponses = findAll(storeProductFilter);
         return storeResponses.map(storeResponse -> {
-            List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+            List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
             if (CollectionUtils.isNotEmpty(imageUrls)) {
                 storeResponse.setLogoUrl(imageUrls.get(0));
             }
