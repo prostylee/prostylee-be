@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
-import vn.prostylee.useractivity.dto.request.CheckLikeRequest;
+import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
-import vn.prostylee.useractivity.dto.response.CheckLikeResponse;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
 
@@ -44,10 +43,10 @@ public class UserLikeController {
         return SimpleResponse.builder().data(service.unlike(request)).build();
     }
 
-    @PostMapping("/checkLike")
-    public ResponseEntity<SimpleResponse> checkStatusLike(@RequestBody CheckLikeRequest checkLikeRequest) {
-        List<Long> existIds = service.checkStatusLike(checkLikeRequest);
-        int targetIdListSize = checkLikeRequest.getTargetIds().size();
+    @PostMapping("/loadStatusLike")
+    public ResponseEntity<SimpleResponse> loadStatusLikes(@RequestBody StatusLikeRequest statusLikeRequest) {
+        List<Long> existIds = service.loadStatusLikes(statusLikeRequest);
+        int targetIdListSize = statusLikeRequest.getTargetIds().size();
 
         if (CollectionUtils.isEmpty(existIds)) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.NO_CONTENT);

@@ -7,12 +7,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-public class CheckLikeRequest {
+public class StatusFollowRequest {
 
     @NotNull
     private List<Long> targetIds;
 
     @NotBlank
     private String targetType;
-
 }

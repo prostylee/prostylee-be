@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
-import vn.prostylee.useractivity.dto.request.CheckFollowRequest;
-import vn.prostylee.useractivity.dto.request.CheckLikeRequest;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
@@ -44,10 +43,10 @@ public class UserFollowerController {
         return service.unfollow(request);
     }
 
-    @PostMapping("/checkFollow")
-    public ResponseEntity<SimpleResponse> checkStatusFollow(@RequestBody CheckFollowRequest checkFollowRequest) {
-        List<Long> existIds = service.checkStatusFollow(checkFollowRequest);
-        int targetIdListSize = checkFollowRequest.getTargetIds().size();
+    @PostMapping("/loadStatusFollow")
+    public ResponseEntity<SimpleResponse> loadStatusFollow(@RequestBody StatusFollowRequest statusFollowRequest) {
+        List<Long> existIds = service.loadStatusFollows(statusFollowRequest);
+        int targetIdListSize = statusFollowRequest.getTargetIds().size();
 
         if (CollectionUtils.isEmpty(existIds)) {
             return new ResponseEntity<>(getSimpleResponse(existIds), HttpStatus.NO_CONTENT);
