@@ -1,7 +1,5 @@
 package vn.prostylee.core.specs;
 
-import vn.prostylee.core.constant.ApiParamConstant;
-import vn.prostylee.core.dto.filter.BaseFilter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +8,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.constant.ApiParamConstant;
+import vn.prostylee.core.dto.filter.BaseFilter;
 
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.util.Arrays;
 import java.util.List;
@@ -20,10 +21,6 @@ import java.util.stream.Collectors;
 @Component
 public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
         CustomSortable<BaseFilter>, CustomPageable<BaseFilter> {
-
-    private static final String SORT_ASC = "+";
-
-    private static final String SORT_DESC = "-";
 
     @Override
     public Specification<T> search(BaseFilter filterable) {
@@ -67,14 +64,14 @@ public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
             return null;
         }
         param = param.trim();
-        if (param.startsWith(SORT_DESC)) {
+        if (param.startsWith(ApiParamConstant.SORT_DESC)) {
             String columnName = param.substring(1);
             if (isAllowedSortByField(sortableFields, columnName)) {
                 return Sort.by(columnName).descending();
             }
         } else {
             String columnName = param;
-            if (param.startsWith(SORT_ASC)) {
+            if (param.startsWith(ApiParamConstant.SORT_ASC)) {
                 columnName = param.substring(1);
             }
             if (isAllowedSortByField(sortableFields, columnName)) {
@@ -94,7 +91,7 @@ public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
             if (StringUtils.isNotBlank(filterable.getKeyword())) {
                 String[] searchableFields = filterable.getSearchableFields();
                 for(String searchByField : searchableFields) {
-                    queryBuilder = queryBuilder.likeIgnoreCase(searchByField, filterable.getKeyword());
+                    queryBuilder = buildQueryForEachField(queryBuilder, searchByField, filterable.getKeyword());
                 }
             }
             Predicate[] orPredicates = queryBuilder.build();
@@ -103,5 +100,15 @@ public class BaseFilterSpecs<T> implements CustomSearchable<T, BaseFilter>,
             }
             return null;
         };
+    }
+
+    private QueryBuilder buildQueryForEachField(QueryBuilder queryBuilder, String searchByField, String keyWord) {
+        if(searchByField.contains(ApiParamConstant.REF_OBJ_FIELD_SEPERATOR)) {
+            String[] fields = StringUtils.split(searchByField, ApiParamConstant.REF_OBJ_FIELD_SEPERATOR);
+            queryBuilder = queryBuilder.likeIgnoreCaseRef(fields[0], fields[1], keyWord, JoinType.LEFT);
+        } else {
+            queryBuilder = queryBuilder.likeIgnoreCase(searchByField, keyWord);
+        }
+        return queryBuilder;
     }
 }

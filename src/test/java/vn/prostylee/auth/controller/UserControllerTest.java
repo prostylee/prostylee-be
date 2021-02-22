@@ -17,8 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.Validator;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
-import vn.prostylee.auth.service.impl.UserServiceImpl;
+import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.order.service.OrderService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +43,20 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private UserServiceImpl userService;
+    private UserService userService;
+
+    @Mock
+    private OrderService orderService;
+
+    @Mock
+    private AuthenticatedProvider authenticatedProvider;
 
     @Mock
     private Validator mockValidator;
 
     @BeforeEach
     public void setup() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService, orderService, authenticatedProvider))
                 .setValidator(mockValidator) // Need to ignore validation because can not mock a custom validator
                 .build();
     }
