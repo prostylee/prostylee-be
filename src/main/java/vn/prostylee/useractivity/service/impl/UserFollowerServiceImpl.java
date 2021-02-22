@@ -11,7 +11,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
-import vn.prostylee.useractivity.dto.request.CheckFollowRequest;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.entity.UserFollower;
@@ -59,8 +59,8 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     }
 
     @Override
-    public List<Long> checkStatusFollow(CheckFollowRequest checkFollowRequest) {
-        return repository.checkStatusFollow(checkFollowRequest.getTargetIds(), checkFollowRequest.getTargetType(), authenticatedProvider.getUserIdValue());
+    public List<Long> loadStatusFollows(StatusFollowRequest checkFollowRequest) {
+        return repository.loadStatusFollows(checkFollowRequest.getTargetIds(), checkFollowRequest.getTargetType(), authenticatedProvider.getUserIdValue());
     }
 
     private Specification<UserFollower> getUserFollowerSpecification(UserFollowerFilter filter) {

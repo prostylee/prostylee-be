@@ -11,7 +11,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
-import vn.prostylee.useractivity.dto.request.CheckLikeRequest;
+import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.entity.UserLike;
@@ -63,8 +63,8 @@ public class UserLikeServiceImpl implements UserLikeService {
     }
 
     @Override
-    public List<Long> checkStatusLike(CheckLikeRequest request) {
-        return repository.checkStatusLike(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
+    public List<Long> loadStatusLikes(StatusLikeRequest request) {
+        return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
     }
 
     private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter) {
