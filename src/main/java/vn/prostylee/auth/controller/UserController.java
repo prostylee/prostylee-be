@@ -34,7 +34,7 @@ public class UserController extends CrudController<UserRequest, UserResponse, Lo
     }
 
     @GetMapping("/status")
-    public Page<OrderResponse> getOrdersByLoggedUser(OrderFilter orderFilter) {
+    public Page<OrderResponse> getOrdersByLoggedInUser(OrderFilter orderFilter) {
         orderFilter.setLoggedInUser(authenticatedProvider.getUserIdValue());
         return orderService.findAll(orderFilter);
     }

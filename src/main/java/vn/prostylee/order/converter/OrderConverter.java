@@ -14,15 +14,15 @@ import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.payment.entity.PaymentType;
-import vn.prostylee.payment.repository.PaymentTypeRepository;
+import vn.prostylee.payment.service.PaymentService;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingAddress;
 import vn.prostylee.shipping.entity.ShippingProvider;
-import vn.prostylee.shipping.repository.ShippingAddressRepository;
-import vn.prostylee.shipping.repository.ShippingProviderRepository;
+import vn.prostylee.shipping.service.ShippingAddressService;
+import vn.prostylee.shipping.service.ShippingProviderService;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.repository.StoreRepository;
@@ -33,11 +33,11 @@ import java.util.stream.Collectors;
 @Component
 public class OrderConverter {
 
-    private final PaymentTypeRepository paymentTypeRepository;
+    private final PaymentService paymentService;
 
-    private final ShippingProviderRepository shippingProviderRepository;
+    private final ShippingProviderService shippingProviderService;
 
-    private final ShippingAddressRepository shippingAddressRepository;
+    private final ShippingAddressService shippingAddressService;
 
     private final ProductRepository productRepository;
 
@@ -47,14 +47,14 @@ public class OrderConverter {
 
     private static Map<Long, Store> storeCache;
 
-    public OrderConverter(PaymentTypeRepository paymentTypeRepository,
-                          ShippingProviderRepository shippingProviderRepository,
-                          ShippingAddressRepository shippingAddressRepository,
+    public OrderConverter(PaymentService paymentService,
+                          ShippingProviderService shippingProviderService,
+                          ShippingAddressService shippingAddressService,
                           ProductRepository productRepository,
                           StoreRepository storeRepository) {
-        this.paymentTypeRepository = paymentTypeRepository;
-        this.shippingAddressRepository = shippingAddressRepository;
-        this.shippingProviderRepository = shippingProviderRepository;
+        this.paymentService = paymentService;
+        this.shippingProviderService = shippingProviderService;
+        this.shippingAddressService = shippingAddressService;
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         productCache = new HashMap<>();
@@ -62,11 +62,11 @@ public class OrderConverter {
     }
 
     public void convertRequestToEntity(OrderRequest request, Order order) {
-        PaymentType paymentType = getPaymentById(request.getPaymentTypeId());
+        PaymentType paymentType = paymentService.getPaymentById(request.getPaymentTypeId());
         order.setPaymentType(paymentType);
-        ShippingProvider sp = getShippingProviderById(request.getShippingProviderId());
+        ShippingProvider sp = shippingProviderService.getShippingProviderById(request.getShippingProviderId());
         order.setShippingProvider(sp);
-        ShippingAddress sa = getShippingAddressById(request.getShippingAddressId());
+        ShippingAddress sa = shippingAddressService.getShippingAddressById(request.getShippingAddressId());
         order.setShippingAddress(sa);
         order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
 
@@ -108,21 +108,6 @@ public class OrderConverter {
         }
         order.getOrderDiscounts().clear();
         order.getOrderDiscounts().addAll(discounts);
-    }
-
-    private PaymentType getPaymentById(Long id) {
-        return paymentTypeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Payment type is not found with id [" + id + "]"));
-    }
-
-    private ShippingProvider getShippingProviderById(Long id) {
-        return shippingProviderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Shipping provider is not found with id [" + id + "]"));
-    }
-
-    private ShippingAddress getShippingAddressById(Long id) {
-        return shippingAddressRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Shipping address is not found with id [" + id + "]"));
     }
 
     private Product getProductById(Long id) {

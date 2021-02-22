@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean deleteById(Long id) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     private Order getOrderById(Long id) {

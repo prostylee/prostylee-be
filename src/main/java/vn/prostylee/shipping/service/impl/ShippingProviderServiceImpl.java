@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.MasterDataFilter;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
@@ -25,5 +26,11 @@ public class ShippingProviderServiceImpl implements ShippingProviderService {
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<ShippingProvider> page = shippingProviderRepository.findAll(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, ShippingProviderResponse.class));
+    }
+
+    @Override
+    public ShippingProvider getShippingProviderById(Long id) {
+        return shippingProviderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Shipping provider is not found with id [" + id + "]"));
     }
 }

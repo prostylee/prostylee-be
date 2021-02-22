@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.MasterDataFilter;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.payment.dto.response.PaymentResponse;
@@ -27,5 +28,11 @@ public class PaymentServiceImpl implements PaymentService {
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<PaymentType> page = paymentTypeRepository.findAll(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, PaymentResponse.class));
+    }
+
+    @Override
+    public PaymentType getPaymentById(Long id) {
+        return paymentTypeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment type is not found with id [" + id + "]"));
     }
 }
