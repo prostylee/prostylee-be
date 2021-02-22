@@ -14,12 +14,9 @@ import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.constant.ImageSize;
-import vn.prostylee.media.entity.Attachment;
-import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.story.constant.StoryConstant;
 import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
@@ -82,13 +79,10 @@ public class StoryServiceImpl implements StoryService {
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
 
         responses.getContent().forEach(response -> {
-            response.setStoryImageUrls(fetchUrls(response.getId()));
-        });
-
-        responses.getContent().forEach(response -> {
+            response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
+            response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
             response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
         });
-
         return responses;
     }
 
@@ -100,26 +94,23 @@ public class StoryServiceImpl implements StoryService {
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
 
         responses.getContent().forEach(response -> {
-            response.setStoryImageUrls(fetchUrls(response.getId()));
-        });
-
-        responses.getContent().forEach(response -> {
+            response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
+            response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
             response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
         });
-
         return responses;
     }
 
-    private List<String> fetchUrls(Long storyId) {
+    private List<String> fetchUrls(ImageSize sizeType, Long storyId) {
         Set<StoryImage> storyImages = storyImageService.getStoryImagesById(storyId);
         List<Long> attachmentIds = storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
-        return fileUploadService.getImageUrls(attachmentIds, ImageSize.LARGE.getWidth(), ImageSize.LARGE.getHeight());
+        return fileUploadService.getImageUrls(attachmentIds, sizeType.getWidth(), sizeType.getHeight());
     }
 
     private StoreForStoryResponse getStoreForStoryBy(Long id) {
         StoreResponse storeResponse = storeService.findById(id);
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
-                ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+                ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
         if (CollectionUtils.isNotEmpty(imageUrls)) {
             storeResponse.setLogoUrl(imageUrls.get(FIRST_INDEX));
         }
