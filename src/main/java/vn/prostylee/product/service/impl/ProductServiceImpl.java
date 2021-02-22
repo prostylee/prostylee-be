@@ -102,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
         Set<ProductImage> productImages = product.getProductImages();
         List<Long> attachmentIds = productImages.stream().map(ProductImage::getAttachmentId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
-            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
             productResponse.setImageUrls(imageUrls);
         }
         return productResponse;

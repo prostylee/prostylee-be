@@ -36,7 +36,7 @@ public class ProductForStoryServiceImpl implements ProductForStoryService {
     private StoreForStoryResponse fetchStoreForStory(ProductResponse productResponse) {
         StoreResponse storeResponse = storeService.findById(productResponse.getStoreId());
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
-                ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight());
+                ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
         if (CollectionUtils.isNotEmpty(imageUrls)) {
             storeResponse.setLogoUrl(imageUrls.get(FIRST_INDEX));
         }
