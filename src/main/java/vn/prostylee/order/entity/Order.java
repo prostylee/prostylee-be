@@ -38,7 +38,7 @@ public class Order extends AuditEntity {
 	private Double totalMoney;
 
 	@Column(name = "status")
-	@Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.ORDINAL)
 	private OrderStatus status;
 
 	@EqualsAndHashCode.Exclude

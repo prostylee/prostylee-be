@@ -24,6 +24,8 @@ import vn.prostylee.order.service.OrderService;
 
 import javax.persistence.criteria.Predicate;
 
+import static vn.prostylee.order.constants.OrderStatus.*;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -55,7 +57,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void findByStatus(OrderFilter orderFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equalsIgnoreCase("status", orderFilter.getStatus());
+        if(orderFilter.getStatus() == null) {
+            return;
+        }
+        int statusId = AWAITING_CONFIRMATION.ordinal();
+        switch (orderFilter.getStatus()) {
+            case "IN_PROGRESS":
+                statusId = IN_PROGRESS.ordinal();
+                break;
+            case "COMPLETE":
+                statusId = COMPLETE.ordinal();
+                break;
+            default:
+                break;
+        }
+        queryBuilder.equals("status", statusId);
     }
 
     private void findByLoggedInUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {

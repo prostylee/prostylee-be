@@ -16,8 +16,7 @@ public class OrderFilter extends BaseFilter  {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "code",
-                "status"
+                "code"
         };
     }
 

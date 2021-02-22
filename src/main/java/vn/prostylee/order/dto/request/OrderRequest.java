@@ -1,5 +1,6 @@
 package vn.prostylee.order.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class OrderRequest {
     private Double totalMoney;
 
     @NotNull
+    @Schema(allowableValues = {"AWAITING_CONFIRMATION", "IN_PROGRESS", "COMPLETE"})
     private String status;
 
     @NotNull
