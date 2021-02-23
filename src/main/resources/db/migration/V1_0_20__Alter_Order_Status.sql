@@ -1,1 +1,0 @@
-ALTER TABLE "order" ALTER COLUMN "status" TYPE INT USING status::integer;
