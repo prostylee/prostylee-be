@@ -3,6 +3,7 @@ package vn.prostylee.product.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +13,13 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
+import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
@@ -37,6 +40,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final FileUploadService fileUploadService;
+
+    private final LocationService locationService;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -105,6 +110,29 @@ public class ProductServiceImpl implements ProductService {
             List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
             productResponse.setImageUrls(imageUrls);
         }
+
+        // TODO remove logic mock data
+        try {
+
+            if (productResponse.getId() % RandomUtils.nextInt(1,5) == 0) { // TODO get ads from ads table
+                productResponse.setIsAdvertising(true);
+            }
+
+            if (productResponse.getLocationId() != null) {
+                productResponse.setLocation(locationService.findById(productResponse.getLocationId()));
+            }
+
+            productResponse.setProductOwnerResponse(ProductOwnerResponse.builder()
+                    .id(product.getStoreId() != null ? product.getStoreId() : product.getCreatedBy())
+                    .name("Lorem Ipsum")
+                    .logoUrl(product.getStoreId() != null
+                            ? "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/0a93f4e8-fca5-492f-9853-f5b6f3b28334.png"
+                            : "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/3b939cd9-3768-4b5a-812f-2a7face512d2.jpeg")
+                    .build());
+        } catch (Exception e) {
+            log.debug("Can not get avatar", e);
+        }
+
         return productResponse;
     }
 

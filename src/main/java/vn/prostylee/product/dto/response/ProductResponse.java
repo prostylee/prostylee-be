@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.location.dto.response.LocationResponse;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ProductResponse {
 
     private String description;
 
-    private String locationId;
+    private Long locationId;
 
     private Long storeId;
 
@@ -32,4 +33,10 @@ public class ProductResponse {
     private Double priceSale;
 
     private List<String> imageUrls;
+
+    private ProductOwnerResponse productOwnerResponse;
+
+    private LocationResponse location;
+
+    private Boolean isAdvertising;
 }
