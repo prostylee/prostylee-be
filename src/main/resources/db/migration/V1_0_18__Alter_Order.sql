@@ -78,5 +78,5 @@ ALTER TABLE "order" ADD COLUMN total_money double precision;
 ALTER TABLE "order" ADD COLUMN shipping_address_id bigint;
 ALTER TABLE "order" ADD COLUMN shipping_provider_id bigint;
 ALTER TABLE "order" RENAME COLUMN payment_type TO payment_type_id;
-ALTER TABLE "order" ALTER COLUMN buyer_id TYPE bigint;
-ALTER TABLE "order" ALTER COLUMN payment_type_id TYPE bigint;
+ALTER TABLE "order" ALTER COLUMN buyer_id TYPE bigint USING (buyer_id::integer);
+ALTER TABLE "order" ALTER COLUMN buyer_id TYPE bigint USING (buyer_id::integer);
