@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.location.dto.request.LocationRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,7 +28,11 @@ public class ProductRequest {
 
     private String description;
 
-    private String locationId;
+    private LocationRequest locationRequest;
+
+    private List<Long> paymentTypes;
+
+    private List<Long> shippingProviders;
 
     private Long storeId;
 

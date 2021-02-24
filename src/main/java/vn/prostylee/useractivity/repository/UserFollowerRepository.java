@@ -9,6 +9,7 @@ import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.entity.UserFollower;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -19,8 +20,8 @@ import java.util.List;
 @Repository
 public interface UserFollowerRepository extends BaseRepository<UserFollower, Long> {
 
-    @Query("DELETE FROM UserFollower WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:createdBy")
     @Modifying
+    @Query("DELETE FROM UserFollower WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:createdBy")
     void unfollow(
             @Param("targetId") Long targetId,
             @Param("targetType") String targetType,
@@ -28,7 +29,6 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
     );
 
     @Query("SELECT e.targetId FROM UserFollower e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
-    @Modifying
     List<Long> loadStatusFollows(
             @Param("targetIds") List<Long> targetIds,
             @Param("targetType") String targetType,
