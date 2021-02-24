@@ -17,4 +17,5 @@ public interface AttachmentService {
      */
     Attachment saveAttachmentByUploadFile(URL fileUrl, MultipartFile file);
 
+    Attachment saveAttachmentByNameAndPath(String name, String path);
 }

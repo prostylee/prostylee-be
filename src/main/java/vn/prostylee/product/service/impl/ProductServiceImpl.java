@@ -13,17 +13,24 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.location.dto.request.LocationRequest;
+import vn.prostylee.location.dto.response.LocationResponse;
+import vn.prostylee.location.entity.Location;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.request.ProductImageRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
+import vn.prostylee.product.dto.response.ProductImageResponse;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.product.repository.ProductRepository;
+import vn.prostylee.product.service.ProductImageService;
 import vn.prostylee.product.service.ProductService;
 
 import java.util.List;
@@ -42,6 +49,8 @@ public class ProductServiceImpl implements ProductService {
     private final FileUploadService fileUploadService;
 
     private final LocationService locationService;
+
+    private final ProductImageService productImageService;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -78,9 +87,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse save(ProductRequest productRequest) {
-        Product product = BeanUtil.copyProperties(productRequest, Product.class);
-        product.setStatus(ProductStatus.PUBLISHED.getStatus());
-        return toResponse(this.productRepository.save(product));
+        Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
+        ProductResponse productResponse = buildAdditionalPart(productRequest, productEntity);
+
+        return productResponse;
+    }
+
+    //TODO need to rename
+    private ProductResponse buildAdditionalPart(ProductRequest productRequest, Product productEntity) {
+        Long locationId = buildLocation(productRequest.getLocationRequest());
+        productEntity.setLocationId(locationId);
+        productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
+
+        ProductImageResponse save = productImageService.save(productRequest.getProductImageRequests(), productEntity);
+        productEntity.setProductImages(save.getProductImages());
+        ProductResponse productResponse = toResponse(this.productRepository.save(productEntity));
+        //handle payment type
+        //handle shipping provider
+        return productResponse;
+    }
+
+    private Long buildLocation(LocationRequest locationRequest) {
+        LocationResponse response = locationService.save(locationRequest);
+        return response.getId();
     }
 
     @Override

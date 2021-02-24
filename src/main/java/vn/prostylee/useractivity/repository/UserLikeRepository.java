@@ -27,7 +27,6 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
     );
     
     @Query("SELECT e.targetId FROM UserLike e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
-    @Modifying
     List<Long> loadStatusLikes(
             @Param("targetIds") List<Long> targetIds,
             @Param("targetType") String targetType,

@@ -18,6 +18,7 @@ import java.util.List;
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepository attachmentRepository;
+    private static final String PREFIX = "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/";
 
     @Autowired
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository) {
@@ -35,6 +36,15 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setName(fileUrl.getFile().replaceAll("/", ""));
         attachment.setDisplayName(file.getOriginalFilename());
         attachment.setSizeInKb(file.getSize() / 1024);
+        return attachmentRepository.save(attachment);
+    }
+
+    @Override
+    public Attachment saveAttachmentByNameAndPath(String name, String path) {
+        Attachment attachment = new Attachment();
+        attachment.setPath(PREFIX + path);
+        attachment.setName(name);
+        attachment.setDisplayName(name);
         return attachmentRepository.save(attachment);
     }
 
