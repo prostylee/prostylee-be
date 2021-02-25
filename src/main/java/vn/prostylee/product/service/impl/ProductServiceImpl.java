@@ -15,14 +15,11 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.dto.response.LocationResponse;
-import vn.prostylee.location.entity.Location;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
-import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
-import vn.prostylee.product.dto.request.ProductImageRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductImageResponse;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
@@ -31,7 +28,9 @@ import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.ProductImageService;
+import vn.prostylee.product.service.ProductPaymentTypeService;
 import vn.prostylee.product.service.ProductService;
+import vn.prostylee.product.service.ProductShippingProviderService;
 
 import java.util.List;
 import java.util.Set;
@@ -41,16 +40,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
-
     private final BaseFilterSpecs<Product> baseFilterSpecs;
-
     private final ProductRepository productRepository;
-
     private final FileUploadService fileUploadService;
-
     private final LocationService locationService;
-
     private final ProductImageService productImageService;
+    private final ProductPaymentTypeService productPaymentTypeService;
+    private final ProductShippingProviderService productShippingProviderService;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -95,19 +91,19 @@ public class ProductServiceImpl implements ProductService {
 
     //TODO need to rename
     private ProductResponse buildAdditionalPart(ProductRequest productRequest, Product productEntity) {
-        Long locationId = buildLocation(productRequest.getLocationRequest());
+        Long locationId = fetchLocation(productRequest.getLocationRequest());
         productEntity.setLocationId(locationId);
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
 
-        ProductImageResponse save = productImageService.save(productRequest.getProductImageRequests(), productEntity);
-        productEntity.setProductImages(save.getProductImages());
+        ProductImageResponse savedImage = productImageService.save(productRequest.getProductImageRequests(), productEntity);
+        productEntity.setProductImages(savedImage.getProductImages());
         ProductResponse productResponse = toResponse(this.productRepository.save(productEntity));
-        //handle payment type
-        //handle shipping provider
+        productRequest.getPaymentTypes().forEach(item -> productPaymentTypeService.save(productResponse.getId(), item));
+        productRequest.getShippingProviders().forEach(item -> productShippingProviderService.save(productResponse.getId(), item));
         return productResponse;
     }
 
-    private Long buildLocation(LocationRequest locationRequest) {
+    private Long fetchLocation(LocationRequest locationRequest) {
         LocationResponse response = locationService.save(locationRequest);
         return response.getId();
     }
