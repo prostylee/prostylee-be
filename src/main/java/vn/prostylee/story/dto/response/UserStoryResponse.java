@@ -18,5 +18,5 @@ public class UserStoryResponse {
     private List<String> storySmallImageUrls;
     private List<String> storyLargeImageUrls;
     private UserForStoryResponse userForStoryResponse;
-    private Long productId;
+    private Long storeId;
 }

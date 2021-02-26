@@ -36,6 +36,9 @@ public class Story extends AuditEntity{
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "store_id")
+    private Long storeId;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_at")
     private Date deletedAt;
