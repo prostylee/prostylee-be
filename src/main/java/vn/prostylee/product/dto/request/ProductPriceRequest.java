@@ -13,28 +13,23 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttributeRequest {
+public class ProductPriceRequest {
 
+    @NotNull
     private Long id;
 
     @NotBlank
-    private String key;
-
-    private Integer order;
-
-    @NotBlank
-    private String label;
-
-    private String description;
+    private String name;
 
     @NotNull
-    private Integer type;
+    private Long productId;
 
-    private String languageCode;
-
-    @NotNull
-    private Set<AttributeOptionRequest> attributeOptionRequests;
+    private String sku;
 
     @NotNull
+    private Double price;
+
+    private Double priceSale;
+
     private Set<ProductAttributeRequest> productAttributeRequests;
 }
