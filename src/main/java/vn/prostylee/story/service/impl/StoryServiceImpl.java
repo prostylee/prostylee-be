@@ -59,16 +59,14 @@ public class StoryServiceImpl implements StoryService {
 
     @Override
     public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
-        String type = StoryDestinationType.USER.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getUserStoryResponses(filter, type);
+        return getUserStoryResponses(filter, StoryDestinationType.USER.getType());
     }
 
     @Override
     public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
-        String type = StoryDestinationType.STORE.getType();
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoreStoryResponses(filter, type);
+        return getStoreStoryResponses(filter, StoryDestinationType.STORE.getType());
     }
 
     private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
@@ -102,7 +100,7 @@ public class StoryServiceImpl implements StoryService {
     }
 
     private List<String> fetchUrls(ImageSize sizeType, Long storyId) {
-        Set<StoryImage> storyImages = storyImageService.getStoryImagesById(storyId);
+        Set<StoryImage> storyImages = storyImageService.getStoryImagesByStoryId(storyId);
         List<Long> attachmentIds = storyImages.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
         return fileUploadService.getImageUrls(attachmentIds, sizeType.getWidth(), sizeType.getHeight());
     }

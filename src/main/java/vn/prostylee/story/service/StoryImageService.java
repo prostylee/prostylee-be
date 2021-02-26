@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface StoryImageService {
 
-    Set<StoryImage> getStoryImagesById(Long Id);
+    Set<StoryImage> getStoryImagesByStoryId(Long Id);
 }

@@ -13,6 +13,6 @@ import java.util.Set;
  */
 @Repository
 public interface StoryImageRepository extends BaseRepository<StoryImage, Long> {
-    Set<StoryImage> getStoryImagesById(Long id);
+    Set<StoryImage> getStoryImagesByStoryId(Long id);
 
 }
