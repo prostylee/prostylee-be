@@ -61,7 +61,7 @@ public class OrderConverter {
         storeCache = new HashMap<>();
     }
 
-    public void convertRequestToEntity(OrderRequest request, Order order) {
+    public void toEntity(OrderRequest request, Order order) {
         PaymentType paymentType = paymentService.getPaymentById(request.getPaymentTypeId());
         order.setPaymentType(paymentType);
         ShippingProvider sp = shippingProviderService.getShippingProviderById(request.getShippingProviderId());
@@ -130,7 +130,7 @@ public class OrderConverter {
         return store;
     }
 
-    public OrderResponse convertToResponse(Order order) {
+    public OrderResponse toDto(Order order) {
         OrderResponse orderResponse = BeanUtil.copyProperties(order, OrderResponse.class);
         orderResponse.setOrderDetails(
                 Optional.ofNullable(order.getOrderDetails())

@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse findById(Long id) {
-        return this.toResponse(this.getById(id));
+        return this.toResponse(this.getProductById(id));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse update(Long id, ProductRequest productRequest) {
-        Product product = this.getById(id);
+        Product product = this.getProductById(id);
         BeanUtil.mergeProperties(productRequest, product);
         return toResponse(this.productRepository.save(product));
     }
@@ -158,8 +158,9 @@ public class ProductServiceImpl implements ProductService {
         return productResponse;
     }
 
-    private Product getById(Long id) {
-        return this.productRepository.findOneActive(id)
+    @Override
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id [" + id + "]"));
     }
 
