@@ -2,6 +2,7 @@ package vn.prostylee.product.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -9,10 +10,16 @@ import javax.persistence.*;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper=true)
+@NoArgsConstructor
 @Table(name = "product_shipping_provider")
 public class ProductShippingProvider extends AuditEntity {
 
     private static final long serialVersionUID = 1L;
+
+    public ProductShippingProvider(Long productId, Long shippingProviderId){
+        this.productId = productId;
+        this.shippingProviderId = shippingProviderId;
+    }
 
     @Id
     @SequenceGenerator(name = "product_shipping_provider_seq", sequenceName = "product_shipping_provider_seq", allocationSize = 1)
