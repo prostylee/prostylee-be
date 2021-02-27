@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
@@ -43,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageService productImageService;
     private final ProductPaymentTypeService productPaymentTypeService;
     private final ProductShippingProviderService productShippingProviderService;
+    private final AuthenticatedProvider authenticatedProvider;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -159,5 +161,10 @@ public class ProductServiceImpl implements ProductService {
     private Product getById(Long id) {
         return this.productRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id [" + id + "]"));
+    }
+
+    @Override
+    public long countTotalProductByUser() {
+        return productRepository.countProductsByCreatedBy(authenticatedProvider.getUserIdValue());
     }
 }

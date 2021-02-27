@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
+import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
@@ -38,4 +39,11 @@ public class ProductController extends CrudController<ProductRequest, ProductRes
     public ProductForStoryResponse getProductForStory(@PathVariable(value = "productId") Long productId) {
         return productForStoryService.getProductForStory(productId);
     }
+
+    @GetMapping("/total-products-by-user")
+    public SimpleResponse countTotalProductByUser() {
+        long totalNumber = productService.countTotalProductByUser();
+        return SimpleResponse.builder().data(totalNumber).build();
+    }
+
 }
