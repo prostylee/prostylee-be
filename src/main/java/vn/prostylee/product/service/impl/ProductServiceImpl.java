@@ -24,6 +24,8 @@ import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductImageResponse;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.entity.Brand;
+import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.product.repository.ProductRepository;
@@ -32,6 +34,7 @@ import vn.prostylee.product.service.ProductPaymentTypeService;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.product.service.ProductShippingProviderService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -84,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse save(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
+
         ProductResponse productResponse = buildAdditionalPart(productRequest, productEntity);
 
         return productResponse;
@@ -94,10 +98,21 @@ public class ProductServiceImpl implements ProductService {
         Long locationId = fetchLocation(productRequest.getLocationRequest());
         productEntity.setLocationId(locationId);
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
+        productEntity.setPublishedDate(new Date());
+        Brand brandEntity = new Brand();
+        Category categoryEntity = new Category();
+        brandEntity.setId(productRequest.getBrandId());
+        categoryEntity.setId(productRequest.getCategoryId());
+        productEntity.setBrand(brandEntity);
+        productEntity.setCategory(categoryEntity);
 
+
+        ProductResponse productResponse = toResponse(this.productRepository.save(productEntity));
+        productResponse.setBrandId(productEntity.getBrand().getId());
+        productResponse.setCategoryId(productEntity.getCategory().getId());
         ProductImageResponse savedImage = productImageService.save(productRequest.getProductImageRequests(), productEntity);
         productEntity.setProductImages(savedImage.getProductImages());
-        ProductResponse productResponse = toResponse(this.productRepository.save(productEntity));
+
         productRequest.getPaymentTypes().forEach(item -> productPaymentTypeService.save(productResponse.getId(), item));
         productRequest.getShippingProviders().forEach(item -> productShippingProviderService.save(productResponse.getId(), item));
         return productResponse;
@@ -129,14 +144,7 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
-        Set<ProductImage> productImages = product.getProductImages();
-        List<Long> attachmentIds = productImages.stream().map(ProductImage::getAttachmentId).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(attachmentIds)) {
-            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
-            productResponse.setImageUrls(imageUrls);
-        }
 
-        // TODO remove logic mock data
         try {
 
             if (productResponse.getId() % RandomUtils.nextInt(1,5) == 0) { // TODO get ads from ads table
