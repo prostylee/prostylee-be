@@ -9,24 +9,19 @@ import vn.prostylee.product.dto.response.ProductAttributeResponse;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
-import vn.prostylee.product.service.AttributeService;
-import vn.prostylee.product.service.ProductPriceService;
 
 @Component
 @AllArgsConstructor
 @Slf4j
 public class ProductAttributeConverter {
 
-    private final ProductPriceService productPriceService;
-    private final AttributeService attributeService;
-
     public ProductAttributeResponse toDto(ProductAttribute productAttribute) {
         return BeanUtil.copyProperties(productAttribute, ProductAttributeResponse.class);
     }
 
     public void toEntity(ProductAttributeRequest request, ProductAttribute productAttribute) {
-        Attribute attribute = attributeService.getAttributeById(request.getAttributeId());
-        ProductPrice productPrice = productPriceService.getProductPriceById(request.getProductPriceId());
+        Attribute attribute = Attribute.builder().id(request.getAttributeId()).build();
+        ProductPrice productPrice = ProductPrice.builder().id(request.getProductPriceId()).build();
         productAttribute.setAttribute(attribute);
         productAttribute.setProductPrice(productPrice);
     }
