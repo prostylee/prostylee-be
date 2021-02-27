@@ -1,12 +1,14 @@
 package vn.prostylee.product.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper=true)
 @Table(name = "product_shipping_provider")
 public class ProductShippingProvider extends AuditEntity {
 

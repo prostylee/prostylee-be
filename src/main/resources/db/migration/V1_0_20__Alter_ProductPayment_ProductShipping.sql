@@ -23,3 +23,6 @@ create table product_shipping_provider
     product_id bigint not null constraint "FK_product_product_shipping_provider" references product,
     shipping_provider_id bigint not null constraint "FK_shipping_provider_product_shipping_provider" references shipping_provider
 );
+
+create sequence if not exists product_payment_type_seq;
+create sequence if not exists product_shipping_provider_seq;

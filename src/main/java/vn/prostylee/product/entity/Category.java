@@ -26,6 +26,10 @@ public class Category extends AuditEntity {
 
 	private static final long serialVersionUID = 1L;
 
+	public Category(Long id){
+		this.id = id;
+	}
+
 	@Id
 	@SequenceGenerator(name = "category_seq", sequenceName = "category_seq", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")

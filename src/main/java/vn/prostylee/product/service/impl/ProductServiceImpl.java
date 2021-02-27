@@ -18,12 +18,12 @@ import vn.prostylee.location.service.LocationService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
-import vn.prostylee.product.dto.response.ProductImageResponse;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Brand;
 import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.ProductImageService;
 import vn.prostylee.product.service.ProductPaymentTypeService;
@@ -31,6 +31,7 @@ import vn.prostylee.product.service.ProductService;
 import vn.prostylee.product.service.ProductShippingProviderService;
 
 import java.util.Date;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -79,9 +80,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse save(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
-
         ProductResponse productResponse = buildAdditionalPart(productRequest, productEntity);
-
         return productResponse;
     }
 
@@ -91,22 +90,22 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setLocationId(locationId);
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
         productEntity.setPublishedDate(new Date());
-        Brand brandEntity = new Brand();
-        Category categoryEntity = new Category();
-        brandEntity.setId(productRequest.getBrandId());
-        categoryEntity.setId(productRequest.getCategoryId());
-        productEntity.setBrand(brandEntity);
-        productEntity.setCategory(categoryEntity);
+        productEntity.setBrand(new Brand(productRequest.getBrandId()));
+        productEntity.setCategory(new Category(productRequest.getCategoryId()));
+        productEntity.setUsedStatusId(productRequest.getUsedStatusId());
 
+        Set<ProductImage> savedImages = productImageService.buildProductImages(productRequest.getProductImageRequests(), productEntity);
+        productEntity.setProductImages(savedImages);
 
-        ProductResponse productResponse = toResponse(this.productRepository.save(productEntity));
-        productResponse.setBrandId(productEntity.getBrand().getId());
-        productResponse.setCategoryId(productEntity.getCategory().getId());
-        ProductImageResponse savedImage = productImageService.save(productRequest.getProductImageRequests(), productEntity);
-        productEntity.setProductImages(savedImage.getProductImages());
+        Product savedProductEntity = this.productRepository.save(productEntity);
+        ProductResponse productResponse = BeanUtil.copyProperties(savedProductEntity, ProductResponse.class);
 
         productRequest.getPaymentTypes().forEach(item -> productPaymentTypeService.save(productResponse.getId(), item));
         productRequest.getShippingProviders().forEach(item -> productShippingProviderService.save(productResponse.getId(), item));
+
+        productResponse.setBrandId(savedProductEntity.getBrand().getId());
+        productResponse.setCategoryId(savedProductEntity.getCategory().getId());
+
         return productResponse;
     }
 
@@ -141,10 +140,6 @@ public class ProductServiceImpl implements ProductService {
 
             if (productResponse.getId() % RandomUtils.nextInt(1,5) == 0) { // TODO get ads from ads table
                 productResponse.setIsAdvertising(true);
-            }
-
-            if (productResponse.getLocationId() != null) {
-                productResponse.setLocation(locationService.findById(productResponse.getLocationId()));
             }
 
             productResponse.setProductOwnerResponse(ProductOwnerResponse.builder()

@@ -58,11 +58,15 @@ public class Product extends AuditEntity {
 	@Column(name = "store_id")
 	private Long storeId;
 
+	@Column(name = "used_status_id")
+	private Long usedStatusId;
+
 	@Column(name = "price", precision = 22, scale = 0)
 	private Double price;
 
 	@Column(name = "price_sale", precision = 22, scale = 0)
 	private Double priceSale;
+
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "published_date", length = 19)
