@@ -15,9 +15,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProductPriceRequest {
 
-    @NotNull
-    private Long id;
-
     @NotBlank
     private String name;
 
