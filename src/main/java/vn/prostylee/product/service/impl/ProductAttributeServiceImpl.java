@@ -36,17 +36,12 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
 
     @Override
     public ProductAttributeResponse save(ProductAttributeRequest request) {
-        ProductAttribute productAttribute = BeanUtil.copyProperties(request, ProductAttribute.class);
-        productAttributeConverter.toEntity(request, productAttribute);
-        return productAttributeConverter.toDto(this.productAttributeRepository.save(productAttribute));
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ProductAttributeResponse update(Long id, ProductAttributeRequest request) {
-        ProductAttribute productAttribute = this.getProductAttributeById(id);
-        BeanUtil.mergeProperties(request, productAttribute);
-        productAttributeConverter.toEntity(request, productAttribute);
-        return productAttributeConverter.toDto(this.productAttributeRepository.save(productAttribute));
+        throw new UnsupportedOperationException();
     }
 
     @Override
