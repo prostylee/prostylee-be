@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import vn.prostylee.location.dto.request.LocationRequest;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Set;
 
@@ -24,9 +22,18 @@ public class ProductRequest {
     @NotNull
     private Long categoryId;
 
+    @NotNull
+    private Long usedStatusId;
+
+    @NotNull
+    private Long storeId;
+
     @NotBlank
+    @Size(max = 255)
     private String name;
 
+    @NotBlank
+    @Size(max = 255)
     private String description;
 
     private LocationRequest locationRequest;
@@ -38,13 +45,10 @@ public class ProductRequest {
     private List<Long> shippingProviders;
 
     @NotNull
-    private Long storeId;
-
-    @NotNull
     private Double price;
 
     private Double priceSale;
 
     @NotEmpty
-    private Set<ProductImageRequest> productImageRequests;
+    private List<ProductImageRequest> productImageRequests;
 }

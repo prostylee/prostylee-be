@@ -20,6 +20,8 @@ public class ProductResponse {
 
     private Long categoryId;
 
+    private Long usedStatusId;
+
     private String name;
 
     private String description;
