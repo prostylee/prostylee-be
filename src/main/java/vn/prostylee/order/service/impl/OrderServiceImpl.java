@@ -53,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
         }
         Pageable pageable = baseFilterSpecs.page(orderFilter);
         Page<Order> orders = orderRepository.findAll(mainSpec, pageable);
-        return orders.map(orderConverter::convertToResponse);
+        return orders.map(orderConverter::toDto);
     }
 
     private void findByStatus(OrderFilter orderFilter, QueryBuilder queryBuilder) {
@@ -81,24 +81,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse findById(Long id) {
         Order order = getOrderById(id);
-        return orderConverter.convertToResponse(order);
+        return orderConverter.toDto(order);
     }
 
     @Override
     public OrderResponse save(OrderRequest request) {
         Order order = BeanUtil.copyProperties(request, Order.class);
-        orderConverter.convertRequestToEntity(request, order);
+        orderConverter.toEntity(request, order);
         Order savedOrder = orderRepository.save(order);
-        return orderConverter.convertToResponse(savedOrder);
+        return orderConverter.toDto(savedOrder);
     }
 
     @Override
     public OrderResponse update(Long id, OrderRequest request) {
         Order order = getOrderById(id);
         BeanUtil.mergeProperties(request, order);
-        orderConverter.convertRequestToEntity(request, order);
+        orderConverter.toEntity(request, order);
         Order savedOrder = orderRepository.save(order);
-        return orderConverter.convertToResponse(savedOrder);
+        return orderConverter.toDto(savedOrder);
     }
 
     @Override
@@ -116,6 +116,6 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderById(id);
         order.setStatus(OrderStatus.getByStatusValue(statusRequest.getStatus()));
         Order savedOrder = orderRepository.save(order);
-        return orderConverter.convertToResponse(savedOrder);
+        return orderConverter.toDto(savedOrder);
     }
 }
