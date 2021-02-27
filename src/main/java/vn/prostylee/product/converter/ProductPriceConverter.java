@@ -11,8 +11,6 @@ import vn.prostylee.product.dto.response.ProductPriceResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
-import vn.prostylee.product.service.ProductAttributeService;
-import vn.prostylee.product.service.ProductService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,11 +22,7 @@ import java.util.Set;
 @Slf4j
 public class ProductPriceConverter {
 
-    private final ProductAttributeService productAttributeService;
-
     private final ProductAttributeConverter productAttributeConverter;
-
-    private final ProductService productService;
 
     public ProductPriceResponse toDto(ProductPrice productPrice) {
         ProductPriceResponse productPriceResponse = BeanUtil.copyProperties(productPrice, ProductPriceResponse.class);
@@ -41,7 +35,7 @@ public class ProductPriceConverter {
     }
 
     public void toEntity(ProductPriceRequest productPriceRequest, ProductPrice productPrice) {
-        Product product = productService.getProductById(productPriceRequest.getProductId());
+        Product product = Product.builder().id(productPriceRequest.getProductId()).build();
         productPrice.setProduct(product);
         Set<ProductAttribute> productAttributes = new HashSet<>();
         for(ProductAttributeRequest request : productPriceRequest.getProductAttributeRequests()) {
