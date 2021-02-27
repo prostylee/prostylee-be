@@ -14,16 +14,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ProductAttributeRequest {
 
-    @NotNull
-    private Long id;
-
     @NotBlank
     private String attrValue;
 
     @NotNull
     private Long attributeId;
-
-    @NotNull
-    private Long productPriceId;
 
 }

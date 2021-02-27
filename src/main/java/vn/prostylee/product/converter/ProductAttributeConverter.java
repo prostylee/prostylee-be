@@ -19,9 +19,8 @@ public class ProductAttributeConverter {
         return BeanUtil.copyProperties(productAttribute, ProductAttributeResponse.class);
     }
 
-    public void toEntity(ProductAttributeRequest request, ProductAttribute productAttribute) {
+    public void toEntity(ProductAttributeRequest request, ProductAttribute productAttribute, ProductPrice productPrice) {
         Attribute attribute = Attribute.builder().id(request.getAttributeId()).build();
-        ProductPrice productPrice = ProductPrice.builder().id(request.getProductPriceId()).build();
         productAttribute.setAttribute(attribute);
         productAttribute.setProductPrice(productPrice);
     }
