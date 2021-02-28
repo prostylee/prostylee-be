@@ -1,5 +1,6 @@
 package vn.prostylee.product.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class ProductPriceRequest {
 
+    @JsonIgnore
+    private Long id;
+
     @NotBlank
     private String name;
 
@@ -28,5 +32,5 @@ public class ProductPriceRequest {
 
     private Double priceSale;
 
-    private Set<ProductAttributeRequest> productAttributeRequests;
+    private Set<ProductAttributeRequest> productAttributes;
 }
