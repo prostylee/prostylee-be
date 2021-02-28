@@ -24,4 +24,6 @@ public interface UserRepository extends BaseRepository<User, Long> {
     Optional<User> findByPushToken(String pushToken);
 
     Page<User> getAllUsers(UserFilter baseFilter, Pageable pageable);
+
+    Optional<User> findBySub(String sub);
 }

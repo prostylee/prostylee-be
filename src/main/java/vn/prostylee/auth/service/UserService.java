@@ -18,4 +18,6 @@ public interface UserService extends CrudService<UserRequest, UserResponse, Long
     boolean isExistsUserByEmail(String email);
 
     Optional<User> getUserByEmail(String email);
+
+    Optional<User> findBySub(String sub);
 }

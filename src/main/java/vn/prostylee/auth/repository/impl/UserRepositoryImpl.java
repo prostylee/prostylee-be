@@ -13,7 +13,6 @@ import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 import vn.prostylee.core.repository.query.HibernateQueryResult;
 import vn.prostylee.core.utils.DbUtil;
-import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 
 import javax.persistence.EntityManager;
 import java.util.HashMap;
@@ -92,6 +91,18 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implement
         appendSortQuery(queryBuilder, pageable);
         HibernateQueryResult queryResult = new HibernateQueryResult(getEntityManager(), queryBuilder, pageable);
         return queryResult.getResultList(parameterMap, User.class);
+    }
+
+    @Override
+    public Optional<User> findBySub(String sub) {
+        StringBuilder queryBuilder = new StringBuilder("select e "
+                + " from "+ User.class.getName() +" e "
+                + " where e.sub = :sub ");
+
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("sub", sub);
+        HibernateQueryResult queryResult = new HibernateQueryResult(getEntityManager(), queryBuilder, null);
+        return queryResult.getQuerySingleResult(parameterMap, User.class);
     }
 
     private void appendSortQuery(StringBuilder queryBuilder, Pageable pageable) {

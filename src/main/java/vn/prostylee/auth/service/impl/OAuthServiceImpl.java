@@ -9,6 +9,7 @@ import vn.prostylee.auth.dto.request.OAuthRequest;
 import vn.prostylee.auth.dto.request.OAuthUserInfoRequest;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.OAuthService;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.converter.GenderConverter;
@@ -16,6 +17,8 @@ import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.notification.configure.event.EmailEvent;
 import vn.prostylee.notification.configure.event.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
+
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,27 +33,36 @@ public class OAuthServiceImpl implements OAuthService {
     public SimpleResponse signUp(OAuthRequest oAuthRequest) {
         log.debug("oAuthRequest {}", oAuthRequest);
 
-        UserRequest userRequest = UserRequest.builder()
-                .sub(oAuthRequest.getUserInfo().getSub())
-                .username(oAuthRequest.getUsername())
-                .fullName(getFullName(oAuthRequest.getUserInfo()))
-                .phoneNumber(oAuthRequest.getUserInfo().getPhoneNumber())
-                .gender(GenderConverter.convertGender(oAuthRequest.getUserInfo().getGender()))
-                .email(oAuthRequest.getUserInfo().getEmail())
-                .roles(oAuthRequest.getGroups())
-                .active(oAuthRequest.getEnabled())
-                .allowNotification(true)
-                .emailVerified(oAuthRequest.getUserInfo().getEmailVerified())
-                .phoneNumberVerified(oAuthRequest.getUserInfo().getPhoneNumberVerified())
-                .build();
+        final String sub = oAuthRequest.getUserInfo().getSub();
+        Optional<User> optUser = userService.findBySub(sub);
+        if (optUser.isPresent()) {
+            // TODO merge exists user info and oAuthRequest
+            return SimpleResponse.builder()
+                    .data("Already exists")
+                    .build();
+        } else {
+            UserRequest userRequest = UserRequest.builder()
+                    .sub(oAuthRequest.getUserInfo().getSub())
+                    .username(oAuthRequest.getUsername())
+                    .fullName(getFullName(oAuthRequest.getUserInfo()))
+                    .phoneNumber(oAuthRequest.getUserInfo().getPhoneNumber())
+                    .gender(GenderConverter.convertGender(oAuthRequest.getUserInfo().getGender()))
+                    .email(oAuthRequest.getUserInfo().getEmail())
+                    .roles(oAuthRequest.getGroups())
+                    .active(oAuthRequest.getEnabled())
+                    .allowNotification(true)
+                    .emailVerified(oAuthRequest.getUserInfo().getEmailVerified())
+                    .phoneNumberVerified(oAuthRequest.getUserInfo().getPhoneNumberVerified())
+                    .build();
 
-        UserResponse userResponse = userService.save(userRequest);
+            UserResponse userResponse = userService.save(userRequest);
 
-        this.sendEmailWelcome(userRequest.getEmail(), userRequest);
+            this.sendEmailWelcome(userRequest.getEmail(), userRequest);
 
-        return SimpleResponse.builder()
-                .data(userResponse)
-                .build();
+            return SimpleResponse.builder()
+                    .data(userResponse)
+                    .build();
+        }
     }
 
     private String getFullName(OAuthUserInfoRequest userInfo) {

@@ -167,4 +167,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findActivatedUserByEmail(email);
     }
 
+    @Override
+    public Optional<User> findBySub(String sub) {
+        return userRepository.findBySub(sub);
+    }
+
 }
