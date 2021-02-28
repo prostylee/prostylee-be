@@ -48,7 +48,8 @@ public class UserLikeServiceImpl implements UserLikeService {
     public boolean like(UserLikeRequest request) {
         try {
             UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
-            repository.save(entity);
+            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
+                repository.save(entity);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;

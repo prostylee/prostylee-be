@@ -16,6 +16,7 @@ import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.entity.UserFollower;
+import vn.prostylee.useractivity.entity.UserLike;
 import vn.prostylee.useractivity.repository.UserFollowerRepository;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -43,10 +44,15 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     }
 
     @Override
-    public UserFollowerResponse follow(UserFollowerRequest request) {
-        UserFollower entity = BeanUtil.copyProperties(request, UserFollower.class);
-        UserFollower savedEntity = repository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserFollowerResponse.class);
+    public boolean follow(UserFollowerRequest request) {
+        try {
+            UserFollower entity = BeanUtil.copyProperties(request, UserFollower.class);
+            if (!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
+                repository.save(entity);
+            return true;
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
+            return false;
+        }
     }
 
     @Override

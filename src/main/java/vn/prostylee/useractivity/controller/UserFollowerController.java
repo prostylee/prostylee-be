@@ -35,8 +35,8 @@ public class UserFollowerController {
     }
 
     @PostMapping("/follow")
-    public UserFollowerResponse follow(@Valid  @RequestBody UserFollowerRequest request) {
-        return service.follow(request);
+    public SimpleResponse follow(@Valid  @RequestBody UserFollowerRequest request) {
+        return SimpleResponse.builder().data(service.follow(request)).build();
     }
 
     @PutMapping("/unfollow")

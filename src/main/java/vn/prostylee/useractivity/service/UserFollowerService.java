@@ -14,7 +14,7 @@ public interface UserFollowerService {
 
     Page<UserFollowerResponse> findAll(UserFollowerFilter filter);
 
-    UserFollowerResponse follow(UserFollowerRequest request);
+    boolean follow(UserFollowerRequest request);
 
     boolean unfollow(UserFollowerRequest request);
 
