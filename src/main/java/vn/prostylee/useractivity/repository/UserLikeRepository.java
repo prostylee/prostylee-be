@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.entity.UserLike;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ import java.util.List;
  * @author prostylee
  */
 @Repository
+@Transactional
 public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
 
     @Query("DELETE FROM UserLike WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:createdBy")
@@ -25,6 +27,8 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
             @Param("targetType") String targetType,
             @Param("createdBy") Long createdBy
     );
+
+    boolean existsByTargetIdAndTargetType(Long userId, String targetType);
     
     @Query("SELECT e.targetId FROM UserLike e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusLikes(

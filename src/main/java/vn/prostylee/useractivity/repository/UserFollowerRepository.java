@@ -18,6 +18,7 @@ import java.util.List;
  * @author prostylee
  */
 @Repository
+@Transactional
 public interface UserFollowerRepository extends BaseRepository<UserFollower, Long> {
 
     @Modifying
@@ -27,6 +28,8 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
             @Param("targetType") String targetType,
             @Param("createdBy") Long createdBy
     );
+
+    boolean existsByTargetIdAndTargetType(Long userId, String targetType);
 
     @Query("SELECT e.targetId FROM UserFollower e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusFollows(

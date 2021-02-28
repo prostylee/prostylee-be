@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 /**
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @author prostylee
  */
 @Repository
+@Transactional
 public interface NotificationRepository extends BaseRepository<Notification, Long> {
 
     void deleteAllByUserId(Long userId);
