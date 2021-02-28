@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.media.configuration.AWSS3Properties;
+import vn.prostylee.media.configuration.AwsS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
@@ -41,7 +41,7 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
     @Autowired
     public AwsS3AsyncProvider(
             AmazonS3 s3Client,
-            AWSS3Properties awss3Properties,
+            AwsS3Properties awss3Properties,
             AttachmentService attachmentService) {
         this.s3Client = s3Client;
         this.bucketName = awss3Properties.getBucket();

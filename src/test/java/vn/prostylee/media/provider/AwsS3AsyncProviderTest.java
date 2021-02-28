@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import vn.prostylee.ConfigTestUtils;
-import vn.prostylee.media.configuration.AWSS3Properties;
+import vn.prostylee.media.configuration.AwsS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.provider.async.AwsS3AsyncProvider;
@@ -42,7 +42,7 @@ public class AwsS3AsyncProviderTest {
     private AmazonS3 s3Client;
     @Mock
     private AttachmentService attachmentService;
-    private final AWSS3Properties awss3Properties = ConfigTestUtils.prepareAwsS3Props();
+    private final AwsS3Properties awss3Properties = ConfigTestUtils.prepareAwsS3Props();
     private final List<String> fileNames = Arrays.asList("deletedFile");
 
     @BeforeEach

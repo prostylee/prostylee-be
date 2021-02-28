@@ -21,24 +21,24 @@ public class AuthUserDetails implements UserDetails {
 
     private static final long serialVersionUID = -883489449957337175L;
 
-    private Long id;
+    private final Long id;
 
-    private String fullName;
+    private final String fullName;
 
-    private String username;
+    private final String username;
 
-    private String phoneNumber;
+    private final String phoneNumber;
 
-    private Character gender;
+    private final Character gender;
 
     @JsonIgnore
-    private String password;
+    private final String password;
 
-    private Set<Role> roles;
+    private final Set<Role> roles;
 
-    private List<FeatureResponse> features;
+    private final List<FeatureResponse> features;
 
-    private List<GrantedAuthority> authorities;
+    private final List<GrantedAuthority> authorities;
 
     public AuthUserDetails(User user, Collection<Feature> features) {
         this.id = user.getId();

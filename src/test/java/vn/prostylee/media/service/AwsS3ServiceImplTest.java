@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import vn.prostylee.ConfigTestUtils;
 import vn.prostylee.core.constant.ErrorResponseStatus;
-import vn.prostylee.media.configuration.AWSS3Properties;
+import vn.prostylee.media.configuration.AwsS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
@@ -58,7 +58,7 @@ public class AwsS3ServiceImplTest {
     private AwsS3AsyncProvider awsS3AsyncProvider;
     @Captor
     private ArgumentCaptor<Attachment> attachmentArgumentCaptor;
-    private final AWSS3Properties awss3Properties = ConfigTestUtils.prepareAwsS3Props();
+    private final AwsS3Properties awss3Properties = ConfigTestUtils.prepareAwsS3Props();
     private final List<Long> attachmentIds = ConfigTestUtils.prepareAttachmentsIds();
     private final List<Attachment> attachments = prepareAttachments();
 

@@ -1,6 +1,6 @@
 package vn.prostylee.core.configuration.async;
 
-import vn.prostylee.core.configuration.properties.ThreadExecutor;
+import vn.prostylee.core.configuration.properties.ThreadExecutorProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
@@ -26,14 +26,14 @@ import java.util.concurrent.Executor;
 public class SpringAsyncConfig extends AsyncConfigurerSupport {
 
     private static final String THREAD_NAME_PREFIX = "ProStylee-Async-";
-    private final ThreadExecutor threadExecutor;
+    private final ThreadExecutorProperties threadExecutorProperties;
 
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(threadExecutor.getCorePoolSize());
-        executor.setMaxPoolSize(threadExecutor.getMaxPoolSize());
-        executor.setQueueCapacity(threadExecutor.getQueueCapacity());
+        executor.setCorePoolSize(threadExecutorProperties.getCorePoolSize());
+        executor.setMaxPoolSize(threadExecutorProperties.getMaxPoolSize());
+        executor.setQueueCapacity(threadExecutorProperties.getQueueCapacity());
         executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
         executor.initialize();
         return executor;

@@ -28,7 +28,6 @@ public class RegisterRequest {
 
     @Unique(service = UserService.class)
     @NotBlank
-    @Email
     @Size(min = 4, max = 256)
     private String username;
 
@@ -36,6 +35,9 @@ public class RegisterRequest {
     @NotBlank
     @Size(min = 4, max = 128)
     private String password;
+
+    @Email
+    private String email;
 
     @Gender
     private Character gender;

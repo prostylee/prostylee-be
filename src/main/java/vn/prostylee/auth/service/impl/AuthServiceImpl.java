@@ -3,6 +3,7 @@ package vn.prostylee.auth.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,7 @@ import vn.prostylee.notification.constant.EmailTemplateType;
 import java.util.Collections;
 
 @Slf4j
+@Primary
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -57,10 +59,9 @@ public class AuthServiceImpl implements AuthService {
         UserRequest userRequest = BeanUtil.copyProperties(registerRequest, UserRequest.class);
         userRequest.setRoles(Collections.singletonList(AuthRole.BUYER.name()));
         userRequest.setActive(registerRequest.getActive() == null ? Boolean.TRUE : registerRequest.getActive());
-        userRequest.setEmail(registerRequest.getUsername());
         userService.save(userRequest);
 
-        this.sendEmailWelcome(userRequest.getEmail(), registerRequest);
+        this.sendEmailWelcome(userRequest.getEmail(), userRequest);
 
         LoginRequest loginRequest = LoginRequest.builder()
                 .username(registerRequest.getUsername())
@@ -97,11 +98,11 @@ public class AuthServiceImpl implements AuthService {
         throw new AuthenticationException("Can not change the password");
     }
 
-    protected void sendEmailWelcome(String email, RegisterRequest registerRequest) {
+    private void sendEmailWelcome(String email, UserRequest userRequest) {
         EmailEventDto<?> eventDto = EmailEventDto.builder()
                 .emailTemplateType(EmailTemplateType.WELCOME)
                 .email(email)
-                .data(registerRequest)
+                .data(userRequest)
                 .build();
         eventPublisher.publishEvent(new EmailEvent(eventDto));
     }

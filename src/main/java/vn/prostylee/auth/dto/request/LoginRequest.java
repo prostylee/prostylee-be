@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -24,7 +23,6 @@ public class LoginRequest {
     private String appClientSecret;
 
     @NotBlank
-    @Email
     @Size(min = 4, max = 256)
     private String username;
 

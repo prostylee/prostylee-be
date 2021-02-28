@@ -61,9 +61,14 @@ public class UserServiceImpl implements UserService {
         if (user.getAllowNotification() == null) {
             user.setAllowNotification(true);
         }
+        if (StringUtils.isBlank(userRequest.getSub())) {
+            user.setSub(UUID.randomUUID().toString());
+        }
         user.setRoles(this.getRoles(userRequest.getRoles()));
         User savedUser = this.save(user);
-        return BeanUtil.copyProperties(savedUser, UserResponse.class);
+        UserResponse response = BeanUtil.copyProperties(savedUser, UserResponse.class);
+        response.setRoles(user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()));
+        return response;
     }
 
     private Set<Role> getRoles(List<String> roleCodes) {
