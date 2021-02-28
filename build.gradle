@@ -99,6 +99,7 @@ dependencies {
 	// AWS
 	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.926')
 	implementation 'com.amazonaws:aws-java-sdk-s3'
+	implementation 'com.amazonaws:aws-java-sdk-cognitoidp'
 
 	// Logging
 	implementation 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
@@ -108,6 +109,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'com.auth0:auth0:1.16.0'
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.7' // Open Id Token verification
 	implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20200713.1'
 
 	// Object mapper

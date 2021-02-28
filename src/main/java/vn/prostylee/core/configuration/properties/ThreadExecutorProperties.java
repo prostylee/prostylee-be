@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties("app.thread-executor")
-public class ThreadExecutor {
+public class ThreadExecutorProperties {
 
     private int corePoolSize;
 

@@ -65,10 +65,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private FeatureRepository featureRepository;
 
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter();
-	}
+	@Autowired
+	public AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter;
+
+	@Autowired
+	public JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -115,7 +116,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		;
 
 		// Add our custom JWT security filter
-		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(awsCognitoJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
 	private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry buildDynamicMatchers(

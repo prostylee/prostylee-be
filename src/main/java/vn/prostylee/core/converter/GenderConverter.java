@@ -6,14 +6,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class GenderConverter {
-    private static final List<String> MALE_LIST_DEFINITION = Arrays.asList("male", "1", "boy", "men");
-    private static final List<String> FEMALE_LIST_DEFINITION = Arrays.asList("female", "0", "girl", "women");
+public final class GenderConverter {
 
-    public static Character convertGender(String gender){
-        if(MALE_LIST_DEFINITION.stream().anyMatch(isMatched(gender))){
+    private static final List<String> MALE_LIST_DEFINITION = Arrays.asList("male", "1", "boy", "men", "m");
+    private static final List<String> FEMALE_LIST_DEFINITION = Arrays.asList("female", "0", "girl", "women", "f");
+
+    private GenderConverter() {
+    }
+
+    public static Character convertGender(String gender) {
+        if (MALE_LIST_DEFINITION.stream().anyMatch(isMatched(gender))) {
             return Gender.MALE.getValue();
-        }else if(FEMALE_LIST_DEFINITION.stream().anyMatch(isMatched(gender))){
+        } else if (FEMALE_LIST_DEFINITION.stream().anyMatch(isMatched(gender))) {
             return Gender.FEMALE.getValue();
         }
         return Gender.OTHER.getValue();

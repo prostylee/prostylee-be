@@ -119,14 +119,31 @@ app:
       - /v1/auth/**/**
       - /v1/masters/**
       - /v1/supports/**
+      - /v1/oauth/**
   aws:
-    bucket: thebucketofkai2020
-    region: ap-southeast-1
-    accessKey: AKIAZVNNPQGLWGFMYF6X
-    secretKey: 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
-    bucketUrl: https://${app.aws.bucket}.s3.${app.aws.region}.amazonaws.com/
-    cloudFrontId: d257kiz92yvhbo
-    cloudFrontUrl: https://${app.aws.cloudFrontId}.cloudfront.net/fit-in/
+    # AWS Credential
+    credential:
+      accessKey: AKIA5IRSGPONR66ETTWG
+      secretKey: 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
+    # AWS S3
+    s3:
+      bucket: thebucketofkai2020
+      region: ap-southeast-1
+      bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
+      cloudFrontId: d257kiz92yvhbo
+      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/fit-in/
+    # AWS Cognito
+    cognito:
+      clientId: 1cjpg4lfnim8m1p7iiokcvbrld
+      poolId: ap-southeast-1_c0EMF4obI
+      endpoint: prostylee-dev.auth.ap-southeast-1.amazoncognito.com
+      region: ap-southeast-1
+      identityPoolId: ap-southeast-1:289b0d35-9dd6-4164-a2f8-073a72d88e84
+      issuer: https://cognito-idp.${app.aws.cognito.region}.amazonaws.com/${app.aws.cognito.poolId}
+      jwkUrl: ${app.aws.cognito.issuer}/.well-known/jwks.json
+      connectionTimeout: 2000
+      readTimeout: 2000
+
   http:
     connectTimeout: 5000
     responseTimeout: 5000

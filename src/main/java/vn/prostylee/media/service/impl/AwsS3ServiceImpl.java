@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.media.configuration.AWSS3Properties;
+import vn.prostylee.media.configuration.AwsS3Properties;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
@@ -37,7 +37,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
 
     @Autowired
     public AwsS3ServiceImpl(
-            AWSS3Properties awss3Properties,
+            AwsS3Properties awss3Properties,
             AwsS3AsyncProvider awsS3AsyncProvider,
             AttachmentRepository attachmentRepository) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
