@@ -38,7 +38,7 @@ public class ProductPriceConverter {
         Product product = Product.builder().id(productPriceRequest.getProductId()).build();
         productPrice.setProduct(product);
         Set<ProductAttribute> productAttributes = new HashSet<>();
-        for(ProductAttributeRequest request : productPriceRequest.getProductAttributeRequests()) {
+        for(ProductAttributeRequest request : productPriceRequest.getProductAttributes()) {
             ProductAttribute productAttribute = BeanUtil.copyProperties(request, ProductAttribute.class);
             productAttributeConverter.toEntity(request, productAttribute, productPrice);
             productAttributes.add(productAttribute);
