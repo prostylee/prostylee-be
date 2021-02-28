@@ -1,1 +1,1 @@
-SELECT setval('attachment_seq', (SELECT MAX(id) FROM attachment)+1);
+ALTER SEQUENCE attachment_seq RESTART WITH 101;
