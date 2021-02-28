@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )
 @Sql(
-        statements = { "DELETE FROM role" },
+        statements = { "DELETE FROM user_role; DELETE FROM role;" },
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD,
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )

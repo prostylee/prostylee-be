@@ -70,7 +70,7 @@ public class UserRatingServiceImpl implements UserRatingService {
         try {
             userRatingRepository.deleteById(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
         }
     }

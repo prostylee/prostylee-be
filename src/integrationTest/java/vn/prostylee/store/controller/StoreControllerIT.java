@@ -223,9 +223,9 @@ class StoreControllerIT extends AuthSupporterIT {
 
     @Test
     void delete_Successfully() throws Exception {
-        final long userId = 10L;
+        final long id = 10L;
         this.mockMvc
-                .perform(delete(ENDPOINT + "/" + userId))
+                .perform(delete(ENDPOINT + "/" + id))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$").value("true"))
@@ -234,9 +234,9 @@ class StoreControllerIT extends AuthSupporterIT {
 
     @Test
     void delete_EntityNotFound_Successfully() throws Exception {
-        final long userId = 20L;
+        final long id = 10000L;
         this.mockMvc
-                .perform(delete(ENDPOINT + "/" + userId))
+                .perform(delete(ENDPOINT + "/" + id))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$").value("false"))

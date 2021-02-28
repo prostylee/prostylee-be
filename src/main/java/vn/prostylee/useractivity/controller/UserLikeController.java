@@ -14,6 +14,7 @@ import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,17 +35,17 @@ public class UserLikeController {
     }
 
     @PostMapping("/like")
-    public SimpleResponse like(@RequestBody UserLikeRequest request) {
+    public SimpleResponse like(@Valid @RequestBody UserLikeRequest request) {
         return SimpleResponse.builder().data(service.like(request)).build();
     }
 
     @PutMapping("/unlike")
-    public SimpleResponse unlike(@RequestBody UserLikeRequest request) {
+    public SimpleResponse unlike(@Valid @RequestBody UserLikeRequest request) {
         return SimpleResponse.builder().data(service.unlike(request)).build();
     }
 
     @PostMapping("/loadStatusLike")
-    public ResponseEntity<SimpleResponse> loadStatusLikes(@RequestBody StatusLikeRequest statusLikeRequest) {
+    public ResponseEntity<SimpleResponse> loadStatusLikes(@Valid @RequestBody StatusLikeRequest statusLikeRequest) {
         List<Long> existIds = service.loadStatusLikes(statusLikeRequest);
         int targetIdListSize = statusLikeRequest.getTargetIds().size();
 
