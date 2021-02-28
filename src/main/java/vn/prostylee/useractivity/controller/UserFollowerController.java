@@ -14,6 +14,7 @@ import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -34,16 +35,16 @@ public class UserFollowerController {
     }
 
     @PostMapping("/follow")
-    public UserFollowerResponse follow(@RequestBody UserFollowerRequest request) {
+    public UserFollowerResponse follow(@Valid  @RequestBody UserFollowerRequest request) {
         return service.follow(request);
     }
 
     @PutMapping("/unfollow")
-    public SimpleResponse unfollow(@RequestBody UserFollowerRequest request) {
+    public SimpleResponse unfollow(@Valid @RequestBody UserFollowerRequest request) {
         return SimpleResponse.builder().data(service.unfollow(request)).build();
     }
 
-    @PostMapping("/loadStatusFollow")
+    @PostMapping("/load-status-follow")
     public ResponseEntity<SimpleResponse> loadStatusFollow(@RequestBody StatusFollowRequest statusFollowRequest) {
         List<Long> existIds = service.loadStatusFollows(statusFollowRequest);
         int targetIdListSize = statusFollowRequest.getTargetIds().size();

@@ -44,7 +44,7 @@ public class UserLikeController {
         return SimpleResponse.builder().data(service.unlike(request)).build();
     }
 
-    @PostMapping("/loadStatusLike")
+    @PostMapping("/load-status-like")
     public ResponseEntity<SimpleResponse> loadStatusLikes(@Valid @RequestBody StatusLikeRequest statusLikeRequest) {
         List<Long> existIds = service.loadStatusLikes(statusLikeRequest);
         int targetIdListSize = statusLikeRequest.getTargetIds().size();
