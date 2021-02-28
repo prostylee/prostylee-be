@@ -15,6 +15,8 @@ import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.repository.ProductPriceRepository;
 import vn.prostylee.product.service.ProductPriceService;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -65,5 +67,10 @@ public class ProductPriceServiceImpl implements ProductPriceService {
     public ProductPrice getProductPriceById(Long id) {
         return productPriceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product price is not found with id [" + id + "]"));
+    }
+
+    @Override
+    public List<ProductPrice> getProductPricesByProduct(Long productId) {
+        return productPriceRepository.findAllByProductId(productId);
     }
 }
