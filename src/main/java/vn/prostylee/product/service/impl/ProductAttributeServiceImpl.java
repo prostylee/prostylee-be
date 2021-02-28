@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.product.converter.ProductAttributeConverter;
 import vn.prostylee.product.dto.request.ProductAttributeRequest;
 import vn.prostylee.product.dto.response.ProductAttributeResponse;
@@ -54,11 +53,6 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
             log.debug("Product attribute id {} does not exists", id);
             throw new ResourceNotFoundException("Product attribute is not found with id [" + id + "]");
         }
-    }
-
-    @Override
-    public ProductAttributeResponse toDto(ProductAttribute productAttribute) {
-        return BeanUtil.copyProperties(productAttribute, ProductAttributeResponse.class);
     }
 
     public ProductAttribute getProductAttributeById(Long id) {
