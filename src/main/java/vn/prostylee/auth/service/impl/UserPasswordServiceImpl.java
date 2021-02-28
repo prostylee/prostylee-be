@@ -18,8 +18,6 @@ import vn.prostylee.notification.configure.event.EmailEvent;
 import vn.prostylee.notification.configure.event.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
-import javax.transaction.Transactional;
-
 @Service
 @RequiredArgsConstructor
 public class UserPasswordServiceImpl implements UserPasswordService {
@@ -58,7 +56,6 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    @Transactional // TODO fix can not open transaction
     public boolean changePassword(ChangePasswordRequest request) {
         String email = request.getEmail();
         final User user = getUserByEmail(email);

@@ -1,11 +1,13 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
@@ -20,6 +22,7 @@ import vn.prostylee.useractivity.service.UserLikeService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserLikeServiceImpl implements UserLikeService {
@@ -47,7 +50,7 @@ public class UserLikeServiceImpl implements UserLikeService {
             UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
             repository.save(entity);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
         }
     }
@@ -57,7 +60,7 @@ public class UserLikeServiceImpl implements UserLikeService {
         try {
             repository.unlike(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue());
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
         }
     }
