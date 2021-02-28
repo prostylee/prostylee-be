@@ -11,7 +11,7 @@ import vn.prostylee.product.service.UsedStatusService;
 import java.util.List;
 
 @RestController
-@RequestMapping(ApiVersion.API_V1 + "/used_statuses")
+@RequestMapping(ApiVersion.API_V1 + "/used-statuses")
 public class UsedStatusController {
     private final UsedStatusService usedStatusService;
 
