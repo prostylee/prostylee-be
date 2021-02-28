@@ -43,6 +43,12 @@ public class ProductPriceConverter {
             productAttributeConverter.toEntity(request, productAttribute, productPrice);
             productAttributes.add(productAttribute);
         }
-        productPrice.setProductAttributes(productAttributes);
+        Set<ProductAttribute> entityProductAttrs = productPrice.getProductAttributes();
+        if (entityProductAttrs == null) {
+            productPrice.setProductAttributes(productAttributes);
+            return;
+        }
+        entityProductAttrs.clear();
+        entityProductAttrs.addAll(productAttributes);
     }
 }

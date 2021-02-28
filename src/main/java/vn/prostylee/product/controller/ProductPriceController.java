@@ -18,5 +18,4 @@ public class ProductPriceController extends CrudController<ProductPriceRequest, 
     public ProductPriceController(ProductPriceService productPriceService) {
         super(productPriceService);
     }
-
 }
