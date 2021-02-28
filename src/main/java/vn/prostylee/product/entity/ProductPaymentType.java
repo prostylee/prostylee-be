@@ -1,26 +1,21 @@
 package vn.prostylee.product.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 @Table(name = "product_payment_type")
 public class ProductPaymentType extends AuditEntity {
 
     private static final long serialVersionUID = 1L;
-
-    public ProductPaymentType(Long productId , Long paymentTypeId){
-        this.productId = productId;
-        this.paymentTypeId = paymentTypeId;
-    }
 
     @Id
     @SequenceGenerator(name = "product_payment_type_seq", sequenceName = "product_payment_type_seq", allocationSize = 1)
@@ -28,8 +23,12 @@ public class ProductPaymentType extends AuditEntity {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @Column(name = "product_id")
-    private Long productId;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @Column(name = "payment_type_id")
     private Long paymentTypeId;

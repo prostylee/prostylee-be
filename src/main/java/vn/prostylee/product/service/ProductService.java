@@ -6,5 +6,6 @@ import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 
 public interface ProductService extends CrudService<ProductRequest, ProductResponse, Long> {
+    long countTotalProductByUser(Long userId);
     Product getProductById(Long id);
 }

@@ -1,13 +1,13 @@
 package vn.prostylee.useractivity.dto.filter;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserFollowerFilter extends BaseFilter {
 
     private Long targetId;

@@ -29,11 +29,11 @@ public class ProductRequest {
     private Long storeId;
 
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 512)
     private String name;
 
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 4096)
     private String description;
 
     private LocationRequest locationRequest;

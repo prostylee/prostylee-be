@@ -21,13 +21,13 @@ public class ProductImageServiceImpl implements ProductImageService {
     private final AttachmentService attachmentService;
 
     @Override
-    public Set<ProductImage> buildProductImages(List<ProductImageRequest> productImageRequests, Product product) {
+    public Set<ProductImage> handleProductImages(List<ProductImageRequest> productImageRequests, Product product) {
         return IntStream.range(0, productImageRequests.size())
-            .mapToObj(index -> getProductImage(product, productImageRequests, index)
+            .mapToObj(index -> handleProductImage(product, productImageRequests, index)
         ).collect(Collectors.toSet());
     }
 
-    private ProductImage getProductImage(Product product, List<ProductImageRequest> productImageRequests, int index) {
+    private ProductImage handleProductImage(Product product, List<ProductImageRequest> productImageRequests, int index) {
         Attachment attachment = this.saveAttachment(productImageRequests.get(index));
         return buildProductImage(product, attachment.getId(), index + 1);
     }

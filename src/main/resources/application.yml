@@ -30,6 +30,8 @@ services:
     temp-folder:
       location: prostylee-temp
       timeToLiveInHours: 720
+  aws:
+    image-url: https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/
 
 app:
   order-code:
