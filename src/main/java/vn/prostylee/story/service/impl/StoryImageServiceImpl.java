@@ -15,8 +15,8 @@ public class StoryImageServiceImpl implements StoryImageService {
     private final StoryImageRepository repository;
 
     @Override
-    public Set<StoryImage> getStoryImagesByStoryId(Long Id) {
-        return repository.getStoryImagesByStoryId(Id);
+    public Set<StoryImage> getStoryImagesByStoryId(Long id) {
+        return repository.getStoryImagesByStoryId(id);
     }
 
 }

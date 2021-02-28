@@ -40,10 +40,4 @@ public class ProductController extends CrudController<ProductRequest, ProductRes
         return productForStoryService.getProductForStory(productId);
     }
 
-    @GetMapping("/total-products-by-user")
-    public SimpleResponse countTotalProductByUser() {
-        long totalNumber = productService.countTotalProductByUser();
-        return SimpleResponse.builder().data(totalNumber).build();
-    }
-
 }

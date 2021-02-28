@@ -2,6 +2,7 @@ package vn.prostylee.media.service.impl;
 
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -18,7 +19,9 @@ import java.util.List;
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepository attachmentRepository;
-    private static final String PREFIX = "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/";
+
+    @Value("${services.aws.image-url}")
+    private String imageUrl;
 
     @Autowired
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository) {
@@ -42,7 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Attachment saveAttachmentByNameAndPath(String name, String path) {
         Attachment attachment = new Attachment();
-        attachment.setPath(PREFIX + path);
+        attachment.setPath(imageUrl + path);
         attachment.setName(name);
         attachment.setDisplayName(name);
         return attachmentRepository.save(attachment);

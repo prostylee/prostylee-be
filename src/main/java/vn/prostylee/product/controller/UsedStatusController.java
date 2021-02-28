@@ -20,7 +20,7 @@ public class UsedStatusController {
         this.usedStatusService = usedStatusService;
     }
 
-    @GetMapping("")
+    @GetMapping()
     public List<UsedStatusResponse> getAllByStore() {
         return usedStatusService.getUsedStatuses();
     }

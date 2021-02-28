@@ -1,8 +1,7 @@
 package vn.prostylee.product.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -11,15 +10,12 @@ import javax.persistence.*;
 @Data
 @EqualsAndHashCode(callSuper=true)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "product_shipping_provider")
 public class ProductShippingProvider extends AuditEntity {
 
     private static final long serialVersionUID = 1L;
-
-    public ProductShippingProvider(Long productId, Long shippingProviderId){
-        this.productId = productId;
-        this.shippingProviderId = shippingProviderId;
-    }
 
     @Id
     @SequenceGenerator(name = "product_shipping_provider_seq", sequenceName = "product_shipping_provider_seq", allocationSize = 1)
@@ -27,8 +23,12 @@ public class ProductShippingProvider extends AuditEntity {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
-    @Column(name = "product_id")
-    private Long productId;
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @Column(name = "shipping_provider_id")
     private Long shippingProviderId;

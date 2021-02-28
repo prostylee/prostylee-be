@@ -9,5 +9,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface ProductImageService {
-    Set<ProductImage> buildProductImages(List<ProductImageRequest> productImageRequests, Product product);
+    Set<ProductImage> handleProductImages(List<ProductImageRequest> productImageRequests, Product product);
 }

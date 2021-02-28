@@ -52,7 +52,7 @@ public class Product extends AuditEntity {
 	@Column(name = "status")
 	private Integer status;
 
-	@Column(name = "location_id", length = 512)
+	@Column(name = "location_id")
 	private Long locationId;
 
 	@Column(name = "store_id")
@@ -86,4 +86,13 @@ public class Product extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
 	private Set<ProductImage> productImages;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
+	private Set<ProductPaymentType> productPaymentTypes;
+
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
+	private Set<ProductShippingProvider> productShippingProviders;
 }
