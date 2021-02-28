@@ -38,16 +38,14 @@ public class ProductRequest {
 
     private LocationRequest locationRequest;
 
+    @NotNull
+    private List<ProductPriceRequest> productPriceRequest;
+
     @NotEmpty
     private List<Long> paymentTypes;
 
     @NotEmpty
     private List<Long> shippingProviders;
-
-    @NotNull
-    private Double price;
-
-    private Double priceSale;
 
     @NotEmpty
     private List<ProductImageRequest> productImageRequests;

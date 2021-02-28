@@ -10,7 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
@@ -23,26 +22,23 @@ import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
-import vn.prostylee.product.service.ProductImageService;
-import vn.prostylee.product.service.ProductPaymentTypeService;
-import vn.prostylee.product.service.ProductService;
-import vn.prostylee.product.service.ProductShippingProviderService;
+import vn.prostylee.product.service.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
+
     private final BaseFilterSpecs<Product> baseFilterSpecs;
     private final ProductRepository productRepository;
     private final LocationService locationService;
     private final ProductImageService productImageService;
     private final ProductPaymentTypeService productPaymentTypeService;
     private final ProductShippingProviderService productShippingProviderService;
+    private final ProductPriceService productPriceService;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -80,12 +76,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse save(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
-        ProductResponse productResponse = buildAdditionalPart(productRequest, productEntity);
-        return productResponse;
+        return toResponse(productRequest, productEntity);
     }
 
-    //TODO need to rename
-    private ProductResponse buildAdditionalPart(ProductRequest productRequest, Product productEntity) {
+    private ProductResponse toResponse(ProductRequest productRequest, Product productEntity) {
         Long locationId = fetchLocation(productRequest.getLocationRequest());
         productEntity.setLocationId(locationId);
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
@@ -105,9 +99,16 @@ public class ProductServiceImpl implements ProductService {
                 .buildProductShippingProviders(productRequest.getShippingProviders(), productEntity);
         productEntity.setProductShippingProviders(productShippingProviders);
 
-        Product savedProductEntity = this.productRepository.save(productEntity);
-        ProductResponse productResponse = BeanUtil.copyProperties(savedProductEntity, ProductResponse.class);
+        Product savedProductEntity = productRepository.save(productEntity);
+        Long productId = savedProductEntity.getId();
 
+        productRequest.getProductPriceRequest().forEach(productPriceRequest -> {
+            productPriceRequest.setProductId(productId);
+            productPriceService.save(productPriceRequest);
+        });
+
+
+        ProductResponse productResponse = BeanUtil.copyProperties(savedProductEntity, ProductResponse.class);
         productResponse.setBrandId(savedProductEntity.getBrand().getId());
         productResponse.setCategoryId(savedProductEntity.getCategory().getId());
 
