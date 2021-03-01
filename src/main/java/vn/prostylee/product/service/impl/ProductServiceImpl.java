@@ -2,6 +2,7 @@ package vn.prostylee.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
@@ -25,7 +28,9 @@ import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -39,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductPaymentTypeService productPaymentTypeService;
     private final ProductShippingProviderService productShippingProviderService;
     private final ProductPriceService productPriceService;
-
+    private final FileUploadService fileUploadService;
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
         ProductFilter productFilter = (ProductFilter) baseFilter;
@@ -141,8 +146,19 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
+        Set<ProductImage> productImages = product.getProductImages();
+        List<Long> attachmentIds = productImages.stream().map(ProductImage::getAttachmentId).collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(attachmentIds)) {
+            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
+            productResponse.setImageUrls(imageUrls);
+        }
 
         try {
+
+            if (productResponse.getLocationId() != null) {
+                productResponse.setLocation(locationService.findById(productResponse.getLocationId()));
+            }
 
             if (productResponse.getId() % RandomUtils.nextInt(1, 5) == 0) { // TODO get ads from ads table
                 productResponse.setIsAdvertising(true);
