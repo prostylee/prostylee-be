@@ -1,30 +1,29 @@
 package vn.prostylee.product.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Data
 public class AttributeResponse {
 
     private Long id;
-    @NotBlank
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long categoryId;
+
     private String key;
 
     private Integer order;
 
-    @NotBlank
     private String label;
 
     private String description;
 
-    @NotNull
     private Integer type;
 
     private String languageCode;
 
-    @NotNull
     private Set<AttributeOptionResponse> attributeOptions;
 }

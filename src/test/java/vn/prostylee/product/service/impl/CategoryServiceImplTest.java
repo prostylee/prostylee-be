@@ -21,13 +21,13 @@ import vn.prostylee.product.dto.response.CategoryResponse;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.AttributeOption;
 import vn.prostylee.product.entity.Category;
-import vn.prostylee.product.repository.AttributeOptionRepository;
 import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.CategoryRepository;
 
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -40,9 +40,6 @@ public class CategoryServiceImplTest {
 
     @Mock
     private AttributeRepository attributeRepository;
-
-    @Mock
-    private AttributeOptionRepository attrOptionRepository;
 
     @Mock
     private BaseFilterSpecs<Category> baseFilterSpecs;
@@ -148,7 +145,7 @@ public class CategoryServiceImplTest {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         attributeRequests.add(BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class));
-        request.setAttributeRequests(attributeRequests);
+        request.setAttributes(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -167,9 +164,9 @@ public class CategoryServiceImplTest {
         attributeOptionRequests.add(BeanUtil.copyProperties(this.mockAttributeOption(), AttributeOptionRequest.class));
         Set<AttributeRequest> attributeRequests = new HashSet<>();
         AttributeRequest attributeRequest = BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class);
-        attributeRequest.setAttributeOptionRequests(attributeOptionRequests);
+        // attributeRequest.setAttributeOptions(attributeOptionRequests);
         attributeRequests.add(attributeRequest);
-        request.setAttributeRequests(attributeRequests);
+        request.setAttributes(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -195,7 +192,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void updateShouldReturnCategoryRecordOnlyWhenGivenRequestWithoutAttributeAndAttributeOption() {
+    void updateShouldReturnCategoryRecordOnlyWhenGivenRequest() {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
         Category mockCategory = this.mockCategory();
         when(this.categoryRepository.findOneActive(1L)).thenReturn(Optional.of(mockCategory));
@@ -206,51 +203,6 @@ public class CategoryServiceImplTest {
         assertEquals(request.getName(), response.getName());
         assertEquals(request.getLanguageCode(), response.getLanguageCode());
         assertNull(response.getAttributes());
-        verify(this.categoryRepository, times(1)).save(mockCategory);
-    }
-
-    @Test
-    void updateShouldReturnCategoryAndAttributeRecordOnlyWhenGivenRequestWithAttribute() {
-        CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
-        Set<AttributeRequest> attributeRequests = new HashSet<>();
-        attributeRequests.add(BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class));
-        request.setAttributeRequests(attributeRequests);
-        Category mockCategory = this.mockCategory();
-        mockCategory.setAttributes(this.mockAttribute());
-        when(this.categoryRepository.findOneActive(1L)).thenReturn(Optional.of(mockCategory));
-        when(this.categoryRepository.save(Mockito.any())).thenReturn(mockCategory());
-        when(this.attributeRepository.findAllById(Mockito.any())).thenReturn(new ArrayList<>(this.mockAttribute()));
-        CategoryResponse response = this.categoryService.update(1L, request);
-        assertNotNull(response);
-        assertEquals(request.getName(), response.getName());
-        assertEquals(request.getLanguageCode(), response.getLanguageCode());
-        //assertNotNull(response.getAttributes());
-        verify(this.categoryRepository, times(1)).save(mockCategory);
-    }
-
-    @Test
-    void updateShouldReturnAllCategoryAndAttributeRelationshipRecordOnlyWhenGivenRequestWithAttributeAndOption() {
-        CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
-        Set<AttributeOptionRequest> attributeOptionRequests = new HashSet<>();
-        attributeOptionRequests.add(BeanUtil.copyProperties(this.mockAttributeOption(), AttributeOptionRequest.class));
-        Set<AttributeRequest> attributeRequests = new HashSet<>();
-        AttributeRequest attributeRequest = BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class);
-        attributeRequest.setAttributeOptionRequests(attributeOptionRequests);
-        attributeRequests.add(attributeRequest);
-        request.setAttributeRequests(attributeRequests);
-        Category mockCategory = this.mockCategory();
-        mockCategory.setAttributes(this.mockAttribute());
-        mockCategory.setAttributes(this.mockAttribute());
-        when(this.categoryRepository.findOneActive(1L)).thenReturn(Optional.of(mockCategory));
-        when(this.categoryRepository.save(Mockito.any())).thenReturn(mockCategory());
-        when(this.attributeRepository.findAllById(Mockito.any())).thenReturn(new ArrayList<>(this.mockAttribute()));
-
-        CategoryResponse response = this.categoryService.update(1L, request);
-
-        assertNotNull(response);
-        assertEquals(request.getName(), response.getName());
-        assertEquals(request.getLanguageCode(), response.getLanguageCode());
-        //assertNotNull(response.getAttributes());
         verify(this.categoryRepository, times(1)).save(mockCategory);
     }
 
