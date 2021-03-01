@@ -1,6 +1,7 @@
 package vn.prostylee.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import vn.prostylee.product.service.BrandService;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BrandServiceImpl implements BrandService {
     private final BrandRepository brandRepository;
     private final BaseFilterSpecs<Brand> baseFilterSpecs;
@@ -56,15 +58,19 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            brandRepository.deleteById(id);
+            Brand entity = getById(id);
+            if(null != entity)
+                brandRepository.deleteById(id);
+            log.info("Product with id [{}] deleted successfully", id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
+            log.debug("Product id {} does not exists", id);
             return false;
         }
     }
 
     private Brand getById(Long id) {
-        return brandRepository.findOneActive(id)
+        return brandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand is not found with id [" + id + "]"));
     }
 }

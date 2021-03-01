@@ -39,9 +39,6 @@ public class Brand extends AuditEntity {
 	@Column(name = "description", length = 4096)
 	private String description;
 
-	@Column(name = "user_id")
-	private Long userId;
-
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "brand")

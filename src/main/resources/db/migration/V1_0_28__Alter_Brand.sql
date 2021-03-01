@@ -1,0 +1,1 @@
+ALTER TABLE brand DROP COLUMN user_id;
