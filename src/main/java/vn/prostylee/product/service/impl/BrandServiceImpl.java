@@ -27,7 +27,7 @@ public class BrandServiceImpl implements BrandService {
     public Page<BrandResponse> findAll(BaseFilter baseFilter) {
         BrandFilter brandFilter = (BrandFilter) baseFilter;
         Specification<Brand> searchable = baseFilterSpecs.search(brandFilter);
-        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Pageable pageable = baseFilterSpecs.page(brandFilter);
         Page<Brand> page = brandRepository.findAll(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, BrandResponse.class));
     }
