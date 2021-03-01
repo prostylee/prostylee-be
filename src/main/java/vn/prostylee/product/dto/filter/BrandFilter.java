@@ -9,7 +9,10 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class BrandFilter extends BaseFilter {
     @Override
     public String[] getSearchableFields() {
-        return new String[0];
+        return new String[] {
+                "name",
+                "description"
+        };
     }
 
     @Override

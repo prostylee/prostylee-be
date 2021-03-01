@@ -10,6 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.product.dto.filter.BrandFilter;
 import vn.prostylee.product.dto.request.BrandRequest;
 import vn.prostylee.product.dto.response.BrandResponse;
 import vn.prostylee.product.entity.Brand;
@@ -24,9 +25,10 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public Page<BrandResponse> findAll(BaseFilter baseFilter) {
-        Specification<Brand> searchable = baseFilterSpecs.search(baseFilter);
+        BrandFilter brandFilter = (BrandFilter) baseFilter;
+        Specification<Brand> searchable = baseFilterSpecs.search(brandFilter);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
-        Page<Brand> page = brandRepository.findAllActive(searchable, pageable);
+        Page<Brand> page = brandRepository.findAll(searchable, pageable);
         return page.map(entity -> BeanUtil.copyProperties(entity, BrandResponse.class));
     }
 
