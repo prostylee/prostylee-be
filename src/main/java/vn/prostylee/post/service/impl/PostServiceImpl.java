@@ -15,18 +15,19 @@ import vn.prostylee.post.dto.filter.PostFilter;
 import vn.prostylee.post.dto.request.PostRequest;
 import vn.prostylee.post.dto.response.PostResponse;
 import vn.prostylee.post.entity.Post;
-import vn.prostylee.post.repository.PostImageRepository;
+import vn.prostylee.post.entity.PostImage;
 import vn.prostylee.post.repository.PostRepository;
+import vn.prostylee.post.service.PostImageService;
 import vn.prostylee.post.service.PostService;
-import vn.prostylee.product.dto.response.BrandResponse;
-import vn.prostylee.product.entity.Brand;
+
+import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
+    private final PostImageService postImageService;
     private final BaseFilterSpecs<Post> baseFilterSpecs;
 
     @Override
@@ -46,6 +47,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse save(PostRequest postRequest) {
         Post entity = BeanUtil.copyProperties(postRequest, Post.class);
+        Set<PostImage> savedImages = postImageService.handlePostImages(postRequest.getPostImageRequests(), entity);
+            entity.setPostImages(savedImages);
         Post savedEntity = postRepository.save(entity);
         return BeanUtil.copyProperties(savedEntity, PostResponse.class);
     }
@@ -61,13 +64,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            Post entity = getById(id);
-            if(null != entity)
-                postRepository.deleteById(id);
-            log.info("Product with id [{}] deleted successfully", id);
+            postRepository.deleteById(id);
+            log.info("Post with id [{}] deleted successfully", id);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
-            log.debug("Product id {} does not exists", id);
+            log.debug("Post id [{}] does not exists", id);
             return false;
         }
     }

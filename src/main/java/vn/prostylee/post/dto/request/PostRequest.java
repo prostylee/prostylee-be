@@ -1,7 +1,6 @@
 package vn.prostylee.post.dto.request;
 
 import lombok.Data;
-import vn.prostylee.product.dto.request.ProductImageRequest;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -18,5 +17,5 @@ public class PostRequest {
     private Long storeId;
 
     @NotEmpty
-    private List<ProductImageRequest> productImageRequests;
+    private List<PostImageRequest> postImageRequests;
 }
