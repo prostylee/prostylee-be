@@ -1,7 +1,8 @@
 package vn.prostylee.order.converter;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.dto.request.OrderDetailRequest;
@@ -14,59 +15,28 @@ import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.payment.entity.PaymentType;
-import vn.prostylee.payment.service.PaymentService;
 import vn.prostylee.product.entity.Product;
-import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingAddress;
 import vn.prostylee.shipping.entity.ShippingProvider;
-import vn.prostylee.shipping.service.ShippingAddressService;
-import vn.prostylee.shipping.service.ShippingProviderService;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Store;
-import vn.prostylee.store.repository.StoreRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@AllArgsConstructor
+@Slf4j
 public class OrderConverter {
 
-    private final PaymentService paymentService;
-
-    private final ShippingProviderService shippingProviderService;
-
-    private final ShippingAddressService shippingAddressService;
-
-    private final ProductRepository productRepository;
-
-    private final StoreRepository storeRepository;
-
-    private static Map<Long, Product> productCache;
-
-    private static Map<Long, Store> storeCache;
-
-    public OrderConverter(PaymentService paymentService,
-                          ShippingProviderService shippingProviderService,
-                          ShippingAddressService shippingAddressService,
-                          ProductRepository productRepository,
-                          StoreRepository storeRepository) {
-        this.paymentService = paymentService;
-        this.shippingProviderService = shippingProviderService;
-        this.shippingAddressService = shippingAddressService;
-        this.productRepository = productRepository;
-        this.storeRepository = storeRepository;
-        productCache = new HashMap<>();
-        storeCache = new HashMap<>();
-    }
-
     public void toEntity(OrderRequest request, Order order) {
-        PaymentType paymentType = paymentService.getPaymentById(request.getPaymentTypeId());
+        PaymentType paymentType = PaymentType.builder().id(request.getPaymentTypeId()).build();
         order.setPaymentType(paymentType);
-        ShippingProvider sp = shippingProviderService.getShippingProviderById(request.getShippingProviderId());
+        ShippingProvider sp = ShippingProvider.builder().id(request.getShippingProviderId()).build();
         order.setShippingProvider(sp);
-        ShippingAddress sa = shippingAddressService.getShippingAddressById(request.getShippingAddressId());
+        ShippingAddress sa = ShippingAddress.builder().id(request.getShippingAddressId()).build();
         order.setShippingAddress(sa);
         order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
 
@@ -79,9 +49,9 @@ public class OrderConverter {
         for(OrderDetailRequest detailRq : request.getOrderDetails()) {
             OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
             detail.setOrder(order);
-            Product product = getProductById(detailRq.getProductId());
+            Product product = Product.builder().id(detailRq.getProductId()).build();
             detail.setProduct(product);
-            Store store = getStoreById(detailRq.getStoreId());
+            Store store = Store.builder().id(detailRq.getStoreId()).build();
             detail.setStore(store);
             details.add(detail);
         }
@@ -108,26 +78,6 @@ public class OrderConverter {
         }
         order.getOrderDiscounts().clear();
         order.getOrderDiscounts().addAll(discounts);
-    }
-
-    private Product getProductById(Long id) {
-        Product product = productCache.get(id);
-        if (product == null) {
-            product = productRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product is not found with id [" + id + "]"));
-            productCache.put(id, product);
-        }
-        return product;
-    }
-
-    private Store getStoreById(Long id) {
-        Store store = storeCache.get(id);
-        if (store == null) {
-            store = storeRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Store is not found with id [" + id + "]"));
-            storeCache.put(id, store);
-        }
-        return store;
     }
 
     public OrderResponse toDto(Order order) {
