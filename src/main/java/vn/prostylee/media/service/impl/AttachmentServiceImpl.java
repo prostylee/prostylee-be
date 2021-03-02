@@ -45,7 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Attachment saveAttachmentByNameAndPath(String name, String path) {
         Attachment attachment = new Attachment();
-        attachment.setPath(imageUrl + path);
+        attachment.setPath(imageUrl + path + name);
         attachment.setName(name);
         attachment.setDisplayName(name);
         return attachmentRepository.save(attachment);
