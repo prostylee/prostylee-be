@@ -15,6 +15,7 @@ import java.util.Optional;
  * @author prostylee
  */
 public interface UserRepository extends BaseRepository<User, Long> {
+
     Optional<User> findByActivatedUsername(String username);
 
     Optional<User> findActivatedUserByEmail(String email);
@@ -25,5 +26,5 @@ public interface UserRepository extends BaseRepository<User, Long> {
 
     Page<User> getAllUsers(UserFilter baseFilter, Pageable pageable);
 
-    Optional<User> findBySub(String sub);
+    Optional<User> findActivatedUserBySub(String sub);
 }

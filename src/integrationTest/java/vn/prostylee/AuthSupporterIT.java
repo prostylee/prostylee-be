@@ -33,7 +33,7 @@ public class AuthSupporterIT {
                 .fullName("User test")
                 .gender(Gender.MALE.getValue())
                 .phoneNumber("0988111222")
-                .roles(Collections.singletonList(AuthRole.SUPER_ADMIN.name()))
+                .roles(Collections.singletonList(AuthRole.SUPER_ADMIN.getRoleName()))
                 .build();
     }
 }

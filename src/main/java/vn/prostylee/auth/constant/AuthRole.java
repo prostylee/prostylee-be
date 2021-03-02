@@ -1,9 +1,26 @@
 package vn.prostylee.auth.constant;
 
-public enum AuthRole {
-    SUPER_ADMIN, STORE_OWNER, BUYER;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-    public String authority() {
-        return "ROLE_" + this.name();
+import static vn.prostylee.auth.constant.AuthRoleConstants.GRANTED_AUTHORITY_PREFIX;
+
+@AllArgsConstructor
+public enum AuthRole {
+
+    SUPER_ADMIN(AuthRoleConstants.SUPER_ADMIN),
+    STORE_OWNER(AuthRoleConstants.STORE_OWNER),
+    BUYER(AuthRoleConstants.BUYER);
+
+    @Getter
+    private final String roleName;
+
+    public SimpleGrantedAuthority grantedAuthority() {
+        return buildGrantedAuthority(roleName);
+    }
+
+    public static SimpleGrantedAuthority buildGrantedAuthority(String roleName) {
+        return new SimpleGrantedAuthority(GRANTED_AUTHORITY_PREFIX + roleName);
     }
 }
