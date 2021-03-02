@@ -10,16 +10,13 @@ public class AttributeFilter extends BaseFilter {
 
     private String key;
 
-    private Integer order;
-
     private Long categoryId;
 
     @Override
     public String[] getSearchableFields() {
         return new String[] {
                 "key",
-                "order",
-                "categoryId"
+                "label"
         };
     }
 
@@ -28,6 +25,7 @@ public class AttributeFilter extends BaseFilter {
         return new String[] {
                 "key",
                 "order",
+                "label",
                 "categoryId"
         };
     }
