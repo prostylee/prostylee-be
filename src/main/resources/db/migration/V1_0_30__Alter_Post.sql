@@ -27,6 +27,6 @@ create table post_image
             references post
 );
 
-create sequence if not exists post;
+create sequence if not exists post_seq;
 
-create sequence if not exists post_image;
+create sequence if not exists post_image_seq;

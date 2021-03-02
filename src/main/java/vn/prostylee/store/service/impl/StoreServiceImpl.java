@@ -25,6 +25,7 @@ import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.CompanyResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.repository.StoreRepository;
@@ -151,6 +152,12 @@ public class StoreServiceImpl implements StoreService {
             storeProductResponse.setProducts(getProducts(storeResponse.getId(), storeProductFilter.getNumberOfProducts()));
             return storeProductResponse;
         });
+    }
+
+    @Override
+    public StoreResponseLite getStoreResponseLite(Long id) {
+        Store store = getById(id);
+        return BeanUtil.copyProperties(store, StoreResponseLite.class);
     }
 
     private List<ProductResponse> getProducts(Long storeId, int numberOfProducts) {
