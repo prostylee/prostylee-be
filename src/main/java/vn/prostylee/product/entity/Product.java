@@ -46,7 +46,7 @@ public class Product extends AuditEntity {
 	@Column(name = "name", length = 512)
 	private String name;
 
-	@Column(name = "description", length = 512)
+	@Column(name = "description", length = 4096)
 	private String description;
 
 	@Column(name = "status")
