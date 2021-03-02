@@ -1,13 +1,14 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.notification.dto.filter.NotificationFilter;
-import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.notification.dto.response.NotificationResponse;
-import vn.prostylee.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.core.dto.response.SimpleResponse;
+import vn.prostylee.notification.dto.filter.NotificationFilter;
+import vn.prostylee.notification.dto.response.NotificationResponse;
+import vn.prostylee.notification.service.NotificationService;
 
 @RestController
 @RequestMapping(ApiVersion.API_V1 + "/notifications")
@@ -32,28 +33,28 @@ public class NotificationController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public Boolean delete(@PathVariable Long id) {
-        return notificationService.deleteById(id);
+    public SimpleResponse delete(@PathVariable Long id) {
+        return SimpleResponse.builder().data(notificationService.deleteById(id)).build();
     }
 
     @DeleteMapping
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public Boolean deleteAll() {
-        return notificationService.deleteAll();
+    public SimpleResponse deleteAll() {
+        return SimpleResponse.builder().data(notificationService.deleteAll()).build();
     }
 
     @PutMapping("/{id}")
-    public Boolean markAsRead(@PathVariable Long id) {
-        return notificationService.markAsRead(id);
+    public SimpleResponse markAsRead(@PathVariable Long id) {
+        return SimpleResponse.builder().data(notificationService.markAsRead(id)).build();
     }
 
     @PutMapping
-    public Boolean markAllAsRead() {
-        return notificationService.markAllAsRead();
+    public SimpleResponse markAllAsRead() {
+        return SimpleResponse.builder().data(notificationService.markAllAsRead()).build();
     }
 
     @GetMapping("/count")
-    public Integer countUnreadNotification() {
-        return notificationService.countUnreadNotification();
+    public SimpleResponse countUnreadNotification() {
+        return SimpleResponse.builder().data(notificationService.countUnreadNotification()).build();
     }
 }
