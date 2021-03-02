@@ -12,7 +12,6 @@ import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
 
 @RestController
-@Slf4j
 @RequestMapping(value = ApiVersion.API_V1 + "/comments")
 public class CommentController extends CrudController<CommentRequest, CommentResponse, Long, CommentFilter> {
 
