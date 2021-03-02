@@ -17,6 +17,9 @@ public class AttributeRequest {
 
     private Long id;
 
+    @NotNull
+    private Long categoryId;
+
     @NotBlank
     private String key;
 
@@ -33,8 +36,5 @@ public class AttributeRequest {
     private String languageCode;
 
     @NotNull
-    private Set<AttributeOptionRequest> attributeOptionRequests;
-
-    @NotNull
-    private Set<ProductAttributeRequest> productAttributeRequests;
+    private Set<AttributeOptionRequest> attributeOptions;
 }

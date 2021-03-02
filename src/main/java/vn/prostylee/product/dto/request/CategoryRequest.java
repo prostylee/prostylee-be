@@ -27,6 +27,5 @@ public class CategoryRequest {
 
     private String languageCode;
 
-    private Set<AttributeRequest> attributeRequests
-            ;
+    private Set<AttributeRequest> attributes;
 }
