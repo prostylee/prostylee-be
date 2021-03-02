@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @IntegrationTest
 @WebAppConfiguration
-public class OpenAuthControllerIT {
+public class OAuthControllerIT {
 
     @Autowired
     private WebApplicationContext wac;

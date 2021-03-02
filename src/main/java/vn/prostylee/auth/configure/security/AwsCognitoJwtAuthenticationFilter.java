@@ -12,6 +12,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import vn.prostylee.auth.configure.properties.AwsCognitoProperties;
+import vn.prostylee.auth.constant.AuthConstants;
+import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.AwsCognitoJwtAuthentication;
 import vn.prostylee.auth.dto.response.UserCredential;
 import vn.prostylee.auth.exception.AuthenticationException;
@@ -35,11 +37,6 @@ import java.util.stream.Collectors;
 @Component
 public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter {
 
-    private static final String userNameField = "cognito:username";
-    private static final String groupsField = "cognito:groups";
-    private static final String phoneNumber = "phone_number";
-    private static final String fullName = "name";
-
     private final TokenExtractor tokenExtractor;
 
     private final ConfigurableJWTProcessor configurableJWTProcessor;
@@ -50,7 +47,7 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
     boolean setAuthIfTokenValid(HttpServletRequest request) {
         try {
             String jwt = tokenExtractor.extract(request);
-            if (StringUtils.equals("OPEN-ID", request.getHeader("X-PS-Authorization-Type"))
+            if (StringUtils.equals(AuthConstants.OAUTH_VALUE, request.getHeader(AuthConstants.OAUTH_KEY))
                     && StringUtils.isNotBlank(jwt)) {
                 JWTClaimsSet claimsSet = configurableJWTProcessor.process(jwt, null);
                 if (isIssuedCorrectly(claimsSet) && isIdToken(claimsSet)) {
@@ -58,11 +55,9 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
 
                     List<SimpleGrantedAuthority> grantedAuthorities = convertToGrantedAuthorities(groups);
 
-                    String username = (String) claimsSet.getClaim(userNameField);
                     UserCredential user = UserCredential.builder()
-                            .id(0L) // TODO change user id from Long to String
-                            .username(username)
-                            .fullName(username) // TODO set more fields
+                            .sub((String) claimsSet.getClaim("sub"))
+                            .username((String) claimsSet.getClaim("username"))
                             .roles(groups)
                             .features(Collections.emptyList())
                             .build();
@@ -79,7 +74,7 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
 
     private List<String> extractUserGroups(JWTClaimsSet claimsSet) {
         return Optional.of(claimsSet.getClaims())
-                .map(m -> m.get(groupsField))
+                .map(m -> m.get("cognito:groups"))
                 .map(List.class::cast)
                 .stream()
                 .filter(Objects::nonNull)
@@ -89,7 +84,7 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
 
     private List<SimpleGrantedAuthority> convertToGrantedAuthorities(List<String> groups) {
         return groups.stream()
-                .map(group -> new SimpleGrantedAuthority("ROLE_" + group))
+                .map(AuthRole::buildGrantedAuthority)
                 .collect(Collectors.toList());
     }
 

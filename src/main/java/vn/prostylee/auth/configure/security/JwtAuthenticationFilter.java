@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
+import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.response.UserCredential;
 import vn.prostylee.auth.token.extractor.TokenExtractor;
 import vn.prostylee.auth.token.parser.TokenParser;
@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends AuthOncePerRequestFilter {
             // It needs a list of authorities, which has type of GrantedAuthority interface, where SimpleGrantedAuthority is an implementation of that interface
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     user, null, user.getRoles().stream()
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .map(AuthRole::buildGrantedAuthority)
                     .collect(Collectors.toList()));
 
             SecurityContextHolder.getContext().setAuthentication(auth);

@@ -33,36 +33,35 @@ public class OAuthServiceImpl implements OAuthService {
     public SimpleResponse signUp(OAuthRequest oAuthRequest) {
         log.debug("oAuthRequest {}", oAuthRequest);
 
+        UserRequest userRequest = buildUserRequest(oAuthRequest);
         final String sub = oAuthRequest.getUserInfo().getSub();
         Optional<User> optUser = userService.findBySub(sub);
+        UserResponse userResponse;
         if (optUser.isPresent()) {
-            // TODO merge exists user info and oAuthRequest
-            return SimpleResponse.builder()
-                    .data("Already exists")
-                    .build();
+            userResponse = userService.update(optUser.get().getId(), userRequest);
         } else {
-            UserRequest userRequest = UserRequest.builder()
-                    .sub(oAuthRequest.getUserInfo().getSub())
-                    .username(oAuthRequest.getUsername())
-                    .fullName(getFullName(oAuthRequest.getUserInfo()))
-                    .phoneNumber(oAuthRequest.getUserInfo().getPhoneNumber())
-                    .gender(GenderConverter.convertGender(oAuthRequest.getUserInfo().getGender()))
-                    .email(oAuthRequest.getUserInfo().getEmail())
-                    .roles(oAuthRequest.getGroups())
-                    .active(oAuthRequest.getEnabled())
-                    .allowNotification(true)
-                    .emailVerified(oAuthRequest.getUserInfo().getEmailVerified())
-                    .phoneNumberVerified(oAuthRequest.getUserInfo().getPhoneNumberVerified())
-                    .build();
-
-            UserResponse userResponse = userService.save(userRequest);
-
+            userResponse = userService.save(userRequest);
             this.sendEmailWelcome(userRequest.getEmail(), userRequest);
-
-            return SimpleResponse.builder()
-                    .data(userResponse)
-                    .build();
         }
+
+        return SimpleResponse.builder()
+                .data(userResponse)
+                .build();
+    }
+
+    private UserRequest buildUserRequest(OAuthRequest oAuthRequest) {
+        return UserRequest.builder()
+                .sub(oAuthRequest.getUserInfo().getSub())
+                .username(oAuthRequest.getUsername())
+                .fullName(getFullName(oAuthRequest.getUserInfo()))
+                .phoneNumber(oAuthRequest.getUserInfo().getPhoneNumber())
+                .gender(GenderConverter.convertGender(oAuthRequest.getUserInfo().getGender()))
+                .email(oAuthRequest.getUserInfo().getEmail())
+                .roles(oAuthRequest.getGroups())
+                .active(oAuthRequest.getEnabled())
+                .emailVerified(oAuthRequest.getUserInfo().getEmailVerified())
+                .phoneNumberVerified(oAuthRequest.getUserInfo().getPhoneNumberVerified())
+                .build();
     }
 
     private String getFullName(OAuthUserInfoRequest userInfo) {

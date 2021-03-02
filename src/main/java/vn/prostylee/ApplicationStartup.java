@@ -41,7 +41,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
         List<Role> roles = roleRepository.findAll();
         if (CollectionUtils.isEmpty(roles)) {
             Role role = Role.builder()
-                    .code(AuthRole.SUPER_ADMIN.name())
+                    .code(AuthRole.SUPER_ADMIN.getRoleName())
                     .name("Administrator")
                     .build();
             Role saved = roleRepository.save(role);

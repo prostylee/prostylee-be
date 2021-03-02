@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findBySub(String sub) {
-        return userRepository.findBySub(sub);
+        return userRepository.findActivatedUserBySub(sub);
     }
 
 }

@@ -1,16 +1,16 @@
 package vn.prostylee.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.response.FeatureResponse;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.utils.BeanUtil;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +22,8 @@ public class AuthUserDetails implements UserDetails {
     private static final long serialVersionUID = -883489449957337175L;
 
     private final Long id;
+
+    private final String sub;
 
     private final String fullName;
 
@@ -42,6 +44,7 @@ public class AuthUserDetails implements UserDetails {
 
     public AuthUserDetails(User user, Collection<Feature> features) {
         this.id = user.getId();
+        this.sub = user.getSub();
         this.fullName = user.getFullName();
         this.username = user.getUsername();
         this.password = user.getPassword();
@@ -56,7 +59,7 @@ public class AuthUserDetails implements UserDetails {
         return Optional.ofNullable(roles)
                 .orElseGet(HashSet::new)
                 .stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getCode()))
+                .map(role -> AuthRole.buildGrantedAuthority(role.getCode()))
                 .collect(Collectors.toList());
     }
 

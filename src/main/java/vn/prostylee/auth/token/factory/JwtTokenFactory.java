@@ -60,7 +60,10 @@ public class JwtTokenFactory {
             throw new IllegalArgumentException("Cannot create JWT Token without auth user details");
         }
 
-        UserCredential subject = UserCredential.builder().id(userDetail.getId()).build();
+        UserCredential subject = UserCredential.builder()
+                .id(userDetail.getId())
+                .sub(userDetail.getSub())
+                .build();
 
         List<String> scopes = Collections.singletonList(Scope.REFRESH_TOKEN.authority());
 

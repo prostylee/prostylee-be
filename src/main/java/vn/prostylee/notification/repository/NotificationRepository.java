@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Repository for domain model class Notification.
@@ -26,7 +27,7 @@ public interface NotificationRepository extends BaseRepository<Notification, Lon
     @Query("UPDATE Notification e " +
             "SET e.markAsRead = true, e.updatedAt = :updatedAt, e.updatedBy = :userId " +
             "WHERE e.userId = :userId AND (e.markAsRead is null OR e.markAsRead = false)")
-    void markAllAsReadByUserId(@Param("userId") Long userId, @Param("updatedAt") LocalDateTime updatedAt);
+    void markAllAsReadByUserId(@Param("userId") Long userId, @Param("updatedAt") Date updatedAt);
 
     @Query("SELECT count(e.id) FROM Notification e WHERE e.userId = :userId AND (e.markAsRead is null OR e.markAsRead = false)")
     int countUnreadNotification(@Param("userId") Long userId);
