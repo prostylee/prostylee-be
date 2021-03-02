@@ -1,5 +1,6 @@
 package vn.prostylee.product.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.Set;
@@ -13,5 +14,6 @@ public class CategoryResponse {
     private String icon;
     private Boolean active;
     private String languageCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<AttributeResponse> attributes;
 }

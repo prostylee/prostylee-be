@@ -2,7 +2,6 @@ package vn.prostylee.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.exception.ValidatingException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EntityUtils;
@@ -75,11 +73,7 @@ public class AttributeServiceImpl implements AttributeService {
         }
         Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), productRequest.getAttributeOptions(), "id", AttributeOption.class);
         mergedAttributes.forEach(attributeOption -> attributeOption.setAttribute(attribute));
-        try {
-            return toResponse(this.attributeRepository.save(attribute));
-        } catch (ConstraintViolationException e) {
-            throw new ValidatingException("Not valud");
-        }
+        return toResponse(this.attributeRepository.save(attribute));
     }
 
     @Override
