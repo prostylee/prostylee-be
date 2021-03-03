@@ -21,6 +21,7 @@ import vn.prostylee.media.service.FileUploadService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -52,6 +53,16 @@ public class AwsS3ServiceImpl implements FileUploadService {
     }
 
     @Override
+    public String getImageUrl(Long id, int width, int height) {
+        Attachment attachment =  attachmentRepository.getOne(id);
+        if(Objects.isNull(attachment)) {
+            throw new ResourceNotFoundException("File are not existed by getting with id: " + id);
+        }
+        return generateUrlByDimension(attachment, width, height);
+    }
+
+
+    @Override
     public List<String> getImageUrls(List<Long> fileIds, int width, int height) {
         return getUrls(fileIds, width, height);
     }
@@ -62,6 +73,14 @@ public class AwsS3ServiceImpl implements FileUploadService {
             throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
         return generateUrlsByDimension(width, height, attachments);
+    }
+
+    private String generateUrlByDimension(Attachment attachment, int width, int height) {
+        if (width > 0 && height > 0) {
+            return addSizeForFile(attachment.getPath(), width, height);
+        } else {
+            return attachment.getPath();
+        }
     }
 
     private List<String> generateUrlsByDimension(int width, int height, List<Attachment> attachments) {

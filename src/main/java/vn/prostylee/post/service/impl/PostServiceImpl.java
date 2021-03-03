@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.comment.entity.Comment;
+import vn.prostylee.comment.entity.CommentImage;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -15,20 +17,22 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.post.dto.filter.PostFilter;
+import vn.prostylee.post.dto.request.PostImageRequest;
 import vn.prostylee.post.dto.request.PostRequest;
+import vn.prostylee.post.dto.response.PostForListResponse;
+import vn.prostylee.post.dto.response.PostForUpdateResponse;
 import vn.prostylee.post.dto.response.PostResponse;
 import vn.prostylee.post.entity.Post;
 import vn.prostylee.post.entity.PostImage;
 import vn.prostylee.post.repository.PostRepository;
 import vn.prostylee.post.service.PostImageService;
 import vn.prostylee.post.service.PostService;
-import vn.prostylee.product.dto.response.ProductResponse;
-import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.store.service.StoreService;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
@@ -46,32 +50,55 @@ public class PostServiceImpl implements PostService {
         Specification<Post> searchable = baseFilterSpecs.search(postFilter);
         Pageable pageable = baseFilterSpecs.page(postFilter);
         Page<Post> page = postRepository.findAll(searchable, pageable);
-        return page.map(this::toResponse);
+        return page.map(this::toListResponse);
     }
 
     @Override
-    public PostResponse findById(Long id) {
-        return toResponse(getById(id));
+    public PostForUpdateResponse findById(Long id) {
+        return toUpdateResponse(getById(id));
     }
 
     @Override
     public PostResponse save(PostRequest postRequest) {
         Post entity = BeanUtil.copyProperties(postRequest, Post.class);
-        Set<PostImage> savedImages = postImageService.handlePostImages(postRequest.getPostImageRequests(), entity);
+        List<PostImageRequest> newImageRequests = postRequest.getPostImageRequests();
+        if (CollectionUtils.isNotEmpty(newImageRequests)) {
+            Set<PostImage> savedImages = postImageService.handlePostImages(newImageRequests, entity);
             entity.setPostImages(savedImages);
+        }
         Post savedEntity = postRepository.save(entity);
-        return toResponse(savedEntity);
+        return BeanUtil.copyProperties(savedEntity, PostResponse.class);
     }
 
     @Override
-    public PostResponse update(Long id, PostRequest postRequest) {
+    public PostForUpdateResponse update(Long id, PostRequest postRequest) {
         Post entity = getById(id);
         BeanUtil.mergeProperties(postRequest, entity);
-        Set<PostImage> savedImages = postImageService.handlePostImages(postRequest.getPostImageRequests(), entity);
-            entity.setPostImages(savedImages);
-        //handle keep old and add new one.
-            Post savedEntity = postRepository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, PostResponse.class);
+        removeImages(postRequest.getAttachmentDeleteIds(), entity);
+        addNewImages(postRequest, entity);
+        Post savedEntity = postRepository.save(entity);
+        return BeanUtil.copyProperties(savedEntity, PostForUpdateResponse.class);
+    }
+
+    private void removeImages(List<Long> deleteIds, Post entity) {
+        if(CollectionUtils.isNotEmpty(deleteIds)){
+            Set<PostImage> deleteSets = getPostImagesNeedToDelete(entity, deleteIds);
+            entity.getPostImages().removeIf(ci -> deleteSets.contains(ci));
+        }
+    }
+
+    private void addNewImages(PostRequest postRequest, Post entity) {
+        List<PostImageRequest> newImageRequests = postRequest.getPostImageRequests();
+        if (CollectionUtils.isNotEmpty(newImageRequests)) {
+            Set<PostImage> savedImages = postImageService.handlePostImages(newImageRequests, entity);
+            entity.getPostImages().addAll(savedImages);
+        }
+    }
+
+    private Set<PostImage> getPostImagesNeedToDelete(Post entity, List<Long> attachmentIds) {
+        return entity.getPostImages().stream()
+                .filter(image -> attachmentIds.contains(image.getAttachmentId()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -91,19 +118,29 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post is not found with id [" + id + "]"));
     }
 
-    private PostResponse toResponse(Post post){
-        PostResponse postResponse = BeanUtil.copyProperties(post, PostResponse.class);
+    private PostForListResponse toListResponse(Post post){
+        PostForListResponse postForListResponse = BeanUtil.copyProperties(post, PostForListResponse.class);
         Set<PostImage> postImages = post.getPostImages();
         List<Long> attachmentIds = postImages.stream().map(PostImage::getAttachmentId).collect(Collectors.toList());
 
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
-            postResponse.setImageUrls(imageUrls);
+            postForListResponse.setImageUrls(imageUrls);
         }
+
         Long storeId = post.getStoreId();
         if(null != storeId)
-            postResponse.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
+            postForListResponse.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
 
-        return postResponse;
+        return postForListResponse;
+    }
+
+    private PostForUpdateResponse toUpdateResponse(Post post){
+        PostForUpdateResponse response = BeanUtil.copyProperties(post, PostForUpdateResponse.class);
+        Long storeId = post.getStoreId();
+        if(null != storeId)
+            response.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
+        response.getPostImages().forEach(dto -> dto.setUrl(fileUploadService.getImageUrl(dto.getAttachmentId(), ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight())));
+        return response;
     }
 }

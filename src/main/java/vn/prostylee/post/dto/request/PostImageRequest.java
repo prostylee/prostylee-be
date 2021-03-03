@@ -8,5 +8,4 @@ import lombok.Data;
 public class PostImageRequest {
     private String name;
     private String path;
-
 }

@@ -17,6 +17,16 @@ public interface FileUploadService {
     List<String> getFileUrls(List<Long> fileIds);
 
     /**
+     * Get image url
+     *
+     * @param  id is a attachmentId will be get
+     * @param width width
+     * @param height height
+     * @return image url
+     */
+    String getImageUrl(Long id, int width, int height);
+
+    /**
      * Get list image's url
      *
      * @param  fileIds The list of image ids will be get
