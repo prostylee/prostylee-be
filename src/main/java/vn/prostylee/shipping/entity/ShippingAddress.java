@@ -1,10 +1,7 @@
 package vn.prostylee.shipping.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -16,7 +13,9 @@ import javax.persistence.*;
  */
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "shipping_address")
