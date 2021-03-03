@@ -15,13 +15,16 @@ public class CategoryFilter extends BaseFilter {
 
     private Integer order;
 
+    private Long parentId;
+
     private List<Attribute> attributes;
 
     @Override
     public String[] getSearchableFields() {
         return new String[] {
                 "name",
-                "order"
+                "order",
+                "parentId"
         };
     }
 
