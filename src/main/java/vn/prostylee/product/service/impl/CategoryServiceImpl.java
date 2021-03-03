@@ -52,6 +52,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (category.getOrder() == null) {
             category.setOrder(1);
         }
+        if (category.getParentId() == null) {
+            category.setParentId(0L);
+        }
         this.setAttributes(category, request.getAttributes());
         return toResponse(categoryRepository.saveAndFlush(category));
     }
