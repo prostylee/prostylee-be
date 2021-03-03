@@ -7,4 +7,5 @@ public class PostImageResponse {
     private Long id;
     private Integer order;
     private Long attachmentId;
+    private String url;
 }
