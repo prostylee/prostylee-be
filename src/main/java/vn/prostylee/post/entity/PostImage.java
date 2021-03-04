@@ -2,7 +2,6 @@ package vn.prostylee.post.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import vn.prostylee.comment.entity.Comment;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
