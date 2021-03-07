@@ -26,6 +26,9 @@ public class ProductPriceConverter {
 
     public ProductPriceResponse toDto(ProductPrice productPrice) {
         ProductPriceResponse productPriceResponse = BeanUtil.copyProperties(productPrice, ProductPriceResponse.class);
+        if(productPrice.getProductAttributes() == null) {
+            return productPriceResponse;
+        }
         List<ProductAttributeResponse> attrs = new ArrayList<>();
         for (ProductAttribute attr : productPrice.getProductAttributes()) {
             attrs.add(productAttributeConverter.toDto(attr));
@@ -37,6 +40,9 @@ public class ProductPriceConverter {
     public void toEntity(ProductPriceRequest productPriceRequest, ProductPrice productPrice) {
         Product product = Product.builder().id(productPriceRequest.getProductId()).build();
         productPrice.setProduct(product);
+        if(productPriceRequest.getProductAttributes() == null) {
+            return;
+        }
         Set<ProductAttribute> productAttributes = new HashSet<>();
         for(ProductAttributeRequest request : productPriceRequest.getProductAttributes()) {
             ProductAttribute productAttribute = BeanUtil.copyProperties(request, ProductAttribute.class);

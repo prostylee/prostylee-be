@@ -15,6 +15,8 @@ public class UserCredential {
 
     private Long id;
 
+    private String sub;
+
     private String fullName;
 
     private String username;

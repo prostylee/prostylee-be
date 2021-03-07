@@ -70,8 +70,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implement
     @Override
     public Optional<User> findByPushToken(String pushToken) {
         StringBuilder queryBuilder = new StringBuilder("select e "
-                + " from "+ User.class.getName() +" e "
-                + " where e.pushToken= :pushToken ");
+                + " from "+ User.class.getName() + " e "
+                + " where e.pushToken = :pushToken");
 
         Map<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("pushToken", pushToken);
@@ -94,10 +94,10 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<User, Long> implement
     }
 
     @Override
-    public Optional<User> findBySub(String sub) {
+    public Optional<User> findActivatedUserBySub(String sub) {
         StringBuilder queryBuilder = new StringBuilder("select e "
-                + " from "+ User.class.getName() +" e "
-                + " where e.sub = :sub ");
+                + " from " + User.class.getName() + " e "
+                + " where e.sub = :sub AND e.deletedAt = null");
 
         Map<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("sub", sub);

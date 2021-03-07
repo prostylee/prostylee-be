@@ -110,7 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				;
 
 		// Need authentication.
-		registry = registry.antMatchers(ApiVersion.API_V1 + "/transactions/**").hasAnyRole(AuthRole.SUPER_ADMIN.name());
+		registry = registry.antMatchers(ApiVersion.API_V1 + "/transactions/**").hasAnyRole(AuthRole.SUPER_ADMIN.getRoleName());
 		registry = buildDynamicMatchers(registry);
 		registry.anyRequest().authenticated() // require authentication for any endpoint that's not whitelisted
 		;

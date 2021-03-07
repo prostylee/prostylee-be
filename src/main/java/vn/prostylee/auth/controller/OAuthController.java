@@ -15,7 +15,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(value = ApiVersion.API_V1 + "/oauth")
 @RequiredArgsConstructor
-public class OpenAuthController {
+public class OAuthController {
 
     private final OAuthService oAuthService;
 

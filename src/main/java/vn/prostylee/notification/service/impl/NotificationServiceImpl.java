@@ -30,6 +30,7 @@ import vn.prostylee.notification.repository.NotificationRepository;
 import vn.prostylee.notification.service.NotificationService;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public boolean markAllAsRead() {
         Long userId = authenticatedProvider.getUserIdValue();
-        notificationRepository.markAllAsReadByUserId(userId, LocalDateTime.now());
+        notificationRepository.markAllAsReadByUserId(userId, new Date());
         return true;
     }
 

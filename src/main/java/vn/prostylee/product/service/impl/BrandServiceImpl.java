@@ -58,13 +58,11 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            Brand entity = getById(id);
-            if(null != entity)
-                brandRepository.deleteById(id);
-            log.info("Product with id [{}] deleted successfully", id);
+            brandRepository.deleteById(id);
+            log.info("Brand with id [{}] deleted successfully", id);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
-            log.debug("Product id {} does not exists", id);
+            log.debug("Brand id [{}] does not exists", id);
             return false;
         }
     }
