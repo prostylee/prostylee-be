@@ -23,8 +23,7 @@ public class CategoryFilter extends BaseFilter {
     public String[] getSearchableFields() {
         return new String[] {
                 "name",
-                "order",
-                "parentId"
+                "order"
         };
     }
 
