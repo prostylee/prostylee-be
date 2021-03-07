@@ -21,10 +21,13 @@ import vn.prostylee.product.service.CategoryService;
 public class CategoryController extends CrudController<CategoryRequest, CategoryResponse, Long, CategoryFilter> {
 
     private final AttributeService attributeService;
+
+    private final CategoryService categoryService;
     @Autowired
     public CategoryController(CategoryService categoryService, AttributeService attributeService) {
         super(categoryService);
         this.attributeService = attributeService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/{id}/attributes")

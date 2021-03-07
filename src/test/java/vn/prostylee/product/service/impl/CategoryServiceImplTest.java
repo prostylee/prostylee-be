@@ -7,13 +7,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.product.dto.filter.CategoryFilter;
 import vn.prostylee.product.dto.request.AttributeOptionRequest;
 import vn.prostylee.product.dto.request.AttributeRequest;
 import vn.prostylee.product.dto.request.CategoryRequest;
@@ -24,11 +21,11 @@ import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.CategoryRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -53,57 +50,6 @@ public class CategoryServiceImplTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void findAllShouldReturnPageWithEmptyRecordWhenCategoryIsEmpty() {
-        CategoryFilter categoryFilter = new CategoryFilter();
-        categoryFilter.setName("hello");
-        when(this.baseFilterSpecs.page(categoryFilter)).thenReturn(pageable);
-        when(this.categoryRepository.findAllActive(pageable)).thenReturn(Page.empty());
-
-        Page<CategoryResponse> categoryPage = categoryService.findAll(categoryFilter);
-
-        assertEquals(0, categoryPage.getSize());
-        verify(this.categoryRepository, times(1)).findAllActive(pageable);
-    }
-
-    @Test
-    void findAllShouldReturnPageWithCorrespondingRecordWhenAlCategoryAreActive() {
-        CategoryFilter categoryFilter = new CategoryFilter();
-        categoryFilter.setName("hello");
-        List<Category> categories = new ArrayList<>();
-        categories.add(Category.builder().name("Category 1").order(1).active(true).build());
-        categories.add(Category.builder().name("Category 2").order(2).active(true).build());
-        Page<Category> categoryPage = new PageImpl<>(categories);
-        when(this.baseFilterSpecs.page(categoryFilter)).thenReturn(pageable);
-        when(this.categoryRepository.findAllActive(pageable)).thenReturn(categoryPage);
-        Page<CategoryResponse> categoryResponses = categoryService.findAll(categoryFilter);
-        assertEquals(2, categoryResponses.getSize());
-        assertThat(categoryResponses, contains(
-                hasProperty("active", is(true)),
-                hasProperty("active", is(true))
-        ));
-        verify(this.categoryRepository, times(1)).findAllActive(pageable);
-    }
-
-    @Test
-    void findAllShouldOnlyReturnPageWithActiveRecordWhenAlCategoryHaveBothActiveAndDeActiveRecord() {
-        CategoryFilter categoryFilter = new CategoryFilter();
-        categoryFilter.setName("hello");
-        List<Category> categories = new ArrayList<>();
-        categories.add(Category.builder().name("Category 1").deletedAt(new Date()).order(1).active(true).build());
-        categories.add(Category.builder().name("Category 2").deletedAt(null).order(1).order(2).active(true).build());
-        Page<Category> categoryPage = new PageImpl<>(categories);
-        when(this.baseFilterSpecs.page(categoryFilter)).thenReturn(pageable);
-        when(this.categoryRepository.findAllActive(pageable)).thenReturn(categoryPage);
-        Page<CategoryResponse> categoryResponses = categoryService.findAll(categoryFilter);
-        assertEquals(2, categoryResponses.getSize());
-        assertThat(categoryResponses, contains(
-                hasProperty("active", is(true)),
-                hasProperty("active", is(true))
-        ));
-        verify(this.categoryRepository, times(1)).findAllActive(pageable);
     }
 
     @Test

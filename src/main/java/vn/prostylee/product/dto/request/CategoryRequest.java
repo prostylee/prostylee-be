@@ -14,6 +14,10 @@ import java.util.Set;
 @AllArgsConstructor
 public class CategoryRequest {
 
+    private Long parentId;
+
+    private Long attachmentId;
+
     @NotBlank
     private String name;
 

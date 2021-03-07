@@ -15,6 +15,8 @@ public class CategoryFilter extends BaseFilter {
 
     private Integer order;
 
+    private Long parentId;
+
     private List<Attribute> attributes;
 
     @Override

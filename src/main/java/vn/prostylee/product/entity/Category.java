@@ -36,6 +36,12 @@ public class Category extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
+	@Column(name = "parent_id")
+	private Long parentId;
+
+	@Column(name = "attachment_id")
+	private Long attachmentId;
+
 	@Column(name = "name", length = 512)
 	private String name;
 

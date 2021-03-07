@@ -8,6 +8,8 @@ import java.util.Set;
 @Data
 public class CategoryResponse {
     private Long id;
+    private Long parentId;
+    private Long attachmentId;
     private String name;
     private String description;
     private Integer order;

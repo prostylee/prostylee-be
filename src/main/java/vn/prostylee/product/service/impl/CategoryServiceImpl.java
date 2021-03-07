@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
         CategoryFilter categoryFilter = (CategoryFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
-        Page<Category> page = this.categoryRepository.findAllActive(pageable);
+        Page<Category> page = this.categoryRepository.findAllActive(this.buildSearchable(categoryFilter), pageable);
         return page.map(this::toResponse);
     }
 
@@ -50,6 +51,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = BeanUtil.copyProperties(request, Category.class);
         if (category.getOrder() == null) {
             category.setOrder(1);
+        }
+        if (category.getParentId() == null) {
+            category.setParentId(0L);
         }
         this.setAttributes(category, request.getAttributes());
         return toResponse(categoryRepository.saveAndFlush(category));
@@ -100,5 +104,13 @@ public class CategoryServiceImpl implements CategoryService {
     private Category getById(Long id) {
         return this.categoryRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category is not found with id [" + id + "]"));
+    }
+
+    private Specification<Category> buildSearchable(CategoryFilter categoryFilter) {
+        Specification<Category> spec = this.baseFilterSpecs.search(categoryFilter);
+        if (categoryFilter.getParentId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("parentId"), categoryFilter.getParentId()));
+        }
+        return spec;
     }
 }
