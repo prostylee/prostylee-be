@@ -8,8 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.comment.entity.Comment;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.constant.ImageSize;
@@ -35,16 +37,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
+    private static final String CREATED_BY = "createdBy";
     private final PostRepository postRepository;
     private final PostImageService postImageService;
     private final BaseFilterSpecs<Post> baseFilterSpecs;
     private final FileUploadService fileUploadService;
     private final StoreService storeService;
-
+    private final AuthenticatedProvider authenticatedProvider;
     @Override
     public Page<PostResponse> findAll(BaseFilter baseFilter) {
         PostFilter postFilter = (PostFilter) baseFilter;
-        Specification<Post> searchable = baseFilterSpecs.search(postFilter);
+        Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), authenticatedProvider.getUserIdValue());
+        Specification<Post> searchable = baseFilterSpecs.search(postFilter).and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(postFilter);
         Page<Post> page = postRepository.findAll(searchable, pageable);
         return page.map(this::toListResponse);
