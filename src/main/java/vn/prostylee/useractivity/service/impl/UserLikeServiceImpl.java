@@ -88,7 +88,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
         if(filter.getUserId() != null ) {
             Specification<UserLike> userIdParam = (root, query, cb) ->
-                    cb.equal(root.get(UserActivityConstant.CREATED_BY), filter.getUserId());
+                    cb.equal(root.get(UserActivityConstant.CREATED_BY), authenticatedProvider.getUserIdValue());
             searchable = searchable.and(userIdParam);
         }
         return searchable;

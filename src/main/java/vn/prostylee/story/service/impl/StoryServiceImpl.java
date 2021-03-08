@@ -136,6 +136,7 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public UserStoryResponse save(StoryRequest req) {
         Story entity = BeanUtil.copyProperties(req, Story.class);
+        entity.setTargetId(authenticatedProvider.getUserIdValue());
         if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
             entity.setStoryImages(buildStoryImages(req.getAttachmentIds(), entity));
         Story savedEntity = storyRepository.save(entity);
