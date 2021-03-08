@@ -6,12 +6,14 @@ public class PostFilter extends BaseFilter {
     @Override
     public String[] getSearchableFields() {
         return new String[]{
-          "description",
+                "description"
         };
     }
 
     @Override
     public String[] getSortableFields() {
-        return new String[0];
+        return new String[]{
+                "createdAt"
+        };
     }
 }
