@@ -1,6 +1,7 @@
 package vn.prostylee.story.dto.response;
 
 import lombok.Data;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.util.Date;
 import java.util.List;
@@ -19,4 +20,5 @@ public class UserStoryResponse {
     private List<String> storyLargeImageUrls;
     private UserForStoryResponse userForStoryResponse;
     private Long storeId;
+    private StoreResponseLite storeResponseLite;
 }
