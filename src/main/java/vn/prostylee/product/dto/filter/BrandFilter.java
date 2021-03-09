@@ -17,6 +17,8 @@ public class BrandFilter extends BaseFilter {
 
     @Override
     public String[] getSortableFields() {
-        return new String[0];
+        return new String[]{
+                "name"
+        };
     }
 }
