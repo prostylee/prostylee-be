@@ -14,6 +14,7 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.filter.LocationFilter;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.dto.response.LocationResponse;
+import vn.prostylee.location.dto.response.LocationResponseLite;
 import vn.prostylee.location.entity.Location;
 import vn.prostylee.location.repository.LocationRepository;
 import vn.prostylee.location.service.LocationService;
@@ -75,5 +76,11 @@ public class LocationServiceImpl implements LocationService {
             log.debug("Delete a company without existing in database", e);
             return false;
         }
+    }
+
+    @Override
+    public LocationResponseLite getLocationResponseLite(Long id) {
+        Location location = getById(id);
+        return BeanUtil.copyProperties(location, LocationResponseLite.class);
     }
 }

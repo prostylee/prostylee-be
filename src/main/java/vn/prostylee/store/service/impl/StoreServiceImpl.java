@@ -14,6 +14,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.location.dto.response.LocationResponseLite;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
@@ -24,6 +25,7 @@ import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.CompanyResponse;
+import vn.prostylee.store.dto.response.StoreMiniResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Company;
@@ -60,6 +62,12 @@ public class StoreServiceImpl implements StoreService {
         return page.map(this::convertToResponse);
     }
 
+    @Override
+    public Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeFilter) {
+        Page<StoreResponse> storeResponses = findAll(storeFilter);
+        return storeResponses.map(this::convertToMiniResponse);
+    }
+
     private Specification<Store> buildSearchable(StoreFilter storeFilter) {
         Specification<Store> spec = baseFilterSpecs.search(storeFilter);
 
@@ -80,6 +88,12 @@ public class StoreServiceImpl implements StoreService {
         }
 
         return spec;
+    }
+
+    private StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {
+        StoreMiniResponse storeMiniResponse = BeanUtil.copyProperties(storeResponse, StoreMiniResponse.class);
+        storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
+        return storeMiniResponse;
     }
 
     private StoreResponse convertToResponse(Store store) {
