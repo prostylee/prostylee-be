@@ -92,6 +92,10 @@ public class StoreServiceImpl implements StoreService {
 
     private StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {
         StoreMiniResponse storeMiniResponse = BeanUtil.copyProperties(storeResponse, StoreMiniResponse.class);
+        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.LOGO.getWidth(), ImageSize.LOGO.getHeight());
+        if (CollectionUtils.isNotEmpty(imageUrls)) {
+            storeMiniResponse.setLogoUrl(imageUrls.get(0));
+        }
         storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
         return storeMiniResponse;
     }

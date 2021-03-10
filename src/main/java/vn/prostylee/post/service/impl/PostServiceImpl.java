@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.comment.entity.Comment;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;

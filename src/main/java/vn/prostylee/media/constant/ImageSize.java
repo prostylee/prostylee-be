@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ImageSize {
 
+    LOGO(46, 46),
     TINY(48, 64),
     EXTRA_SMALL(90, 120),
     SMALL(90, 140),
