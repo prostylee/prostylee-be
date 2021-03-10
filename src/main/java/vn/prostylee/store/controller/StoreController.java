@@ -29,7 +29,7 @@ public class StoreController extends CrudController<StoreRequest, StoreResponse,
         return storeService.getTopProductsByStores(storeProductFilter);
     }
 
-    @GetMapping("/mini-products")
+    @GetMapping("/mini-stores")
     public Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeProductFilter) {
         return storeService.getMiniStoreResponse(storeProductFilter);
     }
