@@ -9,6 +9,7 @@ import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
+import vn.prostylee.store.dto.response.StoreMiniResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
 
@@ -26,5 +27,10 @@ public class StoreController extends CrudController<StoreRequest, StoreResponse,
     @GetMapping("/top/products")
     public Page<StoreResponse> getTopProductsByStores(StoreProductFilter storeProductFilter) {
         return storeService.getTopProductsByStores(storeProductFilter);
+    }
+
+    @GetMapping("/mini-products")
+    public Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeProductFilter) {
+        return storeService.getMiniStoreResponse(storeProductFilter);
     }
 }
