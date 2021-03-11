@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
+import vn.prostylee.core.specs.QueryBuilder;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.dto.response.LocationResponse;
@@ -27,6 +29,7 @@ import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 
+import javax.persistence.criteria.Predicate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -54,12 +57,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private Specification<Product> buildSearchable(ProductFilter productFilter) {
-        Specification<Product> spec = baseFilterSpecs.search(productFilter);
-
-        if (productFilter.getStoreId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("storeId"), productFilter.getStoreId()));
-        }
-
         // TODO query by new feeds
 //        switch (productFilter.getNewFeedType()) {
 //            case USER:
@@ -69,8 +66,31 @@ public class ProductServiceImpl implements ProductService {
 //            default:
 //                break;
 //        }
+        Specification<Product> mainSpec = (root, query, cb) -> {
+            QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
+            findByUser(productFilter, queryBuilder);
+            findByCategory(productFilter, queryBuilder);
+            findByStore(productFilter, queryBuilder);
+            Predicate[] orPredicates = queryBuilder.build();
+            return cb.and(orPredicates);
+        };
+        if (StringUtils.isNotBlank(productFilter.getKeyword())) {
+            Specification<Product> searchSpec = baseFilterSpecs.search(productFilter);
+            mainSpec = mainSpec.and(searchSpec);
+        }
+        return mainSpec;
+    }
 
-        return spec;
+    private void findByUser(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("createdBy", productFilter.getUserId());
+    }
+
+    private void findByCategory(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("category.id", productFilter.getCategoryId());
+    }
+
+    private void findByStore(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("storeId", productFilter.getStoreId());
     }
 
     @Override
