@@ -10,6 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class OrderFilter extends BaseFilter  {
 
     private String status;
+
     @JsonIgnore
     private Long loggedInUser;
 

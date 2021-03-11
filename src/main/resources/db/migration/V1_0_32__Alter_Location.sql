@@ -1,0 +1,1 @@
+ALTER TABLE location ADD COLUMN target_type varchar(64);

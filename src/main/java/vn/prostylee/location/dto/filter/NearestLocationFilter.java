@@ -4,13 +4,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
-import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class LocationFilter extends BaseFilter {
+public class NearestLocationFilter extends BaseFilter {
 
-    private List<Long> ids;
+    @NotNull
+    private double latitude;
+
+    @NotNull
+    private double longitude;
+
+    @NotBlank
+    private String targetType;
 
     @Override
     public String[] getSearchableFields() {
@@ -25,12 +33,6 @@ public class LocationFilter extends BaseFilter {
 
     @Override
     public String[] getSortableFields() {
-        return new String[]{
-                "address",
-                "state",
-                "city",
-                "country",
-                "zipcode"
-        };
+        return new String[0];
     }
 }

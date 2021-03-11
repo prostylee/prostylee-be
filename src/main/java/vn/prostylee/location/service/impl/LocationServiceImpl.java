@@ -2,6 +2,8 @@ package vn.prostylee.location.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,29 +14,51 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.filter.LocationFilter;
+import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.dto.response.LocationResponseLite;
 import vn.prostylee.location.entity.Location;
+import vn.prostylee.location.repository.LocationExtRepository;
 import vn.prostylee.location.repository.LocationRepository;
 import vn.prostylee.location.service.LocationService;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.List;
+
+import static vn.prostylee.core.dto.filter.PagingAndSortingParam.NUMBER_OF_RECORD_DEFAULT;
 
 @Slf4j
 @AllArgsConstructor
 @Service
 public class LocationServiceImpl implements LocationService {
 
-    private final LocationRepository locationRepository;
+    private final LocationExtRepository locationRepository;
 
     private final BaseFilterSpecs<Location> baseFilterSpecs;
 
     @Override
     public Page<LocationResponse> findAll(BaseFilter baseFilter) {
         LocationFilter locationFilter = (LocationFilter) baseFilter;
-        Specification<Location> spec = baseFilterSpecs.search(baseFilter);
         Pageable pageable = baseFilterSpecs.page(locationFilter);
-        Page<Location> page = locationRepository.findAll(spec, pageable);
+        Page<Location> page = locationRepository.findAll(buildSearchable(locationFilter), pageable);
         return page.map(this::convertToResponse);
+    }
+
+    private Specification<Location> buildSearchable(LocationFilter locationFilter) {
+        Specification<Location> spec = baseFilterSpecs.search(locationFilter);
+
+        if (CollectionUtils.isNotEmpty(locationFilter.getIds())) {
+            spec = spec.and((root, query, cb) -> {
+                CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
+                for (Long id : locationFilter.getIds()) {
+                    inClause.value(id);
+                }
+                return inClause;
+            });
+        }
+
+        return spec;
     }
 
     @Override
@@ -72,7 +96,7 @@ public class LocationServiceImpl implements LocationService {
         try {
             locationRepository.deleteById(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Delete a company without existing in database", e);
             return false;
         }
@@ -82,5 +106,10 @@ public class LocationServiceImpl implements LocationService {
     public LocationResponseLite getLocationResponseLite(Long id) {
         Location location = getById(id);
         return BeanUtil.copyProperties(location, LocationResponseLite.class);
+    }
+
+    @Override
+    public List<LocationResponse> getNearestLocations(NearestLocationFilter nearestLocationFilter) {
+        return locationRepository.getNearestLocations(nearestLocationFilter);
     }
 }

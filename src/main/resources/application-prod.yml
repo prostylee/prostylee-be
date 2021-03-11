@@ -9,6 +9,8 @@ app:
       - "*"
 
 spring:
+  flyway:
+    locations: db/migration,db/func
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:postgresql://localhost:5433/prostylee
