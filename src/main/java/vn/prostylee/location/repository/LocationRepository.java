@@ -4,14 +4,10 @@ package vn.prostylee.location.repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.location.entity.Location;
 
-import org.springframework.stereotype.Repository;
-
 /**
  * Repository for domain model class Location.
  * @see Location;
  * @author prostylee
  */
-@Repository
 public interface LocationRepository extends BaseRepository<Location, Long> {
-
 }
