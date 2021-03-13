@@ -29,6 +29,7 @@ import vn.prostylee.post.service.PostService;
 import vn.prostylee.store.service.StoreService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> findAll(BaseFilter baseFilter) {
         PostFilter postFilter = (PostFilter) baseFilter;
-        Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), authenticatedProvider.getUserIdValue());
+        final Long userId = Optional.ofNullable(postFilter.getUserId()).orElseGet(() -> authenticatedProvider.getUserIdValue());
+        Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), userId);
         Specification<Post> searchable = baseFilterSpecs.search(postFilter).and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(postFilter);
         Page<Post> page = postRepository.findAll(searchable, pageable);

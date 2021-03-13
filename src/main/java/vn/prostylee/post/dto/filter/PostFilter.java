@@ -1,8 +1,15 @@
 package vn.prostylee.post.dto.filter;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PostFilter extends BaseFilter {
+
+    private Long userId;
+
     @Override
     public String[] getSearchableFields() {
         return new String[]{
