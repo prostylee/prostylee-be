@@ -1,1 +1,0 @@
-ALTER TABLE store ADD COLUMN description varchar(4096);

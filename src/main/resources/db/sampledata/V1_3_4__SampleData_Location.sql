@@ -1,4 +1,7 @@
 INSERT INTO location (id, created_at, created_by, updated_at, updated_by, address, city, country, state, zipcode, latitude, longitude)
+VALUES (nextval('location_seq'), '2021-02-04 00:06:05.000000', 1, '2021-02-04 00:06:08.000000', 1, '18, Nguyen Van Mai', 'Tan Binh', 'Viet Nam', 'HCM', '700000', 10.806406363857086, 106.6634168400805);
+
+INSERT INTO location (id, created_at, created_by, updated_at, updated_by, address, city, country, state, zipcode, latitude, longitude)
 VALUES (nextval('location_seq'), '2021-02-04 00:06:05.000000', 1, '2021-02-04 00:06:08.000000', 1,
         'Chung Cư 8X Đầm Sen', 'Tan Binh', 'Viet Nam', 'HCM', '700000', 10.770922339948129, 106.62584458630558);
 
@@ -39,3 +42,4 @@ VALUES (nextval('location_seq'), '2021-02-04 00:06:05.000000', 1, '2021-02-04 00
         'Chung Cư 312', 'Tan Binh', 'Viet Nam', 'HCM', '700000', 10.768519252055944, 106.64416943804024);
 
 UPDATE location SET target_type='STORE';
+

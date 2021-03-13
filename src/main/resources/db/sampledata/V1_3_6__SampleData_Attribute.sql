@@ -1,0 +1,2 @@
+INSERT INTO "attribute" (id, created_at, created_by, updated_at, updated_by, description, key, label, "order", type, category_id, language_code)
+VALUES (1, '2021-02-28 00:57:13.000000', null, '2021-02-28 00:57:17.000000', null, 'Color of shirt', 'Shirt_color', 'Shirt color', 1, 0, 1, 'vi');
