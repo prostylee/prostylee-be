@@ -90,6 +90,14 @@ public class User extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<UserLinkAccount> userLinkAccounts;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<UserAddress> userAddresses;
+
 	@Column(name = "avatar")
 	private String avatar;
+
+	@Column(name = "bio", length = 512, nullable = true)
+	private String bio;
 }
