@@ -44,7 +44,7 @@ public class FileStorageController {
 		return ResponseEntity.ok(fileStorageResponses);
 	}
 
-	@GetMapping(ApiUrl.FILE_STORAGE_ACTION)
+	@GetMapping("/{fileName:.+}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
 		// Load file as Resource
 		Resource resource = fileStorageService.loadFileAsResource(fileName);

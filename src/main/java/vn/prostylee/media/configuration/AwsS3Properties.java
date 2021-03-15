@@ -36,4 +36,10 @@ public class AwsS3Properties {
      * AWS cloudfront url
      */
     private String cloudFrontUrl;
+
+    /**
+     * AWS S3 bucket public folder name
+     */
+    private String s3MediaPublicFolder;
+
 }

@@ -2,6 +2,7 @@ package vn.prostylee.media.service;
 
 import com.google.api.services.drive.model.File;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public interface FileUploadService {
      * Upload files to the default folder id
      *
      * @param files The {@link MultipartFile}
-     * @return The list of {@link File} after uploaded
+     * @return The list of {@link AttachmentResponse} after uploaded
      */
     List<AttachmentResponse> uploadFiles(List<MultipartFile> files);
 
@@ -50,7 +51,7 @@ public interface FileUploadService {
      *
      * @param folderId The folder id will stored the given files
      * @param files The {@link MultipartFile}
-     * @return The list of {@link File} after uploaded
+     * @return The list of {@link AttachmentResponse} after uploaded
      */
     List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files);
 
@@ -61,5 +62,13 @@ public interface FileUploadService {
      * @return true if deleted successfully, otherwise false
      */
     boolean deleteFiles(List<Long> fileIds);
+
+    /**
+     * Store and generate the path to attachment table
+     *
+     * @param mediaFileRequests The {@link MediaFileRequest}
+     * @return The list of {@link AttachmentResponse} after uploaded
+     */
+    List<AttachmentResponse> storeFiles(List<MediaFileRequest> mediaFileRequests);
 
 }
