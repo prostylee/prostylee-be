@@ -133,7 +133,8 @@ app:
       region: ap-southeast-1
       bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
       cloudFrontId: d1fhfbd6s3w12p
-      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/fit-in/
+      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/
+      s3ResizeImagePrefix: fit-in/
       s3MediaPublicFolder: public
     # AWS Cognito
     cognito:
