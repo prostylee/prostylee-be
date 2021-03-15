@@ -11,6 +11,7 @@ import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.configuration.AwsS3Properties;
+import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
@@ -35,6 +36,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
     private final AttachmentRepository attachmentRepository;
     private final String bucketUrl;
     private final String cloudfrontUrl;
+    private final String s3MediaPublicFolder;
 
     @Autowired
     public AwsS3ServiceImpl(
@@ -45,6 +47,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         this.attachmentRepository = attachmentRepository;
         this.bucketUrl = awss3Properties.getBucketUrl();
         this.cloudfrontUrl = awss3Properties.getCloudFrontUrl();
+        this.s3MediaPublicFolder = awss3Properties.getS3MediaPublicFolder();
     }
 
     @Override
@@ -101,11 +104,11 @@ public class AwsS3ServiceImpl implements FileUploadService {
 
     @Override
     public List<AttachmentResponse> uploadFiles(List<MultipartFile> files) {
-        return uploadFiles("", files);
+        return uploadFiles(s3MediaPublicFolder, files);
     }
 
     @Override
-    public List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files) {
+    public List<AttachmentResponse> uploadFiles(String folderName, List<MultipartFile> files) {
         List<AttachmentResponse> attachments = new ArrayList<>();
         if (CollectionUtils.isEmpty(files)) {
             return attachments;
@@ -117,7 +120,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
                 if (StringUtils.isEmpty(file.getOriginalFilename())) {
                     continue;
                 }
-                futures.add(awsS3AsyncProvider.uploadFile(folderId, file));
+                futures.add(awsS3AsyncProvider.uploadFile(folderName, file));
             }
 
             while (!awsS3AsyncProvider.isAllFutureDone(futures)) {
@@ -149,6 +152,12 @@ public class AwsS3ServiceImpl implements FileUploadService {
         } catch (IllegalArgumentException | AmazonClientException e) {
             throw new FileUploaderException(ErrorResponseStatus.FILE_DELETE_ERROR.getCode(), e);
         }
+    }
+
+    @Override
+    public List<AttachmentResponse> storeFiles(List<MediaFileRequest> mediaFileRequests) {
+
+        return null;
     }
 
 }

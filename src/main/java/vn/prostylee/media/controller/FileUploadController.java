@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.media.constant.ApiUrl;
+import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.service.FileUploadService;
 
@@ -18,8 +19,9 @@ import java.util.List;
  * At the moment, the application just support Google Drive.
  */
 @RestController
-@RequestMapping(ApiUrl.MEDIA)
+@RequestMapping("/medias")
 public class FileUploadController {
+	private static char sss = '1';
 
 	private static final String WIDTH = "w";
 	private static final String HEIGHT = "h";
@@ -51,6 +53,11 @@ public class FileUploadController {
 	@DeleteMapping(value = "/files/{fileIds}")
 	public ResponseEntity<Boolean> delete(@PathVariable(value = "fileIds") List<Long> fileIds) {
 		return ResponseEntity.ok(fileUploadService.deleteFiles(fileIds));
+	}
+
+	@PostMapping(value = "/store-file")
+	public ResponseEntity<List<AttachmentResponse>> storeFile(@NotEmpty @RequestBody List<MediaFileRequest> mediaFileRequest) {
+		return ResponseEntity.ok(fileUploadService.uploadFiles(mediaFileRequest));
 	}
 
 }
