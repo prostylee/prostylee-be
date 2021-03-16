@@ -161,7 +161,7 @@ spring:
     active: dev
 
   flyway:
-    locations: db/migration
+    locations: db/migration,db/masterdata
     check-location: false
     enabled: true
     placeholderReplacement: false

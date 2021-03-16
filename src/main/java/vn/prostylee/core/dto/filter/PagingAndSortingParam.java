@@ -7,11 +7,13 @@ import javax.validation.constraints.Min;
 @Data
 public abstract class PagingAndSortingParam implements SortingDefinitions {
 
+    public static final int NUMBER_OF_RECORD_DEFAULT = 30;
+
     @Min(value = 0)
     private int page = 0;
 
     @Min(value = 1)
-    private int limit = 30;
+    private int limit = NUMBER_OF_RECORD_DEFAULT;
 
     /**
      * Multiple sort request parameters.

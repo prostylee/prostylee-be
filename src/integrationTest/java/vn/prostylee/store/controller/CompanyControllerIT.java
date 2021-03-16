@@ -1,7 +1,6 @@
 package vn.prostylee.store.controller;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -9,7 +8,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import vn.prostylee.AuthSupporterIT;
@@ -17,13 +15,11 @@ import vn.prostylee.IntegrationTest;
 import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.store.dto.request.CompanyRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled // TODO don't trigger flyway for mock data in test profile
 @IntegrationTest
 @WebAppConfiguration
 @Sql(
@@ -52,7 +48,7 @@ class CompanyControllerIT extends AuthSupporterIT {
 
     @Test
     void getAll_Successfully() throws Exception {
-        MvcResult mvcResult = this.mockMvc
+        this.mockMvc
                 .perform(get(ENDPOINT))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -60,7 +56,6 @@ class CompanyControllerIT extends AuthSupporterIT {
                 .andExpect(jsonPath("$.totalPages").value(1))
                 .andExpect(jsonPath("$.content.length()").value(8))
                 .andReturn();
-        assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
     }
 
     @Test
