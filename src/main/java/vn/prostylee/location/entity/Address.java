@@ -1,18 +1,17 @@
 package vn.prostylee.location.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Table(name = "address")
 public class Address extends AuditEntity {
 
     private static final long serialVersionUID = 1L;
