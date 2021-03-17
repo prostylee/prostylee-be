@@ -12,4 +12,8 @@ INSERT INTO user (id, created_at, created_by, updated_at, updated_by, active, al
 INSERT INTO user (id, created_at, created_by, updated_at, updated_by, active, allow_notification, deleted_at, email, full_name, gender, location_id, password, phone_number, username) VALUES (9, '2020-12-12 07:19:37', null, '2020-12-12 07:19:37', null, true, true, null, 'test9@prostylee.vn', 'Prostylee 9', 'M', null, '$2a$10$8U4jVkvTdq0UqU/2a9j9h.7PuZ71gHKh5JiwI.aFEJZfNHU1Fl.PK', '0988985000', 'test9@prostylee.vn');
 INSERT INTO user (id, created_at, created_by, updated_at, updated_by, active, allow_notification, deleted_at, email, full_name, gender, location_id, password, phone_number, username) VALUES (10, '2020-12-12 07:19:37', null, '2020-12-12 07:19:37', null, true, true, null, 'test10@prostylee.vn', 'Prostylee 10', 'M', null, '$2a$10$8U4jVkvTdq0UqU/2a9j9h.7PuZ71gHKh5JiwI.aFEJZfNHU1Fl.PK', '0988985000', 'test10@prostylee.vn');
 
+INSERT INTO user_role(user_id, role_id) VALUES (1, 1);
+INSERT INTO user_role(user_id, role_id) VALUES (2, 3);
+INSERT INTO user_role(user_id, role_id) VALUES (4, 2);
+
 ALTER SEQUENCE user_seq RESTART WITH 11;
