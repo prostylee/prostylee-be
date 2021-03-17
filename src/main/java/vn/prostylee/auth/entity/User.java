@@ -58,8 +58,8 @@ public class User extends AuditEntity {
 	@Column(name = "email", unique = true, length = 512)
 	private String email;
 
-	@Column(name = "location_id", length = 512)
-	private String locationId;
+	@Column(name = "location_id")
+	private Long locationId;
 
 	@Column(name = "allow_notification")
 	private Boolean allowNotification;

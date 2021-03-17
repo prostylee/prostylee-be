@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.request.MostActiveUserRequest;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
@@ -69,6 +71,12 @@ public class UserLikeServiceImpl implements UserLikeService {
     @Override
     public List<Long> loadStatusLikes(StatusLikeRequest request) {
         return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
+    }
+
+    @Override
+    public List<Long> getTopBeLikes(MostActiveUserRequest request) {
+        Pageable pageSpecification = PageRequest.of(0, request.getLimit());
+        return repository.getTopBeLikes(request.getTargetTypes(), request.getFromDate(), request.getToDate(), pageSpecification);
     }
 
     private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter) {

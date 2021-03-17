@@ -2,6 +2,7 @@ package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
+import vn.prostylee.useractivity.dto.request.MostActiveUserRequest;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
@@ -19,4 +20,6 @@ public interface UserLikeService {
     boolean unlike(UserLikeRequest request);
 
     List<Long> loadStatusLikes(StatusLikeRequest request);
+
+    List<Long> getTopBeLikes(MostActiveUserRequest request);
 }

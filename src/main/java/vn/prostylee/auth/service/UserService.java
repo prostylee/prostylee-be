@@ -7,11 +7,10 @@ import vn.prostylee.core.service.CrudService;
 import vn.prostylee.core.validator.EntityExists;
 import vn.prostylee.core.validator.FieldValueExists;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService extends CrudService<UserRequest, UserResponse, Long>, FieldValueExists, EntityExists<Long> {
-
-    UserResponse findByPushToken(String pushToken);
 
     User save(User user);
 
@@ -20,4 +19,6 @@ public interface UserService extends CrudService<UserRequest, UserResponse, Long
     Optional<User> getUserByEmail(String email);
 
     Optional<User> findBySub(String sub);
+
+    List<UserResponse> findUsersByIds(List<Long> userIds);
 }
