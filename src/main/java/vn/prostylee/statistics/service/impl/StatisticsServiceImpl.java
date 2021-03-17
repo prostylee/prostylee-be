@@ -22,7 +22,15 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public UserStatisticsResponse getUserActivities() {
         Long userLoginId = authenticatedProvider.getUserIdValue();
+        return getUserStatisticsResponse(userLoginId);
+    }
 
+    @Override
+    public UserStatisticsResponse getUserActivitiesByUserId(Long userId) {
+        return getUserStatisticsResponse(userId);
+    }
+
+    private UserStatisticsResponse getUserStatisticsResponse(Long userLoginId) {
         UserFollowerFilter followerFilter = UserFollowerFilter.builder()
                 .targetId(userLoginId)
                 .targetType(StatisticsType.USER.getType())
