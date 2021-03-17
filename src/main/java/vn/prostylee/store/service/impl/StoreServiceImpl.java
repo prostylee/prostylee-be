@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
@@ -55,11 +56,19 @@ public class StoreServiceImpl implements StoreService {
     private final LocationService locationService;
 
     @Override
+    @UserBehaviorTracking
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
         StoreFilter storeFilter = (StoreFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(storeFilter);
         Page<Store> page = storeRepository.findAllActive(buildSearchable(storeFilter), pageable);
         return page.map(this::convertToResponse);
+    }
+
+    @Override
+    @UserBehaviorTracking
+    public StoreResponse findById(Long id) {
+        Store store = getById(id);
+        return convertToResponse(store);
     }
 
     @Override
@@ -86,7 +95,6 @@ public class StoreServiceImpl implements StoreService {
             };
             spec = spec.and(joinCompanySpec);
         }
-
         return spec;
     }
 
@@ -104,12 +112,6 @@ public class StoreServiceImpl implements StoreService {
         StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
         storeResponse.setCompany(BeanUtil.copyProperties(store.getCompany(), CompanyResponse.class));
         return storeResponse;
-    }
-
-    @Override
-    public StoreResponse findById(Long id) {
-        Store store = getById(id);
-        return convertToResponse(store);
     }
 
     private Store getById(Long id) {
