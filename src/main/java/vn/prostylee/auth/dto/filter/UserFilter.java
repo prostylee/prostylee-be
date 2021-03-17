@@ -10,9 +10,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class UserFilter extends BaseFilter {
 
-	List<String> roleCodes;
-	String email;
-    String username;
+    private List<String> roleCodes;
 
     @Override
     public String[] getSearchableFields() {

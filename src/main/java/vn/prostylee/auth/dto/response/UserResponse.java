@@ -26,6 +26,8 @@ public class UserResponse {
 
     private String email;
 
+    private Long locationId;
+
     private Set<String> roles;
 
     private Boolean active;
