@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseFilter extends PagingAndSortingParam implements SearchingDefinitions {
-
     private String keyword;
 
 }

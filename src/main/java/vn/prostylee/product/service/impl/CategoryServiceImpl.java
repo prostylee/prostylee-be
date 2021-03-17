@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -34,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final BaseFilterSpecs<Category> baseFilterSpecs;
 
     @Override
+    @UserBehaviorTracking
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
         CategoryFilter categoryFilter = (CategoryFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
@@ -42,6 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @UserBehaviorTracking
     public CategoryResponse findById(Long id) {
         return this.toResponse(this.getById(id));
     }

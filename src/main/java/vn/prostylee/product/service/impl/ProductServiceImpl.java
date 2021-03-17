@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -45,7 +46,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductShippingProviderService productShippingProviderService;
     private final ProductPriceService productPriceService;
     private final FileUploadService fileUploadService;
+
     @Override
+    @UserBehaviorTracking
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
         ProductFilter productFilter = (ProductFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(productFilter);
@@ -74,6 +77,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @UserBehaviorTracking
     public ProductResponse findById(Long id) {
         return this.toResponse(this.getProductById(id));
     }
