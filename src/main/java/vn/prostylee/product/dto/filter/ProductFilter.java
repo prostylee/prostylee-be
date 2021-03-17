@@ -9,14 +9,16 @@ import vn.prostylee.product.constant.NewFeedType;
 @EqualsAndHashCode(callSuper = true)
 public class ProductFilter extends BaseFilter {
 
+    private Long userId;
+
     private Long storeId;
+
     private NewFeedType newFeedType = NewFeedType.STORE;
 
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "name",
-                "categoryId"
+                "name"
         };
     }
 
@@ -24,7 +26,8 @@ public class ProductFilter extends BaseFilter {
     public String[] getSortableFields() {
         return new String[] {
                 "name",
-                "price"
+                "price",
+                "createdAt"
         };
     }
 }
