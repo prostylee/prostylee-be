@@ -25,7 +25,7 @@ public class StatisticsController {
         return statisticsService.getUserActivities();
     }
 
-    @GetMapping("/user-activities/{id}")
+    @GetMapping("/user-activities/{userId}")
     public UserStatisticsResponse getUserActivitiesByUserId(@PathVariable Long userId) {
         return statisticsService.getUserActivitiesByUserId(userId);
     }
