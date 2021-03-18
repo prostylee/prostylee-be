@@ -39,4 +39,6 @@ public class UserResponse {
     private Boolean allowNotification;
 
     private String avatar;
+
+    private String bio;
 }
