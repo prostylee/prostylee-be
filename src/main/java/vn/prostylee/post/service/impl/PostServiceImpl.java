@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
@@ -27,6 +29,7 @@ import vn.prostylee.post.repository.PostRepository;
 import vn.prostylee.post.service.PostImageService;
 import vn.prostylee.post.service.PostService;
 import vn.prostylee.store.service.StoreService;
+import vn.prostylee.story.dto.response.UserResponseLite;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +47,8 @@ public class PostServiceImpl implements PostService {
     private final FileUploadService fileUploadService;
     private final StoreService storeService;
     private final AuthenticatedProvider authenticatedProvider;
+    private final UserProfileService userProfileService;
+
     @Override
     public Page<PostResponse> findAll(BaseFilter baseFilter) {
         PostFilter postFilter = (PostFilter) baseFilter;
@@ -134,8 +139,16 @@ public class PostServiceImpl implements PostService {
         if(null != storeId)
             postForListResponse.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
 
+        postForListResponse.setUserResponseLite(this.getUserResponseLite(post.getCreatedBy()));
+
         return postForListResponse;
     }
+
+    private UserResponseLite getUserResponseLite(Long id) {
+        UserResponse profileBy = userProfileService.getProfileBy(id);
+        return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
+    }
+
 
     private PostForUpdateResponse toUpdateResponse(Post post){
         PostForUpdateResponse response = BeanUtil.copyProperties(post, PostForUpdateResponse.class);
