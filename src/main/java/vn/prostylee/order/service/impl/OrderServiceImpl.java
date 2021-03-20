@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -12,17 +13,23 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.specs.QueryBuilder;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.converter.OrderConverter;
+import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.entity.Order;
+import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
 
 import javax.persistence.criteria.Predicate;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import static vn.prostylee.order.constants.OrderStatus.*;
 
@@ -32,6 +39,7 @@ import static vn.prostylee.order.constants.OrderStatus.*;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     private final OrderConverter orderConverter;
 
@@ -66,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
                 statusId = IN_PROGRESS.ordinal();
                 break;
             case "COMPLETE":
-                statusId = COMPLETE.ordinal();
+                statusId = COMPLETED.ordinal();
                 break;
             default:
                 break;
@@ -117,5 +125,13 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.getByStatusValue(statusRequest.getStatus()));
         Order savedOrder = orderRepository.save(order);
         return orderConverter.toDto(savedOrder);
+    }
+
+    @Override
+    public List<Long> getBestSellerProductIds(BestSellerFilter bestSellerFilter) {
+        Date fromDate = DateUtils.getLastDaysBefore(bestSellerFilter.getTimeRangeInDays());
+        Date toDate = Calendar.getInstance().getTime();
+        Pageable pageSpecification = PageRequest.of(bestSellerFilter.getPage(), bestSellerFilter.getLimit());
+        return orderDetailRepository.getBestSellerProductIds(bestSellerFilter.getStoreId(), fromDate, toDate, pageSpecification);
     }
 }

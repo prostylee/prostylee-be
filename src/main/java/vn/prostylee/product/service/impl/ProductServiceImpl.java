@@ -3,7 +3,7 @@ package vn.prostylee.product.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +19,11 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.order.dto.filter.BestSellerFilter;
+import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
@@ -28,6 +31,7 @@ import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductShippingProviderService productShippingProviderService;
     private final ProductPriceService productPriceService;
     private final FileUploadService fileUploadService;
+    private final OrderService orderService;
 
     @Override
     @UserBehaviorTracking
@@ -63,6 +68,8 @@ public class ProductServiceImpl implements ProductService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("storeId"), productFilter.getStoreId()));
         }
 
+        spec = buildBestSellerSpec(spec, productFilter);
+
         // TODO query by new feeds
 //        switch (productFilter.getNewFeedType()) {
 //            case USER:
@@ -76,6 +83,56 @@ public class ProductServiceImpl implements ProductService {
         return spec;
     }
 
+    private Specification<Product> buildBestSellerSpec(Specification<Product> spec, ProductFilter productFilter) {
+        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+            BestSellerFilter bestSellerFilter = BestSellerFilter.builder()
+                    .storeId(productFilter.getStoreId())
+                    .build();
+            bestSellerFilter.setLimit(productFilter.getLimit());
+            bestSellerFilter.setPage(productFilter.getPage());
+            List<Long> productIds = orderService.getBestSellerProductIds(bestSellerFilter);
+            if (CollectionUtils.isNotEmpty(productIds)) { // Get best-seller if exists, otherwise ignore this condition
+                spec = spec.and((root, query, cb) -> {
+                    CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
+                    productIds.forEach(inClause::value);
+                    return inClause;
+                });
+            }
+        }
+        return spec;
+    }
+
+    private ProductResponse toResponse(Product product) {
+        ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
+        Set<ProductImage> productImages = product.getProductImages();
+        List<Long> attachmentIds = productImages.stream().map(ProductImage::getAttachmentId).collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(attachmentIds)) {
+            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
+            productResponse.setImageUrls(imageUrls);
+        }
+
+        try {
+
+            if (productResponse.getLocationId() != null) {
+                productResponse.setLocation(locationService.findById(productResponse.getLocationId()));
+            }
+
+            productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
+            productResponse.setProductOwnerResponse(ProductOwnerResponse.builder()
+                    .id(product.getStoreId() != null ? product.getStoreId() : product.getCreatedBy())
+                    .name("Lorem Ipsum")
+                    .logoUrl(product.getStoreId() != null
+                            ? "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/0a93f4e8-fca5-492f-9853-f5b6f3b28334.png"
+                            : "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/3b939cd9-3768-4b5a-812f-2a7face512d2.jpeg")
+                    .build());
+        } catch (Exception e) {
+            log.debug("Can not get avatar", e);
+        }
+
+        return productResponse;
+    }
+
     @Override
     @UserBehaviorTracking
     public ProductResponse findById(Long id) {
@@ -84,11 +141,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse save(ProductRequest productRequest) {
-        Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
-        return toResponse(productRequest, productEntity);
+        Product product = saveProduct(productRequest);
+        saveProductPrice(product.getId(), productRequest.getProductPriceRequest());
+
+        ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
+        productResponse.setBrandId(product.getBrand().getId());
+        productResponse.setCategoryId(product.getCategory().getId());
+        return productResponse;
     }
 
-    private ProductResponse toResponse(ProductRequest productRequest, Product productEntity) {
+    private Product saveProduct(ProductRequest productRequest) {
+        Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
         Long locationId = fetchLocation(productRequest.getLocationRequest());
         productEntity.setLocationId(locationId);
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
@@ -108,20 +171,14 @@ public class ProductServiceImpl implements ProductService {
                 .buildProductShippingProviders(productRequest.getShippingProviders(), productEntity);
         productEntity.setProductShippingProviders(productShippingProviders);
 
-        Product savedProductEntity = productRepository.save(productEntity);
-        Long productId = savedProductEntity.getId();
+        return productRepository.save(productEntity);
+    }
 
-        productRequest.getProductPriceRequest().forEach(productPriceRequest -> {
+    private void saveProductPrice(Long productId, List<ProductPriceRequest> productPrices) {
+        productPrices.forEach(productPriceRequest -> {
             productPriceRequest.setProductId(productId);
             productPriceService.save(productPriceRequest);
         });
-
-
-        ProductResponse productResponse = BeanUtil.copyProperties(savedProductEntity, ProductResponse.class);
-        productResponse.setBrandId(savedProductEntity.getBrand().getId());
-        productResponse.setCategoryId(savedProductEntity.getCategory().getId());
-
-        return productResponse;
     }
 
     private Long fetchLocation(LocationRequest locationRequest) {
@@ -146,40 +203,6 @@ public class ProductServiceImpl implements ProductService {
             log.debug("Product id {} does not exists", id);
             throw new ResourceNotFoundException("Product is not found with id [" + id + "]");
         }
-    }
-
-    private ProductResponse toResponse(Product product) {
-        ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
-        Set<ProductImage> productImages = product.getProductImages();
-        List<Long> attachmentIds = productImages.stream().map(ProductImage::getAttachmentId).collect(Collectors.toList());
-
-        if (CollectionUtils.isNotEmpty(attachmentIds)) {
-            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
-            productResponse.setImageUrls(imageUrls);
-        }
-
-        try {
-
-            if (productResponse.getLocationId() != null) {
-                productResponse.setLocation(locationService.findById(productResponse.getLocationId()));
-            }
-
-            if (productResponse.getId() % RandomUtils.nextInt(1, 5) == 0) { // TODO get ads from ads table
-                productResponse.setIsAdvertising(true);
-            }
-
-            productResponse.setProductOwnerResponse(ProductOwnerResponse.builder()
-                    .id(product.getStoreId() != null ? product.getStoreId() : product.getCreatedBy())
-                    .name("Lorem Ipsum")
-                    .logoUrl(product.getStoreId() != null
-                            ? "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/0a93f4e8-fca5-492f-9853-f5b6f3b28334.png"
-                            : "https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/3b939cd9-3768-4b5a-812f-2a7face512d2.jpeg")
-                    .build());
-        } catch (Exception e) {
-            log.debug("Can not get avatar", e);
-        }
-
-        return productResponse;
     }
 
     @Override

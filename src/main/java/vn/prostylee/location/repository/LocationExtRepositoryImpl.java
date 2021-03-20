@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static vn.prostylee.core.dto.filter.PagingAndSortingParam.NUMBER_OF_RECORD_DEFAULT;
+import static vn.prostylee.core.dto.filter.PagingParam.NUMBER_OF_RECORD_DEFAULT;
 
 @Repository
 public class LocationExtRepositoryImpl extends BaseRepositoryImpl<Location, Long> implements LocationExtRepository {
