@@ -1,9 +1,10 @@
 package vn.prostylee.core.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
-public class DateUtils {
+public final class DateUtils {
 
     private DateUtils() {}
 
@@ -13,5 +14,11 @@ public class DateUtils {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         return sdf.format(date);
+    }
+
+    public static Date getLastDaysBefore(int numberOfDays) {
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.DAY_OF_MONTH, (-1) * numberOfDays);
+        return today.getTime();
     }
 }

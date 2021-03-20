@@ -9,6 +9,7 @@ import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.useractivity.constant.TargetType;
@@ -39,7 +40,7 @@ public class UserActivityServiceImpl implements UserActivityService {
         MostActiveUserRequest request = MostActiveUserRequest.builder()
                 .targetTypes(Collections.singletonList(TargetType.USER.name()))
                 .limit(filter.getLimit() / NUMBER_OF_CONDITIONS)
-                .fromDate(getLastDays(filter.getTimeRangeInDays()))
+                .fromDate(DateUtils.getLastDaysBefore(filter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
                 .build();
 
@@ -52,12 +53,6 @@ public class UserActivityServiceImpl implements UserActivityService {
 
         List<UserActivityResponse> responses = getMostActiveUsersByUserIds(new ArrayList<>(userIds));
         return new PageImpl<>(responses);
-    }
-
-    private Date getLastDays(int numberOfDays) {
-        Calendar today = Calendar.getInstance();
-        today.add(Calendar.DAY_OF_MONTH, (-1) * numberOfDays);
-        return today.getTime();
     }
 
     private List<UserActivityResponse> getMostActiveUsersByUserIds(List<Long> userIds) {

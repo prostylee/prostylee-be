@@ -9,8 +9,9 @@ import java.util.stream.Stream;
 public enum OrderStatus {
 
     AWAITING_CONFIRMATION(0),
-    IN_PROGRESS(1),
-    COMPLETE(2);
+    IN_PROGRESS(50),
+    CANCELLED(90),
+    COMPLETED(100);
 
     @Getter
     private final int value;

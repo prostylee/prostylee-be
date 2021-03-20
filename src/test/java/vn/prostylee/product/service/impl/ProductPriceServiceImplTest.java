@@ -46,6 +46,7 @@ public class ProductPriceServiceImplTest {
         try {
             when(this.productPriceRepository.findById(2L)).thenReturn(Optional.empty());
             this.productPriceService.findById(2L);
+            fail("Should throw an exception");
         } catch (ResourceNotFoundException e) {
             assertEquals("Product price is not found with id [" + 2L + "]", e.getMessage());
         }
