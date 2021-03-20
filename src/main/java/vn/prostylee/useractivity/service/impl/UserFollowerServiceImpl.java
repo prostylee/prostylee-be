@@ -13,7 +13,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
-import vn.prostylee.useractivity.dto.request.MostActiveUserRequest;
+import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
@@ -72,7 +72,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     }
 
     @Override
-    public List<Long> getTopBeFollows(MostActiveUserRequest request) {
+    public List<Long> getTopBeFollows(MostActiveRequest request) {
         Pageable pageSpecification = PageRequest.of(0, request.getLimit());
         return repository.getTopBeLikes(request.getTargetTypes(), request.getFromDate(), request.getToDate(), pageSpecification);
     }

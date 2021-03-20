@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class MostActiveUserRequest {
+public class MostActiveRequest {
 
     private List<String> targetTypes;
 

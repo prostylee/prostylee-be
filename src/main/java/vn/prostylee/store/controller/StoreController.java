@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
+import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.StoreRequest;
@@ -25,8 +26,8 @@ public class StoreController extends CrudController<StoreRequest, StoreResponse,
     }
 
     @GetMapping("/top/products")
-    public Page<StoreResponse> getTopProductsByStores(StoreProductFilter storeProductFilter) {
-        return storeService.getTopProductsByStores(storeProductFilter);
+    public Page<StoreResponse> getTopProductsOfStores(MostActiveStoreFilter storeFilter) {
+        return storeService.getTopProductsOfStores(storeFilter);
     }
 
     @GetMapping("/mini-stores")

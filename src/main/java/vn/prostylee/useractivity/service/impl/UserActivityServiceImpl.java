@@ -14,13 +14,14 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.MostActiveUserFilter;
-import vn.prostylee.useractivity.dto.request.MostActiveUserRequest;
+import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.response.UserActivityResponse;
 import vn.prostylee.useractivity.service.UserActivityService;
-import vn.prostylee.useractivity.service.UserFollowerService;
-import vn.prostylee.useractivity.service.UserLikeService;
+import vn.prostylee.useractivity.service.UserMostActiveService;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,30 +29,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserActivityServiceImpl implements UserActivityService {
 
-    private static final int NUMBER_OF_CONDITIONS = 2; // followers and likes
-
+    private final UserMostActiveService userMostActiveService;
     private final UserService userService;
     private final LocationService locationService;
-    private final UserLikeService userLikeService;
-    private final UserFollowerService userFollowerService;
 
     @Override
     public Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter) {
-        MostActiveUserRequest request = MostActiveUserRequest.builder()
+        MostActiveRequest request = MostActiveRequest.builder()
                 .targetTypes(Collections.singletonList(TargetType.USER.name()))
-                .limit(filter.getLimit() / NUMBER_OF_CONDITIONS)
+                .limit(filter.getLimit())
                 .fromDate(DateUtils.getLastDaysBefore(filter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
                 .build();
 
-        Set<Long> userIds = new LinkedHashSet<>(getUserIdsOfTopBeFollows(request)); // Priority #1
-        request.setLimit(filter.getLimit());  // To make sure get enough the number of users requested
-        userIds.addAll(getUserIdsOfTopBeLikes(request)); // Priority #2
-        if (userIds.size() > filter.getLimit()) {
-            userIds = userIds.stream().limit(filter.getLimit()).collect(Collectors.toSet());
-        }
-
-        List<UserActivityResponse> responses = getMostActiveUsersByUserIds(new ArrayList<>(userIds));
+        List<Long> userIds = userMostActiveService.getTargetIdsByMostActive(request);
+        List<UserActivityResponse> responses = getMostActiveUsersByUserIds(userIds);
         return new PageImpl<>(responses);
     }
 
@@ -78,13 +70,5 @@ public class UserActivityServiceImpl implements UserActivityService {
             log.error("Could not found a location of userId={}", id, e);
         }
         return null;
-    }
-
-    private List<Long> getUserIdsOfTopBeFollows(MostActiveUserRequest request) {
-        return userFollowerService.getTopBeFollows(request);
-    }
-
-    private List<Long> getUserIdsOfTopBeLikes(MostActiveUserRequest request) {
-        return userLikeService.getTopBeLikes(request);
     }
 }
