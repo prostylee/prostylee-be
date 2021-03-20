@@ -14,7 +14,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
-import vn.prostylee.useractivity.dto.request.MostActiveUserRequest;
+import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
@@ -74,7 +74,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     }
 
     @Override
-    public List<Long> getTopBeLikes(MostActiveUserRequest request) {
+    public List<Long> getTopBeLikes(MostActiveRequest request) {
         Pageable pageSpecification = PageRequest.of(0, request.getLimit());
         return repository.getTopBeLikes(request.getTargetTypes(), request.getFromDate(), request.getToDate(), pageSpecification);
     }
