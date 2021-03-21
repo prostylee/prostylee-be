@@ -35,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final BaseFilterSpecs<Category> baseFilterSpecs;
 
     @Override
-    @UserBehaviorTracking
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
         CategoryFilter categoryFilter = (CategoryFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
@@ -44,7 +43,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @UserBehaviorTracking
     public CategoryResponse findById(Long id) {
         return this.toResponse(this.getById(id));
     }
