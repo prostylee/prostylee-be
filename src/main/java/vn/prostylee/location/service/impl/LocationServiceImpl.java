@@ -47,9 +47,7 @@ public class LocationServiceImpl implements LocationService {
         if (CollectionUtils.isNotEmpty(locationFilter.getIds())) {
             spec = spec.and((root, query, cb) -> {
                 CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
-                for (Long id : locationFilter.getIds()) {
-                    inClause.value(id);
-                }
+                locationFilter.getIds().forEach(inClause::value);
                 return inClause;
             });
         }
