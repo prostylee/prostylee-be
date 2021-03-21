@@ -102,4 +102,17 @@ public class User extends AuditEntity {
 
 	@Column(name = "bio", length = 512, nullable = true)
 	private String bio;
+
+	@Column(name = "allow_sale_notification")
+	private Boolean allowSaleNotification;
+
+	@Column(name = "allow_social_notification")
+	private Boolean allowSocialNotification;
+
+	@Column(name = "allow_order_status_notification")
+	private Boolean allowOrderStatusNotification;
+
+	@Column(name = "allow_stock_notification")
+	private Boolean allowStockNotification;
+
 }
