@@ -66,7 +66,6 @@ public class StoreServiceImpl implements StoreService {
     private final UserMostActiveService userMostActiveService;
 
     @Override
-    @UserBehaviorTracking
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
         StoreFilter storeFilter = (StoreFilter) baseFilter;
         Specification<Store> searchableSpec = buildSearchable(storeFilter);
@@ -151,7 +150,6 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    @UserBehaviorTracking
     public StoreResponse findById(Long id) {
         Store store = getById(id);
         return convertToResponse(store);
