@@ -6,6 +6,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.utils.FieldUtils;
 import vn.prostylee.useractivity.dto.request.UserTrackingRequest;
 import vn.prostylee.useractivity.service.UserTrackingService;
 
@@ -24,42 +25,27 @@ public class UserTrackingAspect {
     public static final String PRODUCT_ID = "productId";
     public static final String STORE_ID = "storeId";
 
-    private final HttpServletRequest request;
     private final UserTrackingService userTrackingService;
+    private final HttpServletRequest request;
 
     @Before("@annotation(vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking)")
     public void trackingUserBehavior(JoinPoint joinPoint) {
-        Long categoryId = null;
-        Long productId = null;
-        Long  storeId = null;
-
-        if(getParameterBy(CATEGORY_ID) != null ){
-            categoryId = Long.valueOf(getParameterBy(CATEGORY_ID));
-        }
-
-        if(getParameterBy(PRODUCT_ID) != null ){
-            productId = Long.valueOf(getParameterBy(PRODUCT_ID));
-        }
-
-        if(getParameterBy(STORE_ID) != null ){
-            productId = Long.valueOf(getParameterBy(STORE_ID));
-        }
+        Object filter = joinPoint.getArgs()[0];
+        Long categoryId =  FieldUtils.readField(Long.class , filter, CATEGORY_ID);
+        Long productId = FieldUtils.readField(Long.class , filter, PRODUCT_ID);
+        Long storeId  = FieldUtils.readField(Long.class , filter, STORE_ID);
+        String keyword = FieldUtils.readField(String.class, filter, KEYWORD);
 
         UserTrackingRequest requestDto = UserTrackingRequest.builder()
                 .categoryId(categoryId)
                 .productId(productId)
                 .storeId(storeId)
                 .path(request.getRequestURL().toString())
-                .searchKeyword(getParameterBy(KEYWORD))
+                .searchKeyword(keyword)
                 .build();
 
         userTrackingService.storeTracking(requestDto);
         log.debug("UserTracking aspect: " + joinPoint.getSignature().getName());
     }
-
-    private String getParameterBy(String paramKey) {
-        return request.getParameter(paramKey);
-    }
-
 }
 

@@ -60,13 +60,13 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
     /**
      * Upload files to AWS S3 asynchronous
      *
-     * @param folderId The AWS S3 folder id will contain the uploaded file
+     * @param folderName The AWS S3 folder id will contain the uploaded file
      * @param file     The {@link MultipartFile}
      * @return The {@link AttachmentResponse}
      */
     @Async
-    public Future<AttachmentResponse> uploadFile(String folderId, MultipartFile file) throws IOException {
-        String fileName = generateFileName(file, folderId);
+    public Future<AttachmentResponse> uploadFile(String folderName, MultipartFile file) throws IOException {
+        String fileName = generateFileName(file, folderName);
         s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
         URL storedUrl = s3Client.getUrl(bucketName, fileName);
         Attachment attachment = attachmentService.saveAttachmentByUploadFile(storedUrl, file);

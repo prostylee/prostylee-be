@@ -1,9 +1,13 @@
 package vn.prostylee.location.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class LocationResponse {
+public class LocationResponse implements Comparable<LocationResponse> {
 
     private Long id;
 
@@ -21,4 +25,22 @@ public class LocationResponse {
 
     private String zipcode;
 
+    private Double distance;
+
+    @Override
+    public int compareTo(LocationResponse o) {
+        if (o == null) {
+            return 0;
+        }
+        if (this.distance == null && o.getDistance() == null) {
+            return 0;
+        }
+        if (this.distance == null) {
+            return 1;
+        }
+        if (o.getDistance() == null) {
+            return -1;
+        }
+        return (this.distance - o.getDistance()) > 0 ? 1 : -1;
+    }
 }

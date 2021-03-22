@@ -9,6 +9,6 @@ public interface UserProfileService {
 
     UserResponse updateProfile(UserProfileRequest request);
 
-    UserResponse getProfileBy(Long Id);
+    UserResponse getProfileBy(Long id);
 
 }

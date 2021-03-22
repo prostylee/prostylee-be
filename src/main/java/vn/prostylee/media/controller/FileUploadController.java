@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.media.constant.ApiUrl;
+import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.service.FileUploadService;
 
@@ -18,7 +20,7 @@ import java.util.List;
  * At the moment, the application just support Google Drive.
  */
 @RestController
-@RequestMapping(ApiUrl.MEDIA)
+@RequestMapping( ApiVersion.API_V1 + "/media")
 public class FileUploadController {
 
 	private static final String WIDTH = "w";

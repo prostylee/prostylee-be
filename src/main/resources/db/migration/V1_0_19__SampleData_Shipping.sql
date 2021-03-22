@@ -1,3 +1,0 @@
-INSERT INTO shipping_address (id, created_at, created_by, updated_at, updated_by, fullname, email, phone_number, address1, address2, state, city, country, zipcode) VALUES (10010, '2021-02-08 12:53:25.000000', null, '2021-02-08 12:53:32.000000', null, 'Test User 2', 'testuser3@gmail.com', '+84 969 193 724', 'Mau Than Can Tho', null, 'Ninh Kieu', 'Can Tho', 'Viet Nam', '900000');
-
-INSERT INTO payment_type (id, created_at, created_by, updated_at, updated_by, description, name) VALUES (1, '2021-02-08 16:53:22.000000', null, '2021-02-08 16:53:23.000000', null, 'napas', 'NAPAS');

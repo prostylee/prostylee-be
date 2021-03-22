@@ -21,6 +21,8 @@ public class StoreResponse {
 
     private String phone;
 
+    private Long companyId;
+
     private CompanyResponse company;
 
     private Long ownerId;
@@ -33,7 +35,7 @@ public class StoreResponse {
 
     private List<ProductResponse> products;
 
-    private Long logo; // TODO rename
+    private Long logo;
 
     private String logoUrl;
 

@@ -1,1 +1,0 @@
-ALTER SEQUENCE attachment_seq RESTART WITH 101;

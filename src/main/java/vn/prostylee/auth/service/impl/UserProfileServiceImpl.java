@@ -1,13 +1,13 @@
 package vn.prostylee.auth.service.impl;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.request.UserProfileRequest;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.service.UserProfileService;
-import vn.prostylee.core.provider.AuthenticatedProvider;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 
 import java.util.ArrayList;
 
@@ -46,8 +46,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public UserResponse getProfileBy(Long Id) {
-        return userService.findById(Id);
+    public UserResponse getProfileBy(Long id) {
+        return userService.findById(id);
     }
 
     private Long getLoggedInUserId() {

@@ -22,7 +22,7 @@ import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
 import vn.prostylee.story.dto.response.StoreForStoryResponse;
 import vn.prostylee.story.dto.response.StoreStoryResponse;
-import vn.prostylee.story.dto.response.UserForStoryResponse;
+import vn.prostylee.story.dto.response.UserResponseLite;
 import vn.prostylee.story.dto.response.UserStoryResponse;
 import vn.prostylee.story.entity.Story;
 import vn.prostylee.story.entity.StoryImage;
@@ -115,9 +115,9 @@ public class StoryServiceImpl implements StoryService {
         return BeanUtil.copyProperties(storeResponse, StoreForStoryResponse.class);
     }
 
-    private UserForStoryResponse getUserForStoryBy(Long id) {
+    private UserResponseLite getUserForStoryBy(Long id) {
         UserResponse profileBy = userProfileService.getProfileBy(id);
-        return BeanUtil.copyProperties(profileBy, UserForStoryResponse.class);
+        return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
     }
 
     private List<Long> getFollowsBy(Long id, String typeName) {

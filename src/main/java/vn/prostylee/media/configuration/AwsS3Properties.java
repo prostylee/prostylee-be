@@ -23,7 +23,7 @@ public class AwsS3Properties {
     private String region;
 
     /**
-     * AWS bucket url
+     * AWS S3 bucket url
      */
     private String bucketUrl;
 
@@ -36,4 +36,14 @@ public class AwsS3Properties {
      * AWS cloudfront url
      */
     private String cloudFrontUrl;
+
+    /**
+     * AWS S3 bucket public folder name
+     */
+    private String s3MediaPublicFolder;
+
+    /**
+     * AWS Cloudfront resize image prefix
+     */
+    private String s3ResizeImagePrefix;
 }

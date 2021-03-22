@@ -1,17 +1,11 @@
 package vn.prostylee.core.dto.filter;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Min;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class PagingAndSortingParam implements SortingDefinitions {
-
-    @Min(value = 0)
-    private int page = 0;
-
-    @Min(value = 1)
-    private int limit = 30;
+public abstract class PagingAndSortingParam extends PagingParam implements SortingDefinitions {
 
     /**
      * Multiple sort request parameters.

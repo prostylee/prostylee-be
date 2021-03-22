@@ -46,14 +46,15 @@ public class AwsS3ServiceImplTest {
 
     private static final int size = 30;
     private static final String IMAGE_NAME = "b94ce7c3-ed51-4a5e-97a4-59824baf286c.png";
-    private static final String SAMPLE_IMAGE_URL = ConfigTestUtils.BUCKET_URL + IMAGE_NAME;
-    private static final String SAMPLE_IMAGE_SIZE_URL = ConfigTestUtils.CLOUDFRONT_URL + size + "x" + size + "/" + IMAGE_NAME;
+    private static final String SAMPLE_IMAGE_SIZE_URL = ConfigTestUtils.CLOUDFRONT_URL + ConfigTestUtils.CLOUDFRONT_RESIZE_PREFIX +
+            size + "x" + size + "/" + ConfigTestUtils.BUCKET_S3_FOLDER_NAME + "/" + IMAGE_NAME;
+    private static final String SAMPLE_IMAGE_NO_SIZE_URL = ConfigTestUtils.CLOUDFRONT_URL + ConfigTestUtils.BUCKET_S3_FOLDER_NAME + "/" + IMAGE_NAME;
 
     private FileUploadService fileUploadService;
     @Mock
     private AmazonS3 s3Client;
     @Mock
-    private AttachmentRepository attachmentRepository;
+    private AttachmentService attachmentService;
     @Mock
     private AwsS3AsyncProvider awsS3AsyncProvider;
     @Captor
@@ -65,24 +66,25 @@ public class AwsS3ServiceImplTest {
     @BeforeEach
     void setUp() throws MalformedURLException {
         openMocks(this);
-        fileUploadService = new AwsS3ServiceImpl(awss3Properties, awsS3AsyncProvider, attachmentRepository);
-        URL url = new URL(SAMPLE_IMAGE_URL);
+        fileUploadService = new AwsS3ServiceImpl(awss3Properties, awsS3AsyncProvider, attachmentService);
+        URL url = new URL(SAMPLE_IMAGE_SIZE_URL);
         when(s3Client.getUrl(eq(ConfigTestUtils.BUCKET_NAME), anyString())).thenReturn(url);
     }
 
     @Test
     public void should_return_listUrlsWithoutSize_when_getFilesWithZeroSize() {
-        when(attachmentRepository.findAllById(attachmentIds)).thenReturn(attachments);
+        when(attachmentService.getByIds(attachmentIds)).thenReturn(attachments);
         List<String> results = fileUploadService.getImageUrls(attachmentIds, 0, 0);
-        Assert.assertEquals(SAMPLE_IMAGE_URL, results.get(0));
+        Assert.assertEquals(SAMPLE_IMAGE_NO_SIZE_URL, results.get(0));
     }
 
     @Test
     public void should_return_listUrlsWithSize_when_getFilesWithSize() {
-        when(attachmentRepository.findAllById(attachmentIds)).thenReturn(attachments);
+        when(attachmentService.getByIds(attachmentIds)).thenReturn(attachments);
         List<String> results = fileUploadService.getImageUrls(attachmentIds, size, size);
         Assert.assertEquals(SAMPLE_IMAGE_SIZE_URL, results.get(0));
     }
+
     @Test
     void should_throwException_when_uploadFile_GetException() throws IOException {
         doThrow(new IOException("failed")).when(awsS3AsyncProvider).uploadFile(any(), any());
@@ -105,7 +107,7 @@ public class AwsS3ServiceImplTest {
         when(awsS3AsyncProvider.uploadFile(FOLDER, files.get(0))).thenReturn(future);
         List<AttachmentResponse> results = fileUploadService.uploadFiles(FOLDER, files);
         assertThat(results, is(not(empty())));
-        assertThat(results.get(0).getPath(), is(equalTo(SAMPLE_IMAGE_URL)));
+        assertThat(results.get(0).getPath(), is(equalTo(SAMPLE_IMAGE_SIZE_URL)));
     }
 
     @Test
@@ -119,21 +121,22 @@ public class AwsS3ServiceImplTest {
     @Test
     public void should_return_true_when_deleteFilesSuccessfully() {
         boolean result = fileUploadService.deleteFiles(attachmentIds);
-        verify(attachmentRepository, Mockito.times(1)).deleteAttachmentsByIdIn(attachmentIds);
+        verify(attachmentService, Mockito.times(1)).deleteAttachmentsByIdIn(attachmentIds);
         assertThat(result, is(true));
     }
 
     private List<Attachment> prepareAttachments() {
         List<Attachment> attachments = new ArrayList<>();
         Attachment attachment = new Attachment();
-        attachment.setPath(SAMPLE_IMAGE_URL);
+        attachment.setPath(ConfigTestUtils.BUCKET_S3_FOLDER_NAME);
+        attachment.setName(IMAGE_NAME);
         attachments.add(attachment);
         return attachments;
     }
 
     private AttachmentResponse prepareResponse() {
         AttachmentResponse attachment = new AttachmentResponse();
-        attachment.setPath(SAMPLE_IMAGE_URL);
+        attachment.setPath(SAMPLE_IMAGE_SIZE_URL);
         return attachment;
     }
 }

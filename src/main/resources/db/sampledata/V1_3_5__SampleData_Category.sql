@@ -1,0 +1,2 @@
+INSERT INTO category (id, created_at, created_by, updated_at, updated_by, active, deleted_at, description, icon, name, "order")
+VALUES (nextval('category_seq'), '2021-02-04 00:27:54.000000', 1, '2021-02-04 00:27:56.000000', 1, true, null, 'Description for category 1', 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,b_rgb:f5f5f5/qmmwhyelq5qegzvh8qu4/air-monarch-iv-training-shoe-cc3XbD.jpg', 'Shoe', 1);

@@ -13,6 +13,8 @@ public class AttachmentResponse {
 
 	private String path;
 
+	private String url;
+
 	private String displayName;
 
 	private Long sizeInKb;
