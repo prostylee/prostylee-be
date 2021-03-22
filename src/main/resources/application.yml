@@ -30,8 +30,6 @@ services:
     temp-folder:
       location: prostylee-temp
       timeToLiveInHours: 720
-  aws:
-    image-url: https://thebucketofkai2020.s3.ap-southeast-1.amazonaws.com/
 
 app:
   order-code:
@@ -129,10 +127,10 @@ app:
       secretKey: SHj9/sQCPonteyL44UAq5vjaVslF+xLkd0POD9R2
     # AWS S3
     s3:
-      bucket: prostylee-media-dev
+      bucket: psmedia211437-dev
       region: ap-southeast-1
       bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
-      cloudFrontId: d1fhfbd6s3w12p
+      cloudFrontId: d1fq4uh0wyvt14
       cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/
       s3ResizeImagePrefix: fit-in/
       s3MediaPublicFolder: public
