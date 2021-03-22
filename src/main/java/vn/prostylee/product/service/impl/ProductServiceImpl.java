@@ -29,7 +29,9 @@ import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -57,20 +59,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private Specification<Product> buildSearchable(ProductFilter productFilter) {
-        // TODO query by new feeds
-//        switch (productFilter.getNewFeedType()) {
-//            case USER:
-//                break;
-//            case STORE:
-//                break;
-//            default:
-//                break;
-//        }
         Specification<Product> mainSpec = (root, query, cb) -> {
             QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
             findByUser(productFilter, queryBuilder);
             findByCategory(productFilter, queryBuilder);
             findByStore(productFilter, queryBuilder);
+            if (isAttributeValueAvailable(productFilter)) {
+                findByAttributeValue(root, productFilter, queryBuilder);
+            }
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
@@ -91,6 +87,58 @@ public class ProductServiceImpl implements ProductService {
 
     private void findByStore(ProductFilter productFilter, QueryBuilder queryBuilder) {
         queryBuilder.equals("storeId", productFilter.getStoreId());
+    }
+
+    private boolean isAttributeValueAvailable(ProductFilter productFilter) {
+        return StringUtils.isNotBlank(productFilter.getSize()) ||
+                StringUtils.isNotBlank(productFilter.getStatus()) ||
+                StringUtils.isNotBlank(productFilter.getMaterial()) ||
+                StringUtils.isNotBlank(productFilter.getStyle());
+    }
+    private void findByAttributeValue(Root root, ProductFilter productFilter, QueryBuilder queryBuilder) {
+        Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
+        Join<ProductPrice, ProductAttribute> joinProductAttr = joinProductPrice.join("productAttributes");
+        Join<ProductAttribute, Attribute> joinAttr = joinProductAttr.join("attribute");
+        findBySize(productFilter, queryBuilder, joinProductAttr, joinAttr);
+        findByStatus(productFilter, queryBuilder, joinProductAttr, joinAttr);
+        findByMaterial(productFilter, queryBuilder, joinProductAttr, joinAttr);
+        findByStyle(productFilter, queryBuilder, joinProductAttr, joinAttr);
+    }
+
+    private void findBySize(ProductFilter productFilter, QueryBuilder queryBuilder,
+                            Join<ProductPrice, ProductAttribute> source,
+                            Join<ProductAttribute, Attribute> attrJoiner) {
+        if (StringUtils.isNotBlank(productFilter.getSize())) {
+            queryBuilder.likeIgnoreCaseMultiTableRef("id", "2", attrJoiner);
+            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getSize(), source);
+        }
+    }
+
+    private void findByStatus(ProductFilter productFilter, QueryBuilder queryBuilder,
+                              Join<ProductPrice, ProductAttribute> source,
+                              Join<ProductAttribute, Attribute> attrJoiner) {
+        if (StringUtils.isNotBlank(productFilter.getStatus())) {
+            queryBuilder.likeIgnoreCaseMultiTableRef("id", "3", attrJoiner);
+            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStatus(), source);
+        }
+    }
+
+    private void findByMaterial(ProductFilter productFilter, QueryBuilder queryBuilder,
+                                Join<ProductPrice, ProductAttribute> source,
+                                Join<ProductAttribute, Attribute> attrJoiner) {
+        if (StringUtils.isNotBlank(productFilter.getMaterial())) {
+            queryBuilder.likeIgnoreCaseMultiTableRef("id", "4", attrJoiner);
+            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getMaterial(), source);
+        }
+    }
+
+    private void findByStyle(ProductFilter productFilter, QueryBuilder queryBuilder,
+                             Join<ProductPrice, ProductAttribute> source,
+                             Join<ProductAttribute, Attribute> attrJoiner) {
+        if (StringUtils.isNotBlank(productFilter.getStyle())) {
+            queryBuilder.likeIgnoreCaseMultiTableRef("id", "5", attrJoiner);
+            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStyle(), source);
+        }
     }
 
     @Override

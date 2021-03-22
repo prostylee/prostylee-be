@@ -12,6 +12,11 @@ public class ProductFilter extends BaseFilter {
     private Long categoryId;
     private Long storeId;
     private Long userId;
+    private String size;
+    private String status;
+    private String material;
+    private String style;
+
     private NewFeedType newFeedType = NewFeedType.STORE;
 
     @Override

@@ -2,10 +2,7 @@ package vn.prostylee.core.specs;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +29,13 @@ public class QueryBuilder<T> {
     public QueryBuilder likeIgnoreCaseRef(String refEntity, String refField, String value, JoinType joinType) {
         if (StringUtils.isNotBlank(value)) {
             predicates.add(cb.like(cb.upper(root.join(refEntity, joinType).get(refField).as(String.class)),"%" + StringUtils.upperCase(value) + "%"));
+        }
+        return this;
+    }
+
+    public QueryBuilder likeIgnoreCaseMultiTableRef(String refField, String value, Join<T, Object> source) {
+        if (StringUtils.isNotBlank(value)) {
+            predicates.add(cb.like(cb.upper(source.get(refField).as(String.class)),"%" + StringUtils.upperCase(value) + "%"));
         }
         return this;
     }
