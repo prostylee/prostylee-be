@@ -3,15 +3,13 @@ package vn.prostylee.product.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -34,10 +32,10 @@ import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -118,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
                             Join<ProductPrice, ProductAttribute> source,
                             Join<ProductAttribute, Attribute> attrJoiner) {
         if (StringUtils.isNotBlank(productFilter.getSize())) {
-            queryBuilder.likeIgnoreCaseMultiTableRef("id", "2", attrJoiner);
+            queryBuilder.equalsMultiTable("id", "2", attrJoiner);
             queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getSize(), source);
         }
     }
@@ -127,7 +125,7 @@ public class ProductServiceImpl implements ProductService {
                               Join<ProductPrice, ProductAttribute> source,
                               Join<ProductAttribute, Attribute> attrJoiner) {
         if (StringUtils.isNotBlank(productFilter.getStatus())) {
-            queryBuilder.likeIgnoreCaseMultiTableRef("id", "3", attrJoiner);
+            queryBuilder.equalsMultiTable("id", "3", attrJoiner);
             queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStatus(), source);
         }
     }
@@ -136,7 +134,7 @@ public class ProductServiceImpl implements ProductService {
                                 Join<ProductPrice, ProductAttribute> source,
                                 Join<ProductAttribute, Attribute> attrJoiner) {
         if (StringUtils.isNotBlank(productFilter.getMaterial())) {
-            queryBuilder.likeIgnoreCaseMultiTableRef("id", "4", attrJoiner);
+            queryBuilder.equalsMultiTable("id", "4", attrJoiner);
             queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getMaterial(), source);
         }
     }
@@ -145,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
                              Join<ProductPrice, ProductAttribute> source,
                              Join<ProductAttribute, Attribute> attrJoiner) {
         if (StringUtils.isNotBlank(productFilter.getStyle())) {
-            queryBuilder.likeIgnoreCaseMultiTableRef("id", "5", attrJoiner);
+            queryBuilder.equalsMultiTable("id", "5", attrJoiner);
             queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStyle(), source);
         }
     }

@@ -54,6 +54,13 @@ public class QueryBuilder<T> {
         return this;
     }
 
+    public QueryBuilder equalsMultiTable(String propertyPath, Object value, Join<T, Object> source) {
+        if (value != null && StringUtils.isNotBlank(value.toString())) {
+            predicates.add(cb.equal(source.get(propertyPath),value));
+        }
+        return this;
+    }
+
     public QueryBuilder greaterThanOrEqualTo(String propertyPath, Double value) {
         if (value != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get(propertyPath), value));
