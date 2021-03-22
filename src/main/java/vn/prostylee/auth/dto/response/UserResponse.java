@@ -26,6 +26,8 @@ public class UserResponse {
 
     private String email;
 
+    private Long locationId;
+
     private Set<String> roles;
 
     private Boolean active;
@@ -37,4 +39,6 @@ public class UserResponse {
     private Boolean allowNotification;
 
     private String avatar;
+
+    private String bio;
 }

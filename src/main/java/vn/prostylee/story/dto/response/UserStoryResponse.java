@@ -5,7 +5,6 @@ import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class UserStoryResponse {
@@ -18,7 +17,7 @@ public class UserStoryResponse {
     private Long createdBy;
     private List<String> storySmallImageUrls;
     private List<String> storyLargeImageUrls;
-    private UserForStoryResponse userForStoryResponse;
+    private UserResponseLite userForStoryResponse;
     private Long storeId;
     private StoreResponseLite storeResponseLite;
 }

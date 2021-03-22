@@ -3,7 +3,6 @@ package vn.prostylee.location.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +19,10 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.dto.response.LocationResponseLite;
 import vn.prostylee.location.entity.Location;
 import vn.prostylee.location.repository.LocationExtRepository;
-import vn.prostylee.location.repository.LocationRepository;
 import vn.prostylee.location.service.LocationService;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
-
-import static vn.prostylee.core.dto.filter.PagingAndSortingParam.NUMBER_OF_RECORD_DEFAULT;
 
 @Slf4j
 @AllArgsConstructor
@@ -51,9 +47,7 @@ public class LocationServiceImpl implements LocationService {
         if (CollectionUtils.isNotEmpty(locationFilter.getIds())) {
             spec = spec.and((root, query, cb) -> {
                 CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
-                for (Long id : locationFilter.getIds()) {
-                    inClause.value(id);
-                }
+                locationFilter.getIds().forEach(inClause::value);
                 return inClause;
             });
         }

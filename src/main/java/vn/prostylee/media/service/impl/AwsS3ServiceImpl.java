@@ -15,15 +15,15 @@ import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
 import vn.prostylee.media.provider.async.AwsS3AsyncProvider;
-import vn.prostylee.media.repository.AttachmentRepository;
+import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * AWS S3 File Upload Service
@@ -32,80 +32,68 @@ import java.util.concurrent.Future;
 public class AwsS3ServiceImpl implements FileUploadService {
 
     private final AwsS3AsyncProvider awsS3AsyncProvider;
-    private final AttachmentRepository attachmentRepository;
-    private final String bucketUrl;
+    private final AttachmentService attachmentService;
     private final String cloudfrontUrl;
+    private final String s3MediaPublicFolder;
+    private final String s3ResizePrefix;
 
     @Autowired
     public AwsS3ServiceImpl(
             AwsS3Properties awss3Properties,
             AwsS3AsyncProvider awsS3AsyncProvider,
-            AttachmentRepository attachmentRepository) {
+            AttachmentService attachmentService) {
         this.awsS3AsyncProvider = awsS3AsyncProvider;
-        this.attachmentRepository = attachmentRepository;
-        this.bucketUrl = awss3Properties.getBucketUrl();
+        this.attachmentService = attachmentService;
         this.cloudfrontUrl = awss3Properties.getCloudFrontUrl();
+        this.s3MediaPublicFolder = awss3Properties.getS3MediaPublicFolder();
+        this.s3ResizePrefix = awss3Properties.getS3ResizeImagePrefix();
     }
 
     @Override
     public List<String> getFileUrls(List<Long> fileIds) {
-        return getUrls(fileIds, 0, 0);
+        return getImageUrls(fileIds, 0, 0);
     }
 
     @Override
     public String getImageUrl(Long id, int width, int height) {
-        Attachment attachment =  attachmentRepository.getOne(id);
-        if(Objects.isNull(attachment)) {
-            throw new ResourceNotFoundException("File are not existed by getting with id: " + id);
-        }
-        return generateUrlByDimension(attachment, width, height);
+        return generateUrlByDimension(attachmentService.getById(id), width, height);
     }
-
 
     @Override
     public List<String> getImageUrls(List<Long> fileIds, int width, int height) {
-        return getUrls(fileIds, width, height);
-    }
-
-    private List<String> getUrls(List<Long> fileIds, int width, int height) {
-        List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+        List<Attachment> attachments = attachmentService.getByIds(fileIds);
         if(Collections.isEmpty(attachments)) {
             throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
-        return generateUrlsByDimension(width, height, attachments);
+        return generateUrlsByDimension(attachments, width, height);
+    }
+
+    private List<String> generateUrlsByDimension(List<Attachment> attachments, int width, int height) {
+        return attachments.stream()
+                .map(attachment -> generateUrlByDimension(attachment, width, height))
+                .collect(Collectors.toList());
     }
 
     private String generateUrlByDimension(Attachment attachment, int width, int height) {
+        return buildUrl(attachment,width, height);
+    }
+
+    private String buildUrl(Attachment attachment, int width, int height){
+        String prefix = cloudfrontUrl;
         if (width > 0 && height > 0) {
-            return addSizeForFile(attachment.getPath(), width, height);
-        } else {
-            return attachment.getPath();
+            prefix = String.format("%s%s%dx%d%s", cloudfrontUrl,
+                    s3ResizePrefix, width, height, AppConstant.PATH_SEPARATOR);
         }
-    }
-
-    private List<String> generateUrlsByDimension(int width, int height, List<Attachment> attachments) {
-        List<String> urls = new ArrayList<>();
-        for(Attachment attachment : attachments) {
-            if (width > 0 && height > 0) {
-                urls.add(addSizeForFile(attachment.getPath(), width, height));
-            } else {
-                urls.add(attachment.getPath());
-            }
-        }
-        return urls;
-    }
-
-    private String addSizeForFile(String path, int width, int height) {
-        return path.replace(bucketUrl, String.format("%s%dx%d%s", cloudfrontUrl, width, height, AppConstant.PATH_SEPARATOR));
+        return prefix + attachment.getPath() + AppConstant.PATH_SEPARATOR + attachment.getName();
     }
 
     @Override
     public List<AttachmentResponse> uploadFiles(List<MultipartFile> files) {
-        return uploadFiles("", files);
+        return uploadFiles(s3MediaPublicFolder, files);
     }
 
     @Override
-    public List<AttachmentResponse> uploadFiles(String folderId, List<MultipartFile> files) {
+    public List<AttachmentResponse> uploadFiles(String folderName, List<MultipartFile> files) {
         List<AttachmentResponse> attachments = new ArrayList<>();
         if (CollectionUtils.isEmpty(files)) {
             return attachments;
@@ -117,7 +105,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
                 if (StringUtils.isEmpty(file.getOriginalFilename())) {
                     continue;
                 }
-                futures.add(awsS3AsyncProvider.uploadFile(folderId, file));
+                futures.add(awsS3AsyncProvider.uploadFile(folderName, file));
             }
 
             while (!awsS3AsyncProvider.isAllFutureDone(futures)) {
@@ -139,11 +127,11 @@ public class AwsS3ServiceImpl implements FileUploadService {
     public boolean deleteFiles(List<Long> fileIds) {
         try {
             List<String> fileNames = new ArrayList<>();
-            List<Attachment> attachments = attachmentRepository.findAllById(fileIds);
+            List<Attachment> attachments = attachmentService.getByIds(fileIds);
             for(Attachment attachment : attachments) {
                 fileNames.add(attachment.getName());
             }
-            attachmentRepository.deleteAttachmentsByIdIn(fileIds);
+            attachmentService.deleteAttachmentsByIdIn(fileIds);
             awsS3AsyncProvider.deleteFiles(fileNames);
             return true;
         } catch (IllegalArgumentException | AmazonClientException e) {

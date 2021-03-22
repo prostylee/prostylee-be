@@ -14,5 +14,5 @@ import java.util.List;
  */
 @Repository
 public interface AttachmentRepository extends BaseRepository<Attachment, Long> {
-    void deleteAttachmentsByIdIn(List<Long> Ids);
+    boolean deleteAttachmentsByIdIn(List<Long> Ids);
 }

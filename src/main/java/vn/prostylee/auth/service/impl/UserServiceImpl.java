@@ -1,10 +1,12 @@
 package vn.prostylee.auth.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
@@ -20,6 +22,9 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Root;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,8 +42,29 @@ public class UserServiceImpl implements UserService {
     public Page<UserResponse> findAll(BaseFilter baseFilter) {
     	UserFilter userFilter = (UserFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(userFilter);
-        Page<User> page = userRepository.getAllUsers(userFilter, pageable);
+        Page<User> page = userRepository.findAll(buildSearchable(userFilter), pageable);
         return page.map(this::convertToResponse);
+    }
+
+    private Specification<User> buildSearchable(UserFilter userFilter) {
+        Specification<User> spec = baseFilterSpecs.search(userFilter);
+
+        if (CollectionUtils.isNotEmpty(userFilter.getRoleCodes())) {
+            Specification<User> additionalSpec = (root, query, cb) -> {
+                // Build Many to Many query
+                query.distinct(true);
+                Root<Role> roleRoot = query.from(Role.class);
+                Expression<Collection<User>> userRoles = roleRoot.get("users");
+                CriteriaBuilder.In<String> inClause = cb.in(roleRoot.get("code"));
+                for (String roleCode : userFilter.getRoleCodes()) {
+                    inClause.value(roleCode);
+                }
+                return cb.and(inClause, cb.isMember(root, userRoles));
+            };
+            spec = spec.and(additionalSpec);
+        }
+
+        return spec;
     }
     
     @Override
@@ -146,13 +172,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findByPushToken(String pushToken) {
-        User user = userRepository.findByPushToken(pushToken)
-                .orElseThrow(() -> new ResourceNotFoundException("User is not found with push token [" + pushToken + "]"));
-        return convertToResponse(user);
-    }
-
-    @Override
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -170,6 +189,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findBySub(String sub) {
         return userRepository.findActivatedUserBySub(sub);
+    }
+
+    @Override
+    public List<UserResponse> findUsersByIds(List<Long> userIds) {
+        return userRepository.findUsersByIds(userIds)
+                .stream()
+                .map(user -> BeanUtil.copyProperties(user, UserResponse.class))
+                .collect(Collectors.toList());
     }
 
 }

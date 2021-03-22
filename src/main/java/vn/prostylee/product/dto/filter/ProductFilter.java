@@ -1,5 +1,6 @@
 package vn.prostylee.product.dto.filter;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
@@ -18,6 +19,7 @@ public class ProductFilter extends BaseFilter {
     private String style;
 
     private NewFeedType newFeedType = NewFeedType.STORE;
+    private Boolean bestSeller;
 
     @Override
     public String[] getSearchableFields() {
@@ -36,5 +38,11 @@ public class ProductFilter extends BaseFilter {
                 "price",
                 "category.name"
         };
+    }
+
+    @Schema(name = "sorts", example = "sorts=+name&sorts=-price&sorts=createdAt")
+    @Override
+    public String[] getSorts() {
+        return super.getSorts();
     }
 }

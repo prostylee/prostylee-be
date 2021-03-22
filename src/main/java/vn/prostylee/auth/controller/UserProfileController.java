@@ -1,11 +1,11 @@
 package vn.prostylee.auth.controller;
 
-import vn.prostylee.auth.dto.request.UserProfileRequest;
-import vn.prostylee.auth.dto.response.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.auth.dto.request.UserProfileRequest;
+import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.service.UserProfileService;
+import vn.prostylee.core.constant.ApiVersion;
 
 import javax.validation.Valid;
 
@@ -23,6 +23,11 @@ public class UserProfileController {
     @GetMapping
     public UserResponse getProfile() {
         return userProfileService.getProfile();
+    }
+
+    @GetMapping("/{id}")
+    public UserResponse getProfileById(@PathVariable Long id) {
+        return userProfileService.getProfileBy(id);
     }
 
     @PutMapping

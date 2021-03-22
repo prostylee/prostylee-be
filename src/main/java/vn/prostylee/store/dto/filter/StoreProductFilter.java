@@ -7,5 +7,4 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class StoreProductFilter extends StoreFilter {
 
-    private int numberOfProducts = 10;
 }

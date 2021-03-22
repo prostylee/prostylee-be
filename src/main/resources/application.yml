@@ -123,17 +123,19 @@ app:
       - /v1/supports/**
       - /v1/oauth/**
   aws:
-    # AWS Credential
+    # AWS Credential -
     credential:
-      accessKey: AKIA5IRSGPONR66ETTWG
-      secretKey: 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
+      accessKey: AKIA5IRSGPONZVRYLWV5
+      secretKey: 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
     # AWS S3
     s3:
-      bucket: thebucketofkai2020
+      bucket: prostylee-media-dev
       region: ap-southeast-1
       bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
-      cloudFrontId: d257kiz92yvhbo
-      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/fit-in/
+      cloudFrontId: d1fhfbd6s3w12p
+      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/
+      s3ResizeImagePrefix: fit-in/
+      s3MediaPublicFolder: public
     # AWS Cognito
     cognito:
       clientId: 1cjpg4lfnim8m1p7iiokcvbrld
