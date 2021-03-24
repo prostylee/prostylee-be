@@ -62,4 +62,6 @@ public class UserRequest implements UniqueIdentifier<Long> {
     @JsonIgnore
     private Boolean phoneNumberVerified;
 
+    private String bio;
+
 }

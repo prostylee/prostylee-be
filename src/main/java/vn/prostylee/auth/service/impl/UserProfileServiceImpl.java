@@ -40,6 +40,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .allowOrderStatusNotification(request.getAllowOrderStatusNotification())
                 .allowSocialNotification(request.getAllowSocialNotification())
                 .allowStockNotification(request.getAllowStockNotification())
+                .bio(request.getBio())
                 .build();
 
         return userService.update(userRequest.getId(), userRequest);

@@ -33,4 +33,6 @@ public class UserProfileRequest {
     private Boolean allowOrderStatusNotification;
 
     private Boolean allowStockNotification;
+
+    private String bio;
 }
