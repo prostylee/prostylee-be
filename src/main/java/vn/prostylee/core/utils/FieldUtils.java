@@ -13,7 +13,7 @@ public final class FieldUtils {
         try {
             obj = org.apache.commons.lang3.reflect.FieldUtils.readField(target, fieldName, true);
         } catch (IllegalAccessException | IllegalArgumentException e) {
-            log.debug("Could not read field={} from class={}", fieldName, clazz.getCanonicalName(), e);
+            log.debug("Could not read field={} from class={} with type={}", fieldName, clazz.getCanonicalName(), e.getMessage());
         }
         return clazz.cast(obj);
     }
