@@ -1,23 +1,28 @@
 package vn.prostylee.location.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.location.dto.AddressDto;
 import vn.prostylee.location.dto.filter.AddressFilter;
-import vn.prostylee.location.dto.request.AddressRequest;
 import vn.prostylee.location.dto.response.AddressResponse;
 import vn.prostylee.location.service.AddressService;
 
 @RestController
 @RequestMapping(ApiVersion.API_V1 + "/addresses")
-public class AddressController extends CrudController<AddressRequest, AddressResponse, Long, AddressFilter> {
+public class AddressController {
     private final AddressService addressService;
-    public AddressController(AddressService addressService, AddressService addressService1) {
-        super(addressService);
-        this.addressService = addressService1;
+
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
+
+    @GetMapping("/")
+    public Page<AddressResponse> findAll(AddressFilter addressFilter) {
+        return addressService.findAll(addressFilter);
     }
 
     @PostMapping("/imports")

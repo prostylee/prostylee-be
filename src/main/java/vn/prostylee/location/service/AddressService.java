@@ -1,11 +1,14 @@
 package vn.prostylee.location.service;
 
-import vn.prostylee.core.service.CrudService;
+import org.springframework.data.domain.Page;
+import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.location.dto.AddressDto;
-import vn.prostylee.location.dto.request.AddressRequest;
 import vn.prostylee.location.dto.response.AddressResponse;
 
-public interface AddressService extends CrudService<AddressRequest, AddressResponse, Long> {
+public interface AddressService {
+
+    Page<AddressResponse> findAll(BaseFilter baseFilter);
+
     AddressDto imports();
 
     AddressResponse findByCode(String code);

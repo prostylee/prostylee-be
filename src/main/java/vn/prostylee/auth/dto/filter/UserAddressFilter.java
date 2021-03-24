@@ -22,6 +22,11 @@ public class UserAddressFilter extends BaseFilter {
 
     @Override
     public String[] getSortableFields() {
-        return new String[0];
+        return new String[]{
+                "address",
+                "fullAddress",
+                "createdAt",
+                "priority"
+        };
     }
 }

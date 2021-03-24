@@ -1,6 +1,5 @@
 package vn.prostylee.location.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -17,7 +16,6 @@ import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.location.dto.AddressDivision;
 import vn.prostylee.location.dto.AddressDto;
 import vn.prostylee.location.dto.filter.AddressFilter;
-import vn.prostylee.location.dto.request.AddressRequest;
 import vn.prostylee.location.dto.response.AddressResponse;
 import vn.prostylee.location.entity.Address;
 import vn.prostylee.location.repository.AddressRepository;
@@ -33,8 +31,6 @@ public class AddressServiceImpl implements AddressService {
 
     private static final String PARENT_CODE = "parentCode";
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     private final AddressRepository addressRepository;
 
     private final BaseFilterSpecs<Address> baseFilterSpecs;
@@ -46,26 +42,6 @@ public class AddressServiceImpl implements AddressService {
         Pageable pageable = this.baseFilterSpecs.page(baseFilter);
         Page<Address> page = this.addressRepository.findAll(buildAddressSpecification(addressFilter), pageable);
         return page.map(this::toResponse);
-    }
-
-    @Override
-    public AddressResponse findById(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public AddressResponse save(AddressRequest addressRequest) {
-        return null;
-    }
-
-    @Override
-    public AddressResponse update(Long aLong, AddressRequest s) {
-        return null;
-    }
-
-    @Override
-    public boolean deleteById(Long aLong) {
-        return false;
     }
 
     private AddressResponse toResponse(Address address) {
@@ -96,6 +72,7 @@ public class AddressServiceImpl implements AddressService {
                         .build();
                 addresses.add(address);
             });
+            this.addressRepository.saveAll(addresses);
         }
         return addressDto;
     }

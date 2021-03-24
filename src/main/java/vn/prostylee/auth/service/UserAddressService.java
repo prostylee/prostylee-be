@@ -7,5 +7,4 @@ import vn.prostylee.core.validator.EntityExists;
 import vn.prostylee.core.validator.FieldValueExists;
 
 public interface UserAddressService extends CrudService<UserAddressRequest, UserAddressResponse, Long>, FieldValueExists, EntityExists<Long> {
-    void savePriority(Boolean priority);
 }

@@ -94,32 +94,30 @@ public class UserAddressServiceImpl implements UserAddressService {
         return false;
     }
 
-    @Override
-    public void savePriority(Boolean priority) {
-        if (!priority) {
-            return;
-        }
-        UserAddress userAddress =  this.userAddressRepository.findOneByUserIdAndPriority(this.getLoggedUserId(), true);
-        if (userAddress != null) {
-            userAddress.setPriority(false);
-            this.userAddressRepository.save(userAddress);
-        }
-    }
-
     private UserAddressResponse buildUserAddress(UserAddress userAddress, UserAddressRequest request) {
         AddressResponse city = this.addressService.findByCode(request.getCityCode());
         AddressResponse district = this.addressService.findByCodeAndParentCode(request.getDistrictCode(), city.getCode());
         AddressResponse ward = this.addressService.findByCodeAndParentCode(request.getWardCode(), district.getCode());
         userAddress.setUser(User.builder().id(this.getLoggedUserId()).build());
-        String fullAddress = String.format("%s,%s,%s,%s", request.getAddress(), ward.getName(), district.getName(), city.getName());
+        String fullAddress = String.format("%s, %s, %s, %s", request.getAddress(), ward.getName(), district.getName(), city.getName());
         userAddress.setCityCode(request.getCityCode());
         userAddress.setDistrictCode(request.getDistrictCode());
         userAddress.setWardCode(request.getWardCode());
         userAddress.setAddress(request.getAddress());
         userAddress.setFullAddress(fullAddress);
+        if (request.getPriority()) {
+            this.resetAddressPrioritySettingForUser(this.getLoggedUserId());
+        }
         userAddress.setPriority(request.getPriority());
-        this.savePriority(request.getPriority());
         return this.toResponse(this.userAddressRepository.save(userAddress));
+    }
+
+    private void resetAddressPrioritySettingForUser(Long userId) {
+        UserAddress userAddress =  this.userAddressRepository.findOneByUserIdAndPriority(userId, true);
+        if (userAddress != null) {
+            userAddress.setPriority(false);
+            this.userAddressRepository.save(userAddress);
+        }
     }
 
     private UserAddress getById(Long id) {
