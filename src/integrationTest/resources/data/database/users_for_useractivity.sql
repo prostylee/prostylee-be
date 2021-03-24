@@ -1,3 +1,4 @@
+DELETE FROM user_address;
 DELETE FROM user;
 
 INSERT INTO user (id, created_at, created_by, updated_at, updated_by, active, allow_notification, deleted_at, email, full_name, gender, location_id, password, phone_number, username) VALUES (1, '2020-12-11 16:09:49', null, '2020-12-11 16:09:49', null, true, true, null, 'test1@prostylee.vn', 'Prostylee 1', 'M', null, '$2a$10$qHzuW4POXF6aOCiuTgr3ZeUVHsiBEPCcK/ArKQefRSB0gdDaZ1NXa', '0900000003', 'test1@prostylee.vn');
