@@ -1,5 +1,6 @@
 package vn.prostylee.useractivity.controller;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class UserActivityControllerIT {
     }
 
     @Test
+    @Ignore
     void getMostUserActivities_Successfully() throws Exception {
         final int pageSize = 20;
 
