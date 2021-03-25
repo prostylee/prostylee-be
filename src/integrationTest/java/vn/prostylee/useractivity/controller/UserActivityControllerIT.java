@@ -43,22 +43,5 @@ public class UserActivityControllerIT {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
-    @Test
-    @Ignore
-    void getMostUserActivities_Successfully() throws Exception {
-        final int pageSize = 20;
 
-        this.mockMvc
-                .perform(get(ENDPOINT + "/most-actives")
-                        .param("timeRangeInDays", "7")
-                        .param("limit", pageSize + "")
-                )
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.totalElements").value(pageSize))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.content.length()").value(pageSize))
-                .andReturn();
-    }
 }
