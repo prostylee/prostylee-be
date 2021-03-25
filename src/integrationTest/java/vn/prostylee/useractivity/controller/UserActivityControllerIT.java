@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )
 @Sql(
-        statements = { "DELETE FROM user; DELETE FROM user_like; DELETE FROM user_follower; DELETE FROM user_address" },
+        statements = { "DELETE FROM user; DELETE FROM user_like; DELETE FROM user_follower;" },
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD,
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )

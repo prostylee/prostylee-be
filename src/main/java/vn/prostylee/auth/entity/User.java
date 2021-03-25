@@ -100,23 +100,18 @@ public class User extends AuditEntity {
 	@Column(name = "avatar")
 	private String avatar;
 
-	@Transient
 	@Column(name = "bio", length = 512, nullable = true)
 	private String bio;
 
-	@Transient
 	@Column(name = "allow_sale_notification")
 	private Boolean allowSaleNotification;
 
-	@Transient
 	@Column(name = "allow_social_notification")
 	private Boolean allowSocialNotification;
 
-	@Transient
 	@Column(name = "allow_order_status_notification")
 	private Boolean allowOrderStatusNotification;
 
-	@Transient
 	@Column(name = "allow_stock_notification")
 	private Boolean allowStockNotification;
 

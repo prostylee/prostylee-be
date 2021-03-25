@@ -26,12 +26,12 @@ create table user_address
     updated_by bigint,
     user_id bigint not null constraint "fk_user_address_user" references "user"
 );
---
---ALTER TABLE "user" ADD COLUMN bio varchar(512);
---ALTER TABLE "user" ADD COLUMN allow_sale_notification boolean default false;
---ALTER TABLE "user" ADD COLUMN allow_social_notification boolean default false;
---ALTER TABLE "user" ADD COLUMN allow_order_status_notification boolean default false;
---ALTER TABLE "user" ADD COLUMN allow_stock_notification boolean default false;
+
+ALTER TABLE "user" ADD COLUMN bio varchar(512);
+ALTER TABLE "user" ADD COLUMN allow_sale_notification boolean default false;
+ALTER TABLE "user" ADD COLUMN allow_social_notification boolean default false;
+ALTER TABLE "user" ADD COLUMN allow_order_status_notification boolean default false;
+ALTER TABLE "user" ADD COLUMN allow_stock_notification boolean default false;
 
 create sequence address_seq;
 create sequence user_address_seq;
