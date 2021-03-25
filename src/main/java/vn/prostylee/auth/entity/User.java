@@ -14,6 +14,8 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -90,6 +92,27 @@ public class User extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<UserLinkAccount> userLinkAccounts;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+	private Set<UserAddress> userAddresses;
+
 	@Column(name = "avatar")
 	private String avatar;
+
+	@Column(name = "bio", length = 512, nullable = true)
+	private String bio;
+
+	@Column(name = "allow_sale_notification")
+	private Boolean allowSaleNotification;
+
+	@Column(name = "allow_social_notification")
+	private Boolean allowSocialNotification;
+
+	@Column(name = "allow_order_status_notification")
+	private Boolean allowOrderStatusNotification;
+
+	@Column(name = "allow_stock_notification")
+	private Boolean allowStockNotification;
+
 }
