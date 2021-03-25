@@ -53,6 +53,7 @@ public class ProductServiceImpl implements ProductService {
     private final OrderService orderService;
 
     @Override
+    @UserBehaviorTracking
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
         ProductFilter productFilter = (ProductFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(productFilter);
@@ -133,6 +134,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @UserBehaviorTracking
     public ProductResponse findById(Long id) {
         return this.toResponse(this.getProductById(id));
     }
