@@ -1,4 +1,4 @@
-package vn.prostylee.location.repository;
+package vn.prostylee.location.repository.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.query.NativeQuery;
@@ -11,6 +11,7 @@ import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.entity.Location;
+import vn.prostylee.location.repository.LocationExtRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

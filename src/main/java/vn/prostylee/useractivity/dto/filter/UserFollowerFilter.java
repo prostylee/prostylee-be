@@ -1,7 +1,6 @@
 package vn.prostylee.useractivity.dto.filter;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 @Data

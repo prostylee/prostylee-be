@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.service.UserService;
-import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.response.LocationResponse;
@@ -22,6 +22,7 @@ import vn.prostylee.useractivity.service.UserMostActiveService;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,10 +38,10 @@ public class UserActivityServiceImpl implements UserActivityService {
     public Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter) {
         MostActiveRequest request = MostActiveRequest.builder()
                 .targetTypes(Collections.singletonList(TargetType.USER.name()))
-                .limit(filter.getLimit())
                 .fromDate(DateUtils.getLastDaysBefore(filter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
-                .build();
+                .build()
+                .pagingParam(new PagingParam(filter.getPage(), filter.getLimit()));
 
         List<Long> userIds = userMostActiveService.getTargetIdsByMostActive(request);
         List<UserActivityResponse> responses = getMostActiveUsersByUserIds(userIds);
@@ -61,14 +62,8 @@ public class UserActivityServiceImpl implements UserActivityService {
     }
 
     private LocationResponse getLocationById(Long id) {
-        if (id == null) {
-            return null;
-        }
-        try {
-            return locationService.findById(id);
-        } catch (ResourceNotFoundException e) {
-            log.error("Could not found a location of userId={}", id, e);
-        }
-        return null;
+        return Optional.ofNullable(id)
+                .flatMap(locationService::fetchById)
+                .orElse(null);
     }
 }
