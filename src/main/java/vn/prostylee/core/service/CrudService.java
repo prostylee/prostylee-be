@@ -1,7 +1,10 @@
 package vn.prostylee.core.service;
 
-import vn.prostylee.core.dto.filter.BaseFilter;
 import org.springframework.data.domain.Page;
+import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.exception.ResourceNotFoundException;
+
+import java.util.Optional;
 
 /**
  * CRUD service
@@ -21,4 +24,12 @@ public interface CrudService<T, R, ID> {
     R update(ID id, T s);
 
     boolean deleteById(ID id);
+
+    default Optional<R> fetchById(ID id) {
+        try {
+            return Optional.ofNullable(findById(id));
+        } catch (ResourceNotFoundException e) {
+            return Optional.empty();
+        }
+    }
 }

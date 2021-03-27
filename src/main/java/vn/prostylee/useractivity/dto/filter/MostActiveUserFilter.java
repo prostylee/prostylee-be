@@ -16,6 +16,8 @@ public class MostActiveUserFilter {
     @Range(min = 1, max = 100)
     private int limit = 20;
 
+    private int page = 0;
+
     @Schema(name = "timeRangeInDays", example = "30", description = "The number of days that will be count for considering as most active users.")
     @Range(min = 1, max = 365)
     private int timeRangeInDays = DEFAULT_TIME_RANGE_IN_DAYS;

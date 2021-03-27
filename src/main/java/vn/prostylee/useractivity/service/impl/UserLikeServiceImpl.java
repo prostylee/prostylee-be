@@ -75,8 +75,10 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Override
     public List<Long> getTopBeLikes(MostActiveRequest request) {
-        Pageable pageSpecification = PageRequest.of(0, request.getLimit());
-        return repository.getTopBeLikes(request.getTargetTypes(), request.getFromDate(), request.getToDate(), pageSpecification);
+        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
+        return repository.getTopBeLikes(request.getTargetTypes(),
+                request.getCustomFieldId1(), request.getCustomFieldId2(), request.getCustomFieldId3(),
+                request.getFromDate(), request.getToDate(), pageSpecification);
     }
 
     private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter) {

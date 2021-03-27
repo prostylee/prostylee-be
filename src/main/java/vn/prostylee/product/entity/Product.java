@@ -3,7 +3,6 @@ package vn.prostylee.product.entity;
 
 import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
-import vn.prostylee.product.constant.ProductStatus;
 
 import javax.persistence.*;
 import java.util.Date;
