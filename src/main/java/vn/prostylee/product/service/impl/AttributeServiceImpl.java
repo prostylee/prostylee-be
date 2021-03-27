@@ -67,7 +67,7 @@ public class AttributeServiceImpl implements AttributeService {
     @Override
     public AttributeResponse save(AttributeRequest productRequest) {
         Attribute attribute = BeanUtil.copyProperties(productRequest, Attribute.class);
-        attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());
+      //  attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());
         if (attribute.getAttributeOptions() == null) {
             attribute.setAttributeOptions(new HashSet<>());
         }
@@ -107,7 +107,7 @@ public class AttributeServiceImpl implements AttributeService {
 
     private AttributeResponse toResponse(Attribute attribute) {
         AttributeResponse attributeResponse = BeanUtil.copyProperties(attribute, AttributeResponse.class);
-        attributeResponse.setCategoryId(attribute.getCategory().getId());
+      //  attributeResponse.setCategoryId(attribute.getCategory().getId());
         return attributeResponse;
     }
 

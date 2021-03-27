@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -97,7 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
                 attribute.setAttributeOptions(new HashSet<>());
             }
             attribute.getAttributeOptions().forEach(item -> item.setAttribute(attribute));
-            attribute.setCategory(category);
+           // attribute.setCategory(category);
         });
         category.setAttributes(mergedAttributes);
     }
