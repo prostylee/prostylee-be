@@ -3,6 +3,7 @@ package vn.prostylee.store.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,8 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -57,13 +58,13 @@ public class StoreServiceImpl implements StoreService {
 
     private final AuthenticatedProvider authenticatedProvider;
 
-    private final ProductService productService;
-
     private final FileUploadService fileUploadService;
 
     private final LocationService locationService;
 
     private final UserMostActiveService userMostActiveService;
+
+    private ProductService productService;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -152,7 +153,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public StoreResponse findById(Long id) {
         Store store = getById(id);
-        return convertToResponse(store);
+        return convertToFullResponse(store, 0);
     }
 
     @Override
@@ -217,10 +218,10 @@ public class StoreServiceImpl implements StoreService {
     public Page<StoreResponse> getTopProductsOfStores(MostActiveStoreFilter storeFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
                 .targetTypes(Collections.singletonList(TargetType.STORE.name()))
-                .limit(storeFilter.getLimit())
                 .fromDate(DateUtils.getLastDaysBefore(storeFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
-                .build();
+                .build()
+                .pagingParam(new PagingParam(storeFilter.getPage(), storeFilter.getLimit()));
 
         List<Long> storeIds = userMostActiveService.getTargetIdsByMostActive(request);
         List<Store> stores;
@@ -304,5 +305,10 @@ public class StoreServiceImpl implements StoreService {
     public StoreResponseLite getStoreResponseLite(Long id) {
         Store store = getById(id);
         return BeanUtil.copyProperties(store, StoreResponseLite.class);
+    }
+
+    @Autowired
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
     }
 }
