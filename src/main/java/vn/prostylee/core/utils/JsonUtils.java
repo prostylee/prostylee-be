@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
+import java.io.InputStream;
+
 public class JsonUtils {
 
     private JsonUtils() {
@@ -17,9 +19,19 @@ public class JsonUtils {
     }
 
     @SneakyThrows
+    public static <T> T toObject(String file, Class<T> clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(getResourceAsStream(file), clazz);
+    }
+
+    @SneakyThrows
     public static <T> T fromJson(String json, Class<T> clazz) {
         ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper.readValue(json, clazz);
+    }
+
+    private static InputStream getResourceAsStream(String file) {
+        return ClassLoader.getSystemClassLoader().getResourceAsStream(file);
     }
 }

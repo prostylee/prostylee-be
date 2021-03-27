@@ -43,6 +43,14 @@ public class UserRequest implements UniqueIdentifier<Long> {
 
     private Boolean allowNotification;
 
+    private Boolean allowSaleNotification;
+
+    private Boolean allowSocialNotification;
+
+    private Boolean allowOrderStatusNotification;
+
+    private Boolean allowStockNotification;
+
     private String pushToken;
 
     @JsonIgnore
@@ -53,4 +61,7 @@ public class UserRequest implements UniqueIdentifier<Long> {
 
     @JsonIgnore
     private Boolean phoneNumberVerified;
+
+    private String bio;
+
 }

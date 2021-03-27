@@ -25,4 +25,14 @@ public class UserProfileRequest {
     private String email;
 
     private Boolean allowNotification;
+
+    private Boolean allowSaleNotification;
+
+    private Boolean allowSocialNotification;
+
+    private Boolean allowOrderStatusNotification;
+
+    private Boolean allowStockNotification;
+
+    private String bio;
 }
