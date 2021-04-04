@@ -41,9 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
-
     private final OrderConverter orderConverter;
-
     private final BaseFilterSpecs<Order> baseFilterSpecs;
 
     @Override
