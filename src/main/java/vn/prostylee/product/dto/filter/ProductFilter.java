@@ -9,6 +9,8 @@ import vn.prostylee.product.constant.NewFeedType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductFilter extends BaseFilter {
 
     private Long userId;
