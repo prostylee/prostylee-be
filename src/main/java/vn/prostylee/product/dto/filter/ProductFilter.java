@@ -1,13 +1,14 @@
 package vn.prostylee.product.dto.filter;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import org.hibernate.validator.constraints.Range;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.product.constant.NewFeedType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class ProductFilter extends BaseFilter {
 
     private Long userId;
@@ -17,6 +18,16 @@ public class ProductFilter extends BaseFilter {
     private NewFeedType newFeedType;
 
     private Boolean bestSeller;
+
+    /**
+     * The default number of days that will be count for considering as top following.
+     */
+    public static final int DEFAULT_TIME_RANGE_IN_DAYS = 90;
+
+    @Builder.Default
+    @Schema(name = "timeRangeInDays", example = "365", description = "The number of days that will be count for considering as as top following.")
+    @Range(min = 1, max = 365)
+    private int timeRangeInDays = DEFAULT_TIME_RANGE_IN_DAYS;
 
     @Override
     public String[] getSearchableFields() {

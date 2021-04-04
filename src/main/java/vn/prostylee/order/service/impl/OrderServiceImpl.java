@@ -25,6 +25,7 @@ import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
+import vn.prostylee.store.dto.request.PaidStoreRequest;
 
 import javax.persistence.criteria.Predicate;
 import java.util.Calendar;
@@ -133,5 +134,11 @@ public class OrderServiceImpl implements OrderService {
         Date toDate = Calendar.getInstance().getTime();
         Pageable pageSpecification = PageRequest.of(bestSellerFilter.getPage(), bestSellerFilter.getLimit());
         return orderDetailRepository.getBestSellerProductIds(bestSellerFilter.getStoreId(), fromDate, toDate, pageSpecification);
+    }
+
+    @Override
+    public List<Long> getPaidStores(PaidStoreRequest request) {
+        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
+        return orderDetailRepository.getPaidStoreIds(request.getBuyerId(), pageSpecification);
     }
 }

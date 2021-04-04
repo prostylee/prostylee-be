@@ -24,4 +24,13 @@ public interface OrderDetailRepository extends BaseRepository<OrderDetail, Long>
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             Pageable pageable);
+
+    @Query("SELECT e.storeId FROM #{#entityName} e " +
+            " WHERE e.order.status = 100 " +
+            " AND e.order.buyerId = :buyerId " +
+            " ORDER BY e.order.createdAt DESC ")
+    List<Long> getPaidStoreIds(
+            @Param("buyerId") Long buyerId,
+            Pageable pageable);
+
 }

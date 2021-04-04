@@ -13,6 +13,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
@@ -26,11 +27,15 @@ import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
+import vn.prostylee.store.dto.request.NewestStoreRequest;
+import vn.prostylee.store.dto.request.PaidStoreRequest;
+import vn.prostylee.store.service.StoreService;
+import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.useractivity.dto.request.MostActiveRequest;
+import vn.prostylee.useractivity.service.UserFollowerService;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +51,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductPriceService productPriceService;
     private final OrderService orderService;
     private final ProductConverter productConverter;
-
+    private final UserFollowerService userFollowerService;
+    private final StoreService storeService;
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
         ProductFilter productFilter = (ProductFilter) baseFilter;
@@ -62,7 +68,13 @@ public class ProductServiceImpl implements ProductService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("storeId"), productFilter.getStoreId()));
         }
 
-        spec = buildBestSellerSpec(spec, productFilter);
+        spec = getProductByTopFollowingStores(spec, productFilter);
+        spec = buildPaidStore(spec, productFilter);
+        spec = buildNewProductOfNewStore(spec, productFilter);
+
+        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+            spec = buildBestSellerSpec(spec, productFilter);
+        }
 
         // TODO query by new feeds
 //        switch (productFilter.getNewFeedType()) {
@@ -73,29 +85,71 @@ public class ProductServiceImpl implements ProductService {
 //            default:
 //                break;
 //        }
-
         return spec;
     }
 
+    private Specification<Product> buildNewProductOfNewStore(Specification<Product> spec, ProductFilter productFilter) {
+        NewestStoreRequest request =  NewestStoreRequest.builder()
+                .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
+                .toDate(Calendar.getInstance().getTime())
+                .build();
+        request.setLimit(productFilter.getLimit());
+        request.setPage(productFilter.getPage());
+        List<Long> storeIds = storeService.getNewStoreIds(request);
+
+        //TODO get random product
+        List<Long> productIds = new ArrayList();
+        return getProductSpecification(spec, productIds);
+    }
+
+    private Specification<Product> buildPaidStore(Specification<Product> spec, ProductFilter productFilter) {
+        PaidStoreRequest request = PaidStoreRequest.builder()
+                .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
+                .toDate(Calendar.getInstance().getTime())
+                .build();
+        request.setLimit(productFilter.getLimit());
+        request.setPage(productFilter.getPage());
+
+        List<Long> storeIds = orderService.getPaidStores(request);
+        //TODO get random product
+        List<Long> productIds = new ArrayList();
+        return getProductSpecification(spec, productIds);
+    }
+
+    private Specification<Product> getProductByTopFollowingStores(Specification<Product> spec, ProductFilter productFilter) {
+        MostActiveRequest request = MostActiveRequest.builder()
+                .targetTypes(Collections.singletonList(TargetType.STORE.name()))
+                .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
+                .toDate(Calendar.getInstance().getTime())
+                .build();
+        request.setLimit(productFilter.getLimit());
+        request.setPage(productFilter.getPage());
+        List<Long> storeIds = userFollowerService.getTopBeFollows(request);
+
+        //TODO get  random product
+        List<Long> productIds = new ArrayList();
+        return getProductSpecification(spec, productIds);
+    }
+
     private Specification<Product> buildBestSellerSpec(Specification<Product> spec, ProductFilter productFilter) {
-        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
             BestSellerFilter bestSellerFilter = BestSellerFilter.builder()
                     .storeId(productFilter.getStoreId())
                     .build();
             bestSellerFilter.setLimit(productFilter.getLimit());
             bestSellerFilter.setPage(productFilter.getPage());
-            List<Long> productIds = orderService.getBestSellerProductIds(bestSellerFilter);
-            if (CollectionUtils.isNotEmpty(productIds)) { // Get best-seller if exists, otherwise ignore this condition
-                spec = spec.and((root, query, cb) -> {
-                    CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
-                    productIds.forEach(inClause::value);
-                    return inClause;
-                });
-            }
+           return getProductSpecification(spec, orderService.getBestSellerProductIds(bestSellerFilter));
+    }
+
+    private Specification<Product> getProductSpecification(Specification<Product> spec, List<Long> productIds) {
+        if (CollectionUtils.isNotEmpty(productIds)) {
+            spec = spec.and((root, query, cb) -> {
+                CriteriaBuilder.In<Long> inClause = cb.in(root.get("id"));
+                productIds.forEach(inClause::value);
+                return inClause;
+            });
         }
         return spec;
     }
-
 
 
     @Override
