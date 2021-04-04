@@ -76,6 +76,12 @@ public class OrderServiceImpl implements OrderService {
             case "COMPLETE":
                 statusId = COMPLETED.ordinal();
                 break;
+            case "CANCELLED":
+                statusId = CANCELLED.ordinal();
+                break;
+            case "COMPLETED":
+                statusId = COMPLETED.ordinal();
+                break;
             default:
                 break;
         }
