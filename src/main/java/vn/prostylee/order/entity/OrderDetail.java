@@ -57,7 +57,7 @@ public class OrderDetail extends AuditEntity {
 	@Column(name = "product_color", length = 512)
 	private String productColor;
 
-	@Column(name = "product_size", length = 512)
+	@Column(name = "productproduct_size_size", length = 512)
 	private String productSize;
 
 	@Column(name = "product_data", length = 512)

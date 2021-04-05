@@ -29,6 +29,7 @@ import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
+import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.CompanyResponse;
 import vn.prostylee.store.dto.response.StoreMiniResponse;
@@ -108,48 +109,6 @@ public class StoreServiceImpl implements StoreService {
         return new PageImpl<>(responses, pageable, page.getTotalElements());
     }
 
-    private Specification<Store> buildSearchable(StoreFilter storeFilter) {
-        Specification<Store> spec = baseFilterSpecs.search(storeFilter);
-
-        if (storeFilter.getStatus() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), storeFilter.getStatus()));
-        }
-
-        if (storeFilter.getOwnerId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("ownerId"), storeFilter.getOwnerId()));
-        }
-
-        if (storeFilter.getCompanyId() != null) {
-            Specification<Store> joinCompanySpec = (root, query, cb) -> {
-                Join<Store, Company> company = root.join("company");
-                return cb.equal(company.get("id"), storeFilter.getCompanyId());
-            };
-            spec = spec.and(joinCompanySpec);
-        }
-
-        return spec;
-    }
-
-    private Specification<Store> buildNearBySpec(Specification<Store> spec, Set<Long> locationIds) {
-        spec = spec.and((root, query, cb) -> {
-            CriteriaBuilder.In<Long> inClause = cb.in(root.get("locationId"));
-            locationIds.forEach(inClause::value);
-            return inClause;
-        });
-        return spec;
-    }
-
-    private List<LocationResponse> getLocationsNearBy(StoreFilter storeFilter) {
-        NearestLocationFilter locationFilter = new NearestLocationFilter();
-        locationFilter.setLatitude(storeFilter.getLatitude());
-        locationFilter.setLongitude(storeFilter.getLongitude());
-        locationFilter.setLimit(storeFilter.getLimit());
-        locationFilter.setPage(storeFilter.getPage());
-        locationFilter.setTargetType(TargetType.STORE.name());
-
-        return locationService.getNearestLocations(locationFilter);
-    }
-
     @Override
     public StoreResponse findById(Long id) {
         Store store = getById(id);
@@ -162,19 +121,11 @@ public class StoreServiceImpl implements StoreService {
         return storeResponses.map(this::convertToMiniResponse);
     }
 
-    private StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {
-        StoreMiniResponse storeMiniResponse = BeanUtil.copyProperties(storeResponse, StoreMiniResponse.class);
-        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.LOGO.getWidth(), ImageSize.LOGO.getHeight());
-        if (CollectionUtils.isNotEmpty(imageUrls)) {
-            storeMiniResponse.setLogoUrl(imageUrls.get(0));
-        }
-        storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
-        return storeMiniResponse;
-    }
-
-    private Store getById(Long id) {
-        return storeRepository.findOneActive(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Store is not found with id [" + id + "]"));
+    //TODO
+    @Override
+    public List<Long> getNewStoreIds(NewestStoreRequest request) {
+        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
+        return storeRepository.findNewestStoreIds(request.getFromDate(), request.getToDate(), pageSpecification);
     }
 
     @Override
@@ -232,6 +183,63 @@ public class StoreServiceImpl implements StoreService {
             stores = storeRepository.findStoresByIds(storeIds);
         }
         return new PageImpl<>(getMostActiveStoresByStoreIds(stores, storeFilter.getNumberOfProducts()));
+    }
+
+    private Specification<Store> buildSearchable(StoreFilter storeFilter) {
+        Specification<Store> spec = baseFilterSpecs.search(storeFilter);
+
+        if (storeFilter.getStatus() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), storeFilter.getStatus()));
+        }
+
+        if (storeFilter.getOwnerId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("ownerId"), storeFilter.getOwnerId()));
+        }
+
+        if (storeFilter.getCompanyId() != null) {
+            Specification<Store> joinCompanySpec = (root, query, cb) -> {
+                Join<Store, Company> company = root.join("company");
+                return cb.equal(company.get("id"), storeFilter.getCompanyId());
+            };
+            spec = spec.and(joinCompanySpec);
+        }
+
+        return spec;
+    }
+
+    private Specification<Store> buildNearBySpec(Specification<Store> spec, Set<Long> locationIds) {
+        spec = spec.and((root, query, cb) -> {
+            CriteriaBuilder.In<Long> inClause = cb.in(root.get("locationId"));
+            locationIds.forEach(inClause::value);
+            return inClause;
+        });
+        return spec;
+    }
+
+    private List<LocationResponse> getLocationsNearBy(StoreFilter storeFilter) {
+        NearestLocationFilter locationFilter = new NearestLocationFilter();
+        locationFilter.setLatitude(storeFilter.getLatitude());
+        locationFilter.setLongitude(storeFilter.getLongitude());
+        locationFilter.setLimit(storeFilter.getLimit());
+        locationFilter.setPage(storeFilter.getPage());
+        locationFilter.setTargetType(TargetType.STORE.name());
+
+        return locationService.getNearestLocations(locationFilter);
+    }
+
+    private StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {
+        StoreMiniResponse storeMiniResponse = BeanUtil.copyProperties(storeResponse, StoreMiniResponse.class);
+        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.LOGO.getWidth(), ImageSize.LOGO.getHeight());
+        if (CollectionUtils.isNotEmpty(imageUrls)) {
+            storeMiniResponse.setLogoUrl(imageUrls.get(0));
+        }
+        storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
+        return storeMiniResponse;
+    }
+
+    private Store getById(Long id) {
+        return storeRepository.findOneActive(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Store is not found with id [" + id + "]"));
     }
 
     private List<StoreResponse> getMostActiveStoresByStoreIds(List<Store> stores, int numberOfProducts) {
