@@ -77,7 +77,6 @@ public class ProductServiceImpl implements ProductService {
                 findByAttributes(root, productFilter.getAttributes(), queryBuilder);
                 
             }
-
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
@@ -85,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         buildPaidStore(mainSpec, productFilter);
         buildNewProductOfNewStore(mainSpec, productFilter);
         if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
-            Specification<Product> spec = buildBestSellerSpec(mainSpec, productFilter);
+            buildBestSellerSpec(mainSpec, productFilter);
         }
         if (StringUtils.isNotBlank(productFilter.getKeyword())) {
             Specification<Product> searchSpec = baseFilterSpecs.search(productFilter);
