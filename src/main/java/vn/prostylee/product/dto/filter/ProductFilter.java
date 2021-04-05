@@ -5,18 +5,17 @@ import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.product.constant.NewFeedType;
 
+import java.util.Map;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ProductFilter extends BaseFilter {
+public class  ProductFilter extends BaseFilter {
 
     private Long productId;
     private Long categoryId;
     private Long storeId;
     private Long userId;
-    private String size;
-    private String status;
-    private String material;
-    private String style;
+    private Map<String, String> attributes;
 
     private NewFeedType newFeedType = NewFeedType.STORE;
     private Boolean bestSeller;

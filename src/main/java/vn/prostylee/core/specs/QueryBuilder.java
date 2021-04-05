@@ -33,9 +33,9 @@ public class QueryBuilder<T> {
         return this;
     }
 
-    public QueryBuilder likeIgnoreCaseMultiTableRef(String refField, String value, Join<T, Object> source) {
-        if (StringUtils.isNotBlank(value)) {
-            predicates.add(cb.like(cb.upper(source.get(refField).as(String.class)),"%" + StringUtils.upperCase(value) + "%"));
+    public QueryBuilder likeIgnoreCaseMultiTableRef(String refField, Object value, Join<T, Object> source) {
+        if (value != null && StringUtils.isNotBlank(value.toString())) {
+            predicates.add(cb.like(cb.upper(source.get(refField).as(String.class)),"%" + StringUtils.upperCase(value.toString()) + "%"));
         }
         return this;
     }
@@ -54,9 +54,16 @@ public class QueryBuilder<T> {
         return this;
     }
 
-    public QueryBuilder equalsMultiTable(String propertyPath, Object value, Join<T, Object> source) {
+    public QueryBuilder equalsRef(String refEntity, String refField, Object value, JoinType joinType) {
         if (value != null && StringUtils.isNotBlank(value.toString())) {
-            predicates.add(cb.equal(source.get(propertyPath),value));
+            predicates.add(cb.equal(root.join(refEntity, joinType).get(refField),value));
+        }
+        return this;
+    }
+
+    public QueryBuilder equalsAsId(Path<Long> idPath, Object value) {
+        if (value != null && StringUtils.isNotBlank(value.toString())) {
+            predicates.add(cb.equal(idPath,value));
         }
         return this;
     }

@@ -22,8 +22,7 @@ import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.service.AttributeService;
 
 import javax.persistence.criteria.Join;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -62,6 +61,16 @@ public class AttributeServiceImpl implements AttributeService {
     @Override
     public AttributeResponse findByIdCategoryIdAndId(Long categoryId, Long id) {
         return this.toResponse(this.getByCategoryIdAndId(categoryId, id));
+    }
+
+    @Override
+    public Map<String, Long> getAllAttributes() {
+        Map<String, Long> attrCollection = new HashMap<>();
+        List<Attribute> attrs = this.attributeRepository.findAll();
+        for(Attribute attr : attrs) {
+            attrCollection.put(attr.getKey(), attr.getId());
+        }
+        return attrCollection;
     }
 
     @Override

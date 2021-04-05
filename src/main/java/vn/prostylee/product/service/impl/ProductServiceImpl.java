@@ -3,6 +3,7 @@ package vn.prostylee.product.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,13 +42,7 @@ import vn.prostylee.useractivity.dto.filter.MostActiveUserFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserMostActiveService;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import javax.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +63,9 @@ public class ProductServiceImpl implements ProductService {
     private final UserService userService;
     private final UserMostActiveService userMostActiveService;
     private StoreService storeService;
+    private final AttributeService attributeService;
+
+    private static Map<String, Long> attrCollection;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -83,8 +81,8 @@ public class ProductServiceImpl implements ProductService {
             findByUser(productFilter, queryBuilder);
             findByCategory(productFilter, queryBuilder);
             findByStore(productFilter, queryBuilder);
-            if (isAttributeValueAvailable(productFilter)) {
-                findByAttributeValue(root, productFilter, queryBuilder);
+            if (isAttributesAvailable(productFilter.getAttributes())) {
+                findByAttributes(root, productFilter.getAttributes(), queryBuilder);
             }
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
@@ -102,62 +100,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void findByCategory(ProductFilter productFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equals("category.id", productFilter.getCategoryId());
+        queryBuilder.equalsRef("category", "id", productFilter.getCategoryId(), JoinType.INNER);
     }
 
     private void findByStore(ProductFilter productFilter, QueryBuilder queryBuilder) {
         queryBuilder.equals("storeId", productFilter.getStoreId());
     }
 
-    private boolean isAttributeValueAvailable(ProductFilter productFilter) {
-        return StringUtils.isNotBlank(productFilter.getSize()) ||
-                StringUtils.isNotBlank(productFilter.getStatus()) ||
-                StringUtils.isNotBlank(productFilter.getMaterial()) ||
-                StringUtils.isNotBlank(productFilter.getStyle());
+    private boolean isAttributesAvailable(Map<String, String> attributes) {
+        return MapUtils.isNotEmpty(attributes);
     }
-    private void findByAttributeValue(Root root, ProductFilter productFilter, QueryBuilder queryBuilder) {
+    private void findByAttributes(Root root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
         Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
         Join<ProductPrice, ProductAttribute> joinProductAttr = joinProductPrice.join("productAttributes");
-        Join<ProductAttribute, Attribute> joinAttr = joinProductAttr.join("attribute");
-        findBySize(productFilter, queryBuilder, joinProductAttr, joinAttr);
-        findByStatus(productFilter, queryBuilder, joinProductAttr, joinAttr);
-        findByMaterial(productFilter, queryBuilder, joinProductAttr, joinAttr);
-        findByStyle(productFilter, queryBuilder, joinProductAttr, joinAttr);
+//        Join<ProductAttribute, Attribute> joinAttr = joinProductAttr.join("attribute");
+        findByAttributes(attributesRequest, queryBuilder, joinProductAttr);
     }
 
-    private void findBySize(ProductFilter productFilter, QueryBuilder queryBuilder,
-                            Join<ProductPrice, ProductAttribute> source,
-                            Join<ProductAttribute, Attribute> attrJoiner) {
-        if (StringUtils.isNotBlank(productFilter.getSize())) {
-            queryBuilder.equalsMultiTable("id", "2", attrJoiner);
-            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getSize(), source);
+    private void findByAttributes( Map<String, String> attributesRequest, QueryBuilder queryBuilder,
+                            Join<ProductPrice, ProductAttribute> source) {
+        if(MapUtils.isEmpty(attrCollection)) {
+            attrCollection = attributeService.getAllAttributes();
         }
-    }
-
-    private void findByStatus(ProductFilter productFilter, QueryBuilder queryBuilder,
-                              Join<ProductPrice, ProductAttribute> source,
-                              Join<ProductAttribute, Attribute> attrJoiner) {
-        if (StringUtils.isNotBlank(productFilter.getStatus())) {
-            queryBuilder.equalsMultiTable("id", "3", attrJoiner);
-            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStatus(), source);
-        }
-    }
-
-    private void findByMaterial(ProductFilter productFilter, QueryBuilder queryBuilder,
-                                Join<ProductPrice, ProductAttribute> source,
-                                Join<ProductAttribute, Attribute> attrJoiner) {
-        if (StringUtils.isNotBlank(productFilter.getMaterial())) {
-            queryBuilder.equalsMultiTable("id", "4", attrJoiner);
-            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getMaterial(), source);
-        }
-    }
-
-    private void findByStyle(ProductFilter productFilter, QueryBuilder queryBuilder,
-                             Join<ProductPrice, ProductAttribute> source,
-                             Join<ProductAttribute, Attribute> attrJoiner) {
-        if (StringUtils.isNotBlank(productFilter.getStyle())) {
-            queryBuilder.equalsMultiTable("id", "5", attrJoiner);
-            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", productFilter.getStyle(), source);
+        for(Map.Entry attribute : attributesRequest.entrySet()) {
+            Long attrId = attrCollection.get(attribute.getKey());
+            Path<Long> idFromSource = source.get("attribute").get("id");
+            queryBuilder.equalsAsId(idFromSource, attrId);
+            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", attribute.getValue(), source);
         }
     }
 
