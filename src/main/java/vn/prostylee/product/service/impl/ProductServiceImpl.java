@@ -68,6 +68,10 @@ public class ProductServiceImpl implements ProductService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("storeId"), productFilter.getStoreId()));
         }
 
+        if (productFilter.getUserId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), productFilter.getUserId()));
+        }
+
         spec = getProductByTopFollowingStores(spec, productFilter);
         spec = buildPaidStore(spec, productFilter);
         spec = buildNewProductOfNewStore(spec, productFilter);
@@ -98,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
         List<Long> storeIds = storeService.getNewStoreIds(request);
 
         //TODO get random product
-        List<Long> productIds = new ArrayList();
+        List<Long> productIds = new ArrayList<>();
         return getProductSpecification(spec, productIds);
     }
 
