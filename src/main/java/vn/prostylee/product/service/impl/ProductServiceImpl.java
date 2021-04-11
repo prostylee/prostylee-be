@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
         List<Long> storeIds = storeService.getNewStoreIds(request);
 
         //TODO get random product
-        List<Long> productIds = new ArrayList();
+        List<Long> productIds = new ArrayList<>();
         return getProductSpecification(spec, productIds);
     }
 
