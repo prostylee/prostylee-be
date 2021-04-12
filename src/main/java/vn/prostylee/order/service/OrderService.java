@@ -18,4 +18,6 @@ public interface OrderService extends CrudService<OrderRequest, OrderResponse, L
     List<Long> getBestSellerProductIds(BestSellerFilter bestSellerFilter);
 
     List<Long> getPaidStores(PaidStoreRequest paidStoreRequest);
+
+    OrderResponse reOrder(Long id);
 }

@@ -22,4 +22,17 @@ public enum OrderStatus {
                 .findFirst()
                 .orElse(AWAITING_CONFIRMATION);
     }
+
+    public int getValue() { return value; }
+
+    public static OrderStatus parse(int statusValue) {
+        OrderStatus status = null; // Default
+        for (OrderStatus item : OrderStatus.values()) {
+            if (item.getValue()==statusValue) {
+                status = item;
+                break;
+            }
+        }
+        return status;
+    }
 }

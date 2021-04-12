@@ -28,4 +28,8 @@ public class OrderController extends CrudController<OrderRequest, OrderResponse,
         return orderService.updateStatus(id, statusRequest);
     }
 
+    @PatchMapping("/reOder/{id}")
+    public OrderResponse reOrder(@PathVariable Long id){
+        return orderService.reOrder(id);
+    }
 }
