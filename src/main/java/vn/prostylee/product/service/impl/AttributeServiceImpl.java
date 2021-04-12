@@ -64,16 +64,6 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
-    public Map<String, Long> getAllAttributes() {
-        Map<String, Long> attrCollection = new HashMap<>();
-        List<Attribute> attrs = this.attributeRepository.findAll();
-        for(Attribute attr : attrs) {
-            attrCollection.put(attr.getKey(), attr.getId());
-        }
-        return attrCollection;
-    }
-
-    @Override
     public AttributeResponse save(AttributeRequest productRequest) {
         Attribute attribute = BeanUtil.copyProperties(productRequest, Attribute.class);
         attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());

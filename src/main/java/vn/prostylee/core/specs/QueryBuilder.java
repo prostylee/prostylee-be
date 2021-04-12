@@ -82,6 +82,11 @@ public class QueryBuilder<T> {
         return this;
     }
 
+    public QueryBuilder valueIn(Join<T, Object> source, String propertyPath, Object... values) {
+        predicates.add(source.get(propertyPath).in(values));
+        return this;
+    }
+
     public Predicate[] build() {
         return predicates.toArray(new Predicate[0]);
     }

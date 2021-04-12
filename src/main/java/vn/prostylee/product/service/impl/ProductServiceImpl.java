@@ -28,6 +28,7 @@ import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.*;
+import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
@@ -56,8 +57,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductConverter productConverter;
     private final UserFollowerService userFollowerService;
     private final StoreService storeService;
-    private final AttributeService attributeService;
-    private static Map<String, Long> attrCollection;
+    private final ProductAttributeRepository productAttributeRepository;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
@@ -75,11 +75,11 @@ public class ProductServiceImpl implements ProductService {
             findByStore(productFilter, queryBuilder);
             if (isAttributesAvailable(productFilter.getAttributes())) {
                 findByAttributes(root, productFilter.getAttributes(), queryBuilder);
-                
             }
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
+
         getProductByTopFollowingStores(mainSpec, productFilter);
         buildPaidStore(mainSpec, productFilter);
         buildNewProductOfNewStore(mainSpec, productFilter);
@@ -110,22 +110,12 @@ public class ProductServiceImpl implements ProductService {
     }
     private void findByAttributes(Root root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
         Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
-        Join<ProductPrice, ProductAttribute> joinProductAttr = joinProductPrice.join("productAttributes");
-//        Join<ProductAttribute, Attribute> joinAttr = joinProductAttr.join("attribute");
-        findByAttributes(attributesRequest, queryBuilder, joinProductAttr);
+        List<Long> attrs = findByAttributes(attributesRequest);
+        queryBuilder.valueIn(joinProductPrice, "id", attrs.toArray());
     }
 
-    private void findByAttributes( Map<String, String> attributesRequest, QueryBuilder queryBuilder,
-                            Join<ProductPrice, ProductAttribute> source) {
-        if(MapUtils.isEmpty(attrCollection)) {
-            attrCollection = attributeService.getAllAttributes();
-        }
-        for(Map.Entry attribute : attributesRequest.entrySet()) {
-            Long attrId = attrCollection.get(attribute.getKey());
-            Path<Long> idFromSource = source.get("attribute").get("id");
-            queryBuilder.equalsAsId(idFromSource, attrId);
-            queryBuilder.likeIgnoreCaseMultiTableRef("attrValue", attribute.getValue(), source);
-        }
+    private List<Long> findByAttributes(Map<String, String> attributesRequest) {
+        return productAttributeRepository.findCrossTabProductAttribute(attributesRequest);
     }
 
     private Specification<Product> buildNewProductOfNewStore(Specification<Product> spec, ProductFilter productFilter) {
