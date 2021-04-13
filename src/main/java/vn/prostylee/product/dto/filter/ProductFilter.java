@@ -54,7 +54,7 @@ public class ProductFilter extends BaseFilter {
         };
     }
 
-//    @Schema(name = "sorts", example = "sorts=+name&-price&createdAt")
+    @Schema(name = "sorts", example = "sorts=+name&-price&createdAt")
     @Override
     public String[] getSorts() {
         return super.getSorts();

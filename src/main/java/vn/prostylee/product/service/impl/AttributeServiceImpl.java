@@ -22,7 +22,8 @@ import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.service.AttributeService;
 
 import javax.persistence.criteria.Join;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
