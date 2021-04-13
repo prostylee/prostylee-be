@@ -30,13 +30,11 @@ public class OrderDetail extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
-	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
 
-	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
@@ -57,7 +55,7 @@ public class OrderDetail extends AuditEntity {
 	@Column(name = "product_color", length = 512)
 	private String productColor;
 
-	@Column(name = "productproduct_size_size", length = 512)
+	@Column(name = "product_size", length = 512)
 	private String productSize;
 
 	@Column(name = "product_data", length = 512)
