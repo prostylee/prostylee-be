@@ -32,6 +32,7 @@ public class ProductSpecificationBuilder {
     public Specification<Product> buildSearchable(ProductFilter productFilter) {
         Specification<Product> spec = baseFilterSpecs.search(productFilter);
 
+        //TODO will config in database and try another way to show useful
         Set<Long> storeIds =  new LinkedHashSet<>();
         //storeIds.addAll(getAdsStores(5, productFilter));
         storeIds.addAll(getTopFollowingStores(5, productFilter));
