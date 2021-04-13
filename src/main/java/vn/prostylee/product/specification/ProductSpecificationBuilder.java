@@ -2,15 +2,20 @@ package vn.prostylee.product.specification;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.specs.BaseFilterSpecs;
+import vn.prostylee.core.specs.QueryBuilder;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.entity.ProductPrice;
+import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
 import vn.prostylee.store.service.StoreService;
@@ -18,7 +23,7 @@ import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.*;
 import java.util.*;
 
 @Service
@@ -28,9 +33,20 @@ public class ProductSpecificationBuilder {
     private final OrderService orderService;
     private final UserFollowerService userFollowerService;
     private final StoreService storeService;
+    private final ProductAttributeRepository productAttributeRepository;
 
     public Specification<Product> buildSearchable(ProductFilter productFilter) {
-        Specification<Product> spec = baseFilterSpecs.search(productFilter);
+        Specification<Product> mainSpec = (root, query, cb) -> {
+            QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
+            findByUser(productFilter, queryBuilder);
+            findByCategory(productFilter, queryBuilder);
+            findByStore(productFilter, queryBuilder);
+            if (isAttributesAvailable(productFilter.getAttributes())) {
+                findByAttributes(root, productFilter.getAttributes(), queryBuilder);
+            }
+            Predicate[] orPredicates = queryBuilder.build();
+            return cb.and(orPredicates);
+        };
 
         //TODO will config in database and try another way to show useful
         Set<Long> storeIds =  new LinkedHashSet<>();
@@ -38,17 +54,16 @@ public class ProductSpecificationBuilder {
         storeIds.addAll(getTopFollowingStores(5, productFilter));
         storeIds.addAll(getPaidStores(5, productFilter));
         storeIds.addAll(getNewStores(30, productFilter));
-        getProductSpecification(spec,  new ArrayList<>(storeIds));
+        getProductSpecification(mainSpec,  new ArrayList<>(storeIds));
 
         if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
-            spec = buildBestSellerSpec(spec, productFilter);
+            buildBestSellerSpec(mainSpec, productFilter);
         }
-
-        if (productFilter.getUserId() != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), productFilter.getUserId()));
+        if (StringUtils.isNotBlank(productFilter.getKeyword())) {
+            Specification<Product> searchSpec = baseFilterSpecs.search(productFilter);
+            mainSpec = mainSpec.and(searchSpec);
         }
-
-        return spec;
+        return mainSpec;
     }
 
     private Specification<Product> getProductSpecification(Specification<Product> spec, List<Long> storeIds) {
@@ -75,7 +90,7 @@ public class ProductSpecificationBuilder {
         return storeService.getNewStoreIds(request);
     }
 
-    private List<Long> getPaidStores(int  numberOfTakeProduct, ProductFilter productFilter) {
+    private List<Long> getPaidStores(int numberOfTakeProduct, ProductFilter productFilter) {
         PaidStoreRequest request = PaidStoreRequest.builder()
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
@@ -116,4 +131,28 @@ public class ProductSpecificationBuilder {
         return getProductSpecification(spec, orderService.getBestSellerProductIds(bestSellerFilter));
     }
 
+    private void findByUser(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("createdBy", productFilter.getUserId());
+    }
+
+    private void findByCategory(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equalsRef("category", "id", productFilter.getCategoryId(), JoinType.INNER);
+    }
+
+    private void findByStore(ProductFilter productFilter, QueryBuilder queryBuilder) {
+        queryBuilder.equals("storeId", productFilter.getStoreId());
+    }
+
+    private boolean isAttributesAvailable(Map<String, String> attributes) {
+        return MapUtils.isNotEmpty(attributes);
+    }
+    private void findByAttributes(Root root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
+        Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
+        List<Long> attrs = findByAttributes(attributesRequest);
+        queryBuilder.valueIn(joinProductPrice, "id", attrs.toArray());
+    }
+
+    private List<Long> findByAttributes(Map<String, String> attributesRequest) {
+        return productAttributeRepository.findCrossTabProductAttribute(attributesRequest);
+    }
 }
