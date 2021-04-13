@@ -1,22 +1,13 @@
 package vn.prostylee.media.service.impl;
 
-import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.dto.request.MediaFileRequest;
-import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.repository.AttachmentRepository;
 import vn.prostylee.media.service.AttachmentService;
-import vn.prostylee.media.service.FileUploadService;
-import vn.prostylee.post.entity.Post;
-import vn.prostylee.product.dto.response.UsedStatusResponse;
 
 import java.net.URL;
 import java.util.ArrayList;
