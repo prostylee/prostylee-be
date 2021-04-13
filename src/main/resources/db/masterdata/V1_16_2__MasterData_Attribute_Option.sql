@@ -1,4 +1,3 @@
-TRUNCATE TABLE attribute_option CASCADE;
 /** Size */
 INSERT INTO attribute_option (id, created_at, created_by, updated_at, updated_by, label, name, value, attribute_id, language_code) VALUES (1, '2021-03-18 23:30:04.000000', null, '2021-03-18 23:30:10.000000', null, 'S', 'size', 's', 2, 'vi');
 INSERT INTO attribute_option (id, created_at, created_by, updated_at, updated_by, label, name, value, attribute_id, language_code) VALUES (2, '2021-03-18 23:30:04.000000', null, '2021-03-18 23:30:10.000000', null, 'M', 'size', 'm', 2, 'vi');
