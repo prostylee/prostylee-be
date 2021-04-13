@@ -44,6 +44,10 @@ public class ProductSpecificationBuilder {
             spec = buildBestSellerSpec(spec, productFilter);
         }
 
+        if (productFilter.getUserId() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("createdBy"), productFilter.getUserId()));
+        }
+
         return spec;
     }
 
