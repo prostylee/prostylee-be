@@ -1,7 +1,9 @@
 server:
   servlet:
     contextPath: /
-
+  tomcat:
+    relaxed-query-chars: "|,{,},[,]"
+    relaxedPathChars: "[,],|"
 
 services:
   firebase:
