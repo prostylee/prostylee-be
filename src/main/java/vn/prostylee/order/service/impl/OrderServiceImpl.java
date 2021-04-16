@@ -3,6 +3,7 @@ package vn.prostylee.order.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,15 +23,15 @@ import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.entity.Order;
+import vn.prostylee.order.entity.OrderDetail;
+import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
 
 import javax.persistence.criteria.Predicate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static vn.prostylee.order.constants.OrderStatus.*;
 
@@ -141,5 +142,41 @@ public class OrderServiceImpl implements OrderService {
     public List<Long> getPaidStores(PaidStoreRequest request) {
         Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
         return orderDetailRepository.getPaidStoreIds(request.getBuyerId(), pageSpecification);
+    }
+
+    @Override
+    public OrderResponse reOrder(Long id){
+        Order reOrderEntity = this.getOrderById(id);
+        if(reOrderEntity == null){
+            return null;
+        }
+        Order newOrder = BeanUtil.copyProperties(reOrderEntity,
+                Order.class);
+        newOrder.setStatus(AWAITING_CONFIRMATION);
+        newOrder.setId(null);
+        //Set orderdetail
+        Set<OrderDetail> newOrderDetail = new HashSet<>();
+        for (OrderDetail item: newOrder.getOrderDetails()
+             ) {
+            OrderDetail newDetail = BeanUtil.copyProperties(item,OrderDetail.class);
+            newDetail.setId(null);
+            newDetail.setOrder(newOrder);
+            newOrderDetail.add(newDetail);
+        }
+        newOrder.getOrderDetails().clear();
+        newOrder.setOrderDetails(newOrderDetail);
+        //Set discount
+        Set<OrderDiscount> newOrderDiscount = new HashSet<>();
+        for (OrderDiscount item: newOrder.getOrderDiscounts()
+             ) {
+            OrderDiscount newDiscount = BeanUtil.copyProperties(item,OrderDiscount.class);
+            newDiscount.setId(null);
+            newDiscount.setOrder(newOrder);
+            newOrderDiscount.add(newDiscount);
+        }
+        newOrder.getOrderDiscounts().clear();
+        newOrder.setOrderDiscounts(newOrderDiscount);
+        Order savedOrder = orderRepository.save(newOrder);
+        return orderConverter.toDto(savedOrder);
     }
 }
