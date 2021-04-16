@@ -1,7 +1,6 @@
 package vn.prostylee.store.service;
 
 import org.springframework.data.domain.Page;
-import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.service.CrudService;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
@@ -22,6 +21,4 @@ public interface StoreService extends CrudService<StoreRequest, StoreResponse, L
     Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeProductFilter);
 
     List<Long> getNewStoreIds(NewestStoreRequest request);
-
-    Page<StoreResponse> searchStoresByKeyword(BaseFilter storeFilter);
 }
