@@ -6,6 +6,8 @@ import org.hibernate.validator.constraints.Range;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.product.constant.NewFeedType;
 
+import java.util.Map;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
@@ -15,10 +17,12 @@ public class ProductFilter extends BaseFilter {
 
     private Long userId;
 
+    private Long productId;
+    private Long categoryId;
     private Long storeId;
+    private Map<String, String> attributes;
 
     private NewFeedType newFeedType;
-
     private Boolean bestSeller;
 
     /**
@@ -34,7 +38,8 @@ public class ProductFilter extends BaseFilter {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "name"
+                "name",
+                "category.name"
         };
     }
 
@@ -42,12 +47,14 @@ public class ProductFilter extends BaseFilter {
     public String[] getSortableFields() {
         return new String[] {
                 "name",
+                "createdAt",
+                "priceSale",
                 "price",
-                "createdAt"
+                "category.name"
         };
     }
 
-    @Schema(name = "sorts", example = "sorts=+name&sorts=-price&sorts=createdAt")
+    @Schema(name = "sorts", example = "sorts=+name&-price&createdAt")
     @Override
     public String[] getSorts() {
         return super.getSorts();

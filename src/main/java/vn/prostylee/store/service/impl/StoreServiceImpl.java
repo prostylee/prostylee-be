@@ -121,7 +121,6 @@ public class StoreServiceImpl implements StoreService {
         return storeResponses.map(this::convertToMiniResponse);
     }
 
-    //TODO
     @Override
     public List<Long> getNewStoreIds(NewestStoreRequest request) {
         Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());

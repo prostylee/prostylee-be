@@ -1,0 +1,2 @@
+INSERT INTO product_price (id, created_at, created_by, updated_at, updated_by, name, price, price_sale, sku, product_id) VALUES (1, '2021-03-27 22:43:23.237000', 2, '2021-03-27 22:43:23.237000', 2, 'T-shirt Blackfriday', 2000, 1500, 'A230', 1);
+INSERT INTO product_price (id, created_at, created_by, updated_at, updated_by, name, price, price_sale, sku, product_id) VALUES (2, '2021-04-04 23:46:52.000000', 2, '2021-04-04 23:46:56.000000', 2, 'Adidas Cloudfoam', 3000, 2300, 'A250', 2);
