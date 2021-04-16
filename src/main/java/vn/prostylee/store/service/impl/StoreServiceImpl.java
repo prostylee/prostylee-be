@@ -319,4 +319,11 @@ public class StoreServiceImpl implements StoreService {
     public void setProductService(ProductService productService) {
         this.productService = productService;
     }
+
+    @Override
+    public Page<StoreResponse> searchStoresByKeyword(BaseFilter storeFilter){
+
+        return null;
+    }
+
 }
