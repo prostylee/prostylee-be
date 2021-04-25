@@ -23,6 +23,8 @@ import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -96,7 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
                 attribute.setAttributeOptions(new HashSet<>());
             }
             attribute.getAttributeOptions().forEach(item -> item.setAttribute(attribute));
-           // attribute.setCategory(category);
+            attribute.setCategories(Stream.of(category).collect(Collectors.toSet()));
         });
         category.setAttributes(mergedAttributes);
     }
