@@ -8,20 +8,6 @@ app:
     allowed-origins:
       - "*"
 
-  ## Scheduler using Spring Quartz
-  ## Reference cron expression: https://crontab.guru/
-  quartz:
-    jobs:
-      - # product-statistic
-        detail:
-          cron: '0 0/10 * * * ?'
-      - # store-statistic
-        detail:
-          cron: '0 * 0/4 * * ?'
-      - # user-statistic
-        detail:
-          cron: '0 * 0/4 * * ?'
-
 spring:
   flyway:
     locations: db/migration,db/func,db/masterdata,db/sampledata
