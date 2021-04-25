@@ -1,11 +1,12 @@
 package vn.prostylee.order.constants;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.stream.Stream;
 
-@AllArgsConstructor
+@Getter
+@RequiredArgsConstructor
 public enum OrderStatus {
 
     AWAITING_CONFIRMATION(0),
@@ -13,13 +14,23 @@ public enum OrderStatus {
     CANCELLED(90),
     COMPLETED(100);
 
-    @Getter
-    private final int value;
+    private final int status;
 
-    public static final OrderStatus getByStatusValue(String status) {
+    public static OrderStatus getByStatusValue(String status) {
         return Stream.of(OrderStatus.values())
                 .filter(storeStatus -> storeStatus.name().trim().equalsIgnoreCase(status))
                 .findFirst()
                 .orElse(AWAITING_CONFIRMATION);
+    }
+
+    public static OrderStatus parse(int statusValue) {
+        OrderStatus status = null; // Default
+        for (OrderStatus item : OrderStatus.values()) {
+            if (item.getStatus()==statusValue) {
+                status = item;
+                break;
+            }
+        }
+        return status;
     }
 }

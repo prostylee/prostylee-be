@@ -17,6 +17,8 @@ public class MostActiveStoreFilter {
     @Range(min = 1, max = 100)
     private int limit = 20;
 
+    private int page = 0;
+
     @Schema(name = "numberOfProducts", example = "10", description = "Number of products in each store to be received.")
     @Range(min = 1, max = 100)
     private int numberOfProducts = PagingConstant.DEFAULT_NUMBER_OF_PRODUCT_IN_EACH_STORE;

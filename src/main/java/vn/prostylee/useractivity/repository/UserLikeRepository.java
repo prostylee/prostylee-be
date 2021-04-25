@@ -41,10 +41,16 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
 
     @Query("SELECT e.targetId FROM #{#entityName} e " +
             "WHERE e.targetType IN :targetTypes AND e.createdAt >= :fromDate AND e.createdAt <= :toDate " +
+            "   AND (:customFieldId1 = null OR :customFieldId1 = e.customFieldId1) " +
+            "   AND (:customFieldId2 = null OR :customFieldId2 = e.customFieldId2) " +
+            "   AND (:customFieldId3 = null OR :customFieldId3 = e.customFieldId3) " +
             "GROUP BY e.targetId " +
             "ORDER BY count(e.targetId) DESC ")
     List<Long> getTopBeLikes(
             @Param("targetTypes") List<String> targetTypes,
+            @Param("customFieldId1") Long customFieldId1,
+            @Param("customFieldId2") Long customFieldId2,
+            @Param("customFieldId3") Long customFieldId3,
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             Pageable pageable);

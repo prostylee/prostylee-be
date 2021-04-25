@@ -2,18 +2,23 @@ package vn.prostylee.product.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.core.controller.TrackingCrudController;
+import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.product.constant.NewFeedType;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.filter.RecentViewProductFilter;
+import vn.prostylee.product.dto.filter.RelatedProductFilter;
+import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.service.ProductCollectionService;
 import vn.prostylee.product.service.ProductForStoryService;
 import vn.prostylee.product.service.ProductService;
 
@@ -23,12 +28,17 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
 
     private final ProductService productService;
     private final ProductForStoryService productForStoryService;
+    private final ProductCollectionService productCollectionService;
 
     @Autowired
-    public ProductController(ProductService productService, ProductForStoryService productForStoryService) {
+    public ProductController(
+            ProductService productService,
+            ProductForStoryService productForStoryService,
+            ProductCollectionService productCollectionService) {
         super(productService);
         this.productService = productService;
         this.productForStoryService = productForStoryService;
+        this.productCollectionService = productCollectionService;
     }
 
     @GetMapping("/new-feeds")
@@ -44,4 +54,28 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
         return productForStoryService.getProductForStory(productId);
     }
 
+    @GetMapping("/{productId}/related")
+    public Page<ProductResponse> getRelatedProducts(@PathVariable(value = "productId") Long productId, RelatedProductFilter relatedProductFilter) {
+        return productCollectionService.getRelatedProducts(productId, relatedProductFilter);
+    }
+
+    @GetMapping("/{productId}/suggestions")
+    public Page<ProductResponse> getSuggestionProductsById(@PathVariable(value = "productId") Long productId, SuggestionProductFilter suggestionProductFilter) {
+        return productCollectionService.getSuggestionProducts(productId, suggestionProductFilter);
+    }
+
+    @GetMapping("/suggestions")
+    public Page<ProductResponse> getSuggestionProducts(SuggestionProductFilter suggestionProductFilter) {
+        return productCollectionService.getSuggestionProducts(null, suggestionProductFilter);
+    }
+
+    @GetMapping("/best-seller")
+    public Page<ProductResponse> getBestSellerProducts(BestSellerFilter bestSellerFilter) {
+        return productCollectionService.getBestSellerProducts(bestSellerFilter);
+    }
+
+    @GetMapping("/recent-view")
+    public Page<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter) {
+        return new PageImpl<>(productService.getRecentViewProducts(recentViewProductFilter));
+    }
 }

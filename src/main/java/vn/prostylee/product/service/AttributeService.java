@@ -7,5 +7,4 @@ import vn.prostylee.product.dto.response.AttributeResponse;
 public interface AttributeService extends CrudService<AttributeRequest, AttributeResponse, Long> {
 
     AttributeResponse findByIdCategoryIdAndId(Long categoryId, Long id);
-
 }

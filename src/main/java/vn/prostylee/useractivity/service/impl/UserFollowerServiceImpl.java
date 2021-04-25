@@ -73,8 +73,10 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     @Override
     public List<Long> getTopBeFollows(MostActiveRequest request) {
-        Pageable pageSpecification = PageRequest.of(0, request.getLimit());
-        return repository.getTopBeLikes(request.getTargetTypes(), request.getFromDate(), request.getToDate(), pageSpecification);
+        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
+        return repository.getTopBeFollows(request.getTargetTypes(),
+                request.getCustomFieldId1(), request.getCustomFieldId2(), request.getCustomFieldId3(),
+                request.getFromDate(), request.getToDate(), pageSpecification);
     }
 
     private Specification<UserFollower> getUserFollowerSpecification(UserFollowerFilter filter) {

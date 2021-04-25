@@ -23,7 +23,7 @@ public abstract class AuthOncePerRequestFilter extends OncePerRequestFilter {
             try {
                 isAuthenticated = setAuthIfTokenValid(request);
             } catch (AuthenticationException e) {
-                log.error("Could not auth user", e);
+                log.error("Could not auth user, errorMessage={}", e.getErrorMessage());
             }
         }
 

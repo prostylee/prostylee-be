@@ -37,4 +37,13 @@ public class UserFollower extends AuditEntity {
 	@Column(name = "target_type", length = 512)
 	private String targetType;
 
+	@Column(name = "custom_field_id_1")
+	private Long customFieldId1;
+
+	@Column(name = "custom_field_id_2")
+	private Long customFieldId2;
+
+	@Column(name = "custom_field_id_3")
+	private Long customFieldId3;
+
 }

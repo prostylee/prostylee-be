@@ -13,6 +13,7 @@ import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.entity.UserStatistic;
 import vn.prostylee.auth.repository.RoleRepository;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.service.UserService;
@@ -91,6 +92,16 @@ public class UserServiceImpl implements UserService {
             user.setSub(UUID.randomUUID().toString());
         }
         user.setRoles(this.getRoles(userRequest.getRoles()));
+        user.setStatistic(UserStatistic.builder()
+                .user(user)
+                .numberOfComment(0L)
+                .numberOfFollower(0L)
+                .numberOfFollowing(0L)
+                .numberOfLike(0L)
+                .numberOfPost(0L)
+                .numberOfProduct(0L)
+                .numberOfStory(0L)
+                .build());
         User savedUser = this.save(user);
         UserResponse response = BeanUtil.copyProperties(savedUser, UserResponse.class);
         response.setRoles(user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()));

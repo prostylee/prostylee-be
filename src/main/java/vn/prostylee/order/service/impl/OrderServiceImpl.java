@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.specs.QueryBuilder;
@@ -21,15 +22,17 @@ import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
+import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.Order;
+import vn.prostylee.order.entity.OrderDetail;
+import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
+import vn.prostylee.store.dto.request.PaidStoreRequest;
 
 import javax.persistence.criteria.Predicate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static vn.prostylee.order.constants.OrderStatus.*;
 
@@ -40,9 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
-
     private final OrderConverter orderConverter;
-
     private final BaseFilterSpecs<Order> baseFilterSpecs;
 
     @Override
@@ -68,13 +69,16 @@ public class OrderServiceImpl implements OrderService {
         if(orderFilter.getStatus() == null) {
             return;
         }
-        int statusId = AWAITING_CONFIRMATION.ordinal();
+        int statusId = AWAITING_CONFIRMATION.getStatus();
         switch (orderFilter.getStatus()) {
             case "IN_PROGRESS":
-                statusId = IN_PROGRESS.ordinal();
+                statusId = IN_PROGRESS.getStatus();
                 break;
-            case "COMPLETE":
-                statusId = COMPLETED.ordinal();
+            case "CANCELLED":
+                statusId = CANCELLED.getStatus();
+                break;
+            case "COMPLETED":
+                statusId = COMPLETED.getStatus();
                 break;
             default:
                 break;
@@ -133,5 +137,53 @@ public class OrderServiceImpl implements OrderService {
         Date toDate = Calendar.getInstance().getTime();
         Pageable pageSpecification = PageRequest.of(bestSellerFilter.getPage(), bestSellerFilter.getLimit());
         return orderDetailRepository.getBestSellerProductIds(bestSellerFilter.getStoreId(), fromDate, toDate, pageSpecification);
+    }
+
+    @Override
+    public List<Long> getPaidStores(PaidStoreRequest request) {
+        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getLimit());
+        return orderDetailRepository.getPaidStoreIds(request.getBuyerId(), pageSpecification);
+    }
+
+    @Override
+    public OrderResponse reOrder(Long id){
+        Order reOrderEntity = this.getOrderById(id);
+        if(reOrderEntity == null){
+            return null;
+        }
+        Order newOrder = BeanUtil.copyProperties(reOrderEntity,
+                Order.class);
+        newOrder.setStatus(AWAITING_CONFIRMATION);
+        newOrder.setId(null);
+        //Set orderdetail
+        Set<OrderDetail> newOrderDetail = new HashSet<>();
+        for (OrderDetail item: newOrder.getOrderDetails()
+             ) {
+            OrderDetail newDetail = BeanUtil.copyProperties(item,OrderDetail.class);
+            newDetail.setId(null);
+            newDetail.setOrder(newOrder);
+            newOrderDetail.add(newDetail);
+        }
+        newOrder.getOrderDetails().clear();
+        newOrder.setOrderDetails(newOrderDetail);
+        //Set discount
+        Set<OrderDiscount> newOrderDiscount = new HashSet<>();
+        for (OrderDiscount item: newOrder.getOrderDiscounts()
+             ) {
+            OrderDiscount newDiscount = BeanUtil.copyProperties(item,OrderDiscount.class);
+            newDiscount.setId(null);
+            newDiscount.setOrder(newOrder);
+            newOrderDiscount.add(newDiscount);
+        }
+        newOrder.getOrderDiscounts().clear();
+        newOrder.setOrderDiscounts(newOrderDiscount);
+        Order savedOrder = orderRepository.save(newOrder);
+        return orderConverter.toDto(savedOrder);
+    }
+
+    @Override
+    public Page<ProductSoldCountResponse> countProductSold(PagingParam pagingParam) {
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        return orderDetailRepository.countProductSold(pageSpecification);
     }
 }

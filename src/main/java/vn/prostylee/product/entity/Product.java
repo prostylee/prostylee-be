@@ -3,7 +3,6 @@ package vn.prostylee.product.entity;
 
 import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
-import vn.prostylee.product.constant.ProductStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -95,4 +94,13 @@ public class Product extends AuditEntity {
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
 	private Set<ProductShippingProvider> productShippingProviders;
+
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product", optional = false)
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	private ProductStatistic statistic;
+
+	public Product(Long productId) {
+		this.id = productId;
+	}
 }

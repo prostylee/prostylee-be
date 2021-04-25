@@ -40,8 +40,7 @@ public class Order extends AuditEntity {
 	private Double totalMoney;
 
 	@Column(name = "status")
-	@Enumerated(EnumType.ORDINAL)
-	private OrderStatus status;
+	private int status;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
@@ -73,4 +72,12 @@ public class Order extends AuditEntity {
 	@OneToOne
 	@JoinColumn(name = "shipping_provider_id", nullable = false)
 	private ShippingProvider shippingProvider;
+
+	public OrderStatus getStatus() {
+		return OrderStatus.parse(this.status);
+	}
+
+	public void setStatus(OrderStatus status) {
+		this.status = status.getStatus();
+	}
 }

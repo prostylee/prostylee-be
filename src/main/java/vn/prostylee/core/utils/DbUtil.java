@@ -2,13 +2,19 @@ package vn.prostylee.core.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class DbUtil {
+public final class DbUtil {
 
-	public static final String getSearchLikeQueryValue(String strValue) {
-		return "%" + trimAndStripAccents(strValue).toLowerCase() + "%";
+	private DbUtil() {}
+
+	public static String buildSearchLikeQuery(String str) {
+		return "%" + trimAndStripAccents(str).toLowerCase() + "%";
 	}
 	
-	private static String trimAndStripAccents(String string) {
-        return StringUtils.stripAccents(string.trim().replaceAll("\\s+", " "));
+	private static String trimAndStripAccents(String str) {
+        return StringUtils.stripAccents(StringUtils.trimToEmpty(str)
+				.replaceAll("\\s+", " "))
+				.replace("_", "\\_")
+				.replace("%", "\\%")
+				;
     }
 }
