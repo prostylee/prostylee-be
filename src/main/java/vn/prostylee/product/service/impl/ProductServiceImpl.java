@@ -2,9 +2,12 @@ package vn.prostylee.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -45,6 +48,18 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
         ProductFilter productFilter = (ProductFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(productFilter);
+
+        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+            Sort sortByBestSeller = Sort.by("statistic.numberOfSold").descending();
+            Sort sort = pageable.getSort();
+            if (pageable.getSort() == Sort.unsorted()) {
+                sort = sortByBestSeller;
+            } else {
+                sort = sortByBestSeller.and(sort);
+            }
+            pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getLimit(), sort);
+        }
+
         Page<Product> page = this.productRepository.findAllActive(searchableBuilder.buildSearchable(productFilter), pageable);
         return page.map(productConverter::toResponse);
     }
@@ -115,8 +130,18 @@ public class ProductServiceImpl implements ProductService {
         Set<ProductShippingProvider> productShippingProviders = productShippingProviderService
                 .buildProductShippingProviders(productRequest.getShippingProviders(), productEntity);
         productEntity.setProductShippingProviders(productShippingProviders);
+        productEntity.setStatistic(buildProductStatistic(productEntity));
 
         return productRepository.save(productEntity);
+    }
+
+    private ProductStatistic buildProductStatistic(Product product) {
+        return ProductStatistic.builder()
+                .product(product)
+                .numberOfSold(0L)
+                .numberOfLike(0L)
+                .numberOfComment(0L)
+                .build();
     }
 
     private void saveProductPrice(Long productId, List<ProductPriceRequest> productPrices) {

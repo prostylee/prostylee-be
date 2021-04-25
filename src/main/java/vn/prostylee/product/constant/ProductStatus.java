@@ -1,9 +1,9 @@
 package vn.prostylee.product.constant;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 public enum ProductStatus {
     DRAFT(0),

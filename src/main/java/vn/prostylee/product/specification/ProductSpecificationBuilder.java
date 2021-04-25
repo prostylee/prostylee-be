@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.specs.QueryBuilder;
 import vn.prostylee.core.utils.DateUtils;
-import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.entity.Product;
@@ -44,6 +43,11 @@ public class ProductSpecificationBuilder {
             if (isAttributesAvailable(productFilter.getAttributes())) {
                 findByAttributes(root, productFilter.getAttributes(), queryBuilder);
             }
+
+            if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+                root.join( "statistic", JoinType.LEFT);
+            }
+
             Predicate[] orPredicates = queryBuilder.build();
             return cb.and(orPredicates);
         };
@@ -56,9 +60,6 @@ public class ProductSpecificationBuilder {
         storeIds.addAll(getNewStores(30, productFilter));
         getProductSpecification(mainSpec,  new ArrayList<>(storeIds));
 
-        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
-            buildBestSellerSpec(mainSpec, productFilter);
-        }
         if (StringUtils.isNotBlank(productFilter.getKeyword())) {
             Specification<Product> searchSpec = baseFilterSpecs.search(productFilter);
             mainSpec = mainSpec.and(searchSpec);
@@ -122,14 +123,6 @@ public class ProductSpecificationBuilder {
                 , request.getToDate(), pageSpecification);
     }
     */
-
-    private Specification<Product> buildBestSellerSpec(Specification<Product> spec, ProductFilter productFilter) {
-        BestSellerFilter bestSellerFilter = BestSellerFilter.builder()
-                .storeId(productFilter.getStoreId()).build();
-        bestSellerFilter.setLimit(productFilter.getLimit());
-        bestSellerFilter.setPage(productFilter.getPage());
-        return getProductSpecification(spec, orderService.getBestSellerProductIds(bestSellerFilter));
-    }
 
     private void findByUser(ProductFilter productFilter, QueryBuilder queryBuilder) {
         queryBuilder.equals("createdBy", productFilter.getUserId());
