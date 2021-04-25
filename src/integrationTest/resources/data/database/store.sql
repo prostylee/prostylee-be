@@ -38,3 +38,36 @@ INSERT INTO store (id, created_at, created_by, updated_at, updated_by, company_i
 VALUES (10, '2020-12-11 16:09:49', 1, '2020-12-11 16:09:49', 1, 1, 'Prostylee 00010', 'This is a description', '01 Ly Tu Trong', 'https://prostylee10.vn', '0988000111', 1, 1, 1, null);
 
 ALTER SEQUENCE store_seq RESTART WITH 11;
+
+-- store Statistic
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (1, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (2, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (3, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (4, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (5, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (6, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (7, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (8, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (9, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+INSERT INTO store_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (10, '2021-04-25 14:06:40.000000', 1, '2021-04-25 14:06:44.000000', 1, 0, 0, 0, 0, 0);
+
+ALTER SEQUENCE store_statistic_seq RESTART WITH 11;

@@ -3,13 +3,13 @@ package vn.prostylee.order.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.specs.QueryBuilder;
@@ -22,6 +22,7 @@ import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
+import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
@@ -68,16 +69,16 @@ public class OrderServiceImpl implements OrderService {
         if(orderFilter.getStatus() == null) {
             return;
         }
-        int statusId = AWAITING_CONFIRMATION.getValue();
+        int statusId = AWAITING_CONFIRMATION.getStatus();
         switch (orderFilter.getStatus()) {
             case "IN_PROGRESS":
-                statusId = IN_PROGRESS.getValue();
+                statusId = IN_PROGRESS.getStatus();
                 break;
             case "CANCELLED":
-                statusId = CANCELLED.getValue();
+                statusId = CANCELLED.getStatus();
                 break;
             case "COMPLETED":
-                statusId = COMPLETED.getValue();
+                statusId = COMPLETED.getStatus();
                 break;
             default:
                 break;
@@ -178,5 +179,11 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setOrderDiscounts(newOrderDiscount);
         Order savedOrder = orderRepository.save(newOrder);
         return orderConverter.toDto(savedOrder);
+    }
+
+    @Override
+    public Page<ProductSoldCountResponse> countProductSold(PagingParam pagingParam) {
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        return orderDetailRepository.countProductSold(pageSpecification);
     }
 }

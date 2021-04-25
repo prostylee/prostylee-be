@@ -115,4 +115,9 @@ public class User extends AuditEntity {
 	@Column(name = "allow_stock_notification")
 	private Boolean allowStockNotification;
 
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user", optional = false)
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	private UserStatistic statistic;
+
 }

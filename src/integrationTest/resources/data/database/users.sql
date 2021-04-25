@@ -17,3 +17,37 @@ INSERT INTO user_role(user_id, role_id) VALUES (2, 3);
 INSERT INTO user_role(user_id, role_id) VALUES (4, 2);
 
 ALTER SEQUENCE user_seq RESTART WITH 11;
+
+-- user statistic
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (1, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (2, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (3, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (4, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (5, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (6, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (7, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (8, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (9, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+INSERT INTO user_statistic (id, created_at, created_by, updated_at, updated_by, number_of_product, number_of_story, number_of_post, number_of_like, number_of_comment, number_of_follower, number_of_following)
+VALUES (10, '2021-04-25 15:28:11.000000', 1, '2021-04-25 15:28:13.000000', 1, 0, 0, 0, 0, 0, 0, 0);
+
+ALTER SEQUENCE user_statistic_seq RESTART WITH 11;
