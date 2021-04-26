@@ -38,6 +38,7 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
+import vn.prostylee.store.entity.StoreStatistic;
 import vn.prostylee.store.repository.StoreRepository;
 import vn.prostylee.store.service.StoreService;
 import vn.prostylee.useractivity.constant.TargetType;
@@ -136,8 +137,17 @@ public class StoreServiceImpl implements StoreService {
         Store store = BeanUtil.copyProperties(storeRequest, Store.class);
         store.setOwnerId(authenticatedProvider.getUserIdValue());
         store.setCompany(company);
+        store.setStatistic(StoreStatistic.builder()
+                .numberOfComment(0L)
+                .numberOfFollower(0L)
+                .numberOfFollowing(0L)
+                .numberOfLike(0L)
+                .numberOfProduct(0L)
+                .store(store)
+                .build());
 
         Store savedStore = storeRepository.save(store);
+
         return convertToResponse(savedStore);
     }
 

@@ -34,11 +34,52 @@ services:
       timeToLiveInHours: 720
 
 app:
+  ## Order configurations
   order-code:
-    length: 8
+    length: 8 # The length of order code.
 
+  ## Mobile push notification using Expo API
   push-notification:
     url: https://exp.host/--/api/v2/push/send
+
+  ## Scheduler using Spring Quartz
+  ## Reference cron expression: https://crontab.guru/
+  quartz:
+    enable: true
+    jobs:
+      - # product-statistic
+        name: 'Product Statistic Job'
+        group: 'PRODUCT'
+        description: 'For product statistic job'
+        job-clazz: vn.prostylee.product.job.ProductStatisticJob
+        job-id: 1
+        job-type: 'STATISTIC'
+        detail:
+          name: 'Product Statistic Trigger'
+          group: 'ProductStatisticTrigger'
+          cron: '0 0/15 * * * ?' # At every 30th minute.
+      - # store-statistic
+        name: 'Store Statistic Job'
+        group: 'STORE'
+        description: 'For store statistic job'
+        job-clazz: vn.prostylee.store.job.StoreStatisticJob
+        job-id: 2
+        job-type: 'STATISTIC'
+        detail:
+          name: 'Store Statistic Trigger'
+          group: 'StoreStatisticTrigger'
+          cron: '0 * 0/1 * * ?' # At every hour.
+      - # user-statistic
+        name: 'User Statistic Job'
+        group: 'USER'
+        description: 'For user statistic job'
+        job-clazz: vn.prostylee.auth.job.UserStatisticJob
+        job-id: 3
+        job-type: 'STATISTIC'
+        detail:
+          name: 'User Statistic Trigger'
+          group: 'UserStatisticTrigger'
+          cron: '0 0/30 * * * ?' # At every 30th minute.
 
   ## Multi-thread
   thread-executor:
@@ -197,6 +238,14 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: false
+    open-in-view: false
+
+  ## Scheduler using Spring Quartz
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always # Auto initialize the Quartz tables
+      comment-prefix: '-- '
 
   ## Upload file config
   servlet:
@@ -240,7 +289,6 @@ spring:
 #            required: true
 #        transport:
 #          protocol: smtp
-
 
 # Swagger config
 # @See https://springdoc.org
