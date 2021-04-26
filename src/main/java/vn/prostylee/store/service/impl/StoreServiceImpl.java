@@ -23,6 +23,7 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.product.constant.PagingConstant;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.service.ProductService;
@@ -320,9 +321,22 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public Page<StoreResponse> searchStoresByKeyword(BaseFilter storeFilter){
-
-        return null;
+    public Page<StoreResponse> searchStoresByKeyword(StoreFilter storeFilter){
+        Pageable pageable = baseFilterSpecs.page(storeFilter);
+        List<Store> stores = storeRepository.searchStoreByKeyword(storeFilter.getKeyword().toLowerCase(), pageable);
+        List<StoreResponse> responses = stores.stream()
+                .map(store -> convertToFullResponse(store, PagingConstant.DEFAULT_NUMBER_OF_PRODUCT_IN_EACH_STORE))
+                .collect(Collectors.toList());
+        boolean isSearchNearBy = storeFilter.getLatitude() != null && storeFilter.getLongitude() != null;
+        if (isSearchNearBy) {
+            responses.sort((store1, store2) -> {
+                if (store1.getLocation() == null) {
+                    return 1;
+                }
+                return store1.getLocation().compareTo(store2.getLocation());
+            });
+        }
+        return new PageImpl<>(responses);
     }
 
 }

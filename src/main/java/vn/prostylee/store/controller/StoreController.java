@@ -38,8 +38,7 @@ public class StoreController extends TrackingCrudController<StoreRequest, StoreR
     }
 
     @GetMapping("/search")
-    public Page<StoreResponse> searchStoresByKeyword(BaseFilter storeFilter){
-
-        return null;
+    public Page<StoreResponse> searchStoresByKeyword(StoreFilter storeFilter){
+        return storeService.searchStoresByKeyword(storeFilter);
     }
 }

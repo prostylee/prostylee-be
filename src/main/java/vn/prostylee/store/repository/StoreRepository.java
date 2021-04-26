@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Store;
 
 import java.util.Date;
@@ -27,4 +28,7 @@ public interface StoreRepository extends BaseRepository<Store, Long> {
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             Pageable pageable);
+    @Query("SELECT e FROM #{#entityName} e where lower(e.name) LIKE %:keyword%")
+    List<Store> searchStoreByKeyword(@Param("keyword") String searchKey,
+                                     Pageable pageable);
 }
