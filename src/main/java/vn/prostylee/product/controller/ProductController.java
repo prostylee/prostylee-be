@@ -2,6 +2,7 @@ package vn.prostylee.product.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,7 @@ import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.product.constant.NewFeedType;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.filter.RecentViewProductFilter;
 import vn.prostylee.product.dto.filter.RelatedProductFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
@@ -72,4 +74,8 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
         return productCollectionService.getBestSellerProducts(bestSellerFilter);
     }
 
+    @GetMapping("/recent-view")
+    public Page<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter) {
+        return new PageImpl<>(productService.getRecentViewProducts(recentViewProductFilter));
+    }
 }

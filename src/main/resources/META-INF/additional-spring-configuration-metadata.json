@@ -1,0 +1,38 @@
+{
+  "properties": [
+    {
+      "name": "app.monitor.create-event.enable",
+      "type": "java.lang.String",
+      "description": "Enable/ Disable monitor on create event."
+    },
+    {
+      "name": "app.monitor.create-event.entities",
+      "type": "java.lang.String",
+      "description": "Entities will be monitor and publish a create event."
+    },
+    {
+      "name": "app.monitor.performance.enable",
+      "type": "java.lang.String",
+      "description": "Enable/ Disable monitor on the time executing each methods."
+    },
+    {
+      "name": "app.monitor.trace.enable",
+      "type": "java.lang.String",
+      "description": "Enable log trace, must also change the setting: logging.level.root=TRACE to enable this feature."
+    },
+    {
+      "name": "app.monitor.user-access.enable",
+      "type": "java.lang.String",
+      "description": "Enable/ Disable monitor on each method save / delete of user."
+    },
+    {
+      "name": "app.push-notification.url",
+      "type": "java.lang.String",
+      "description": "Mobile push notification using Expo API."
+    },
+    {
+      "name": "app.order-code.length",
+      "type": "java.lang.String",
+      "description": "The length of order code."
+    }
+  ] }

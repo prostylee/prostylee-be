@@ -70,6 +70,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+	// Scheduler
+	implementation 'org.springframework.boot:spring-boot-starter-quartz:2.4.4'
+
 	// Database - JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.postgresql:postgresql:42.2.18'

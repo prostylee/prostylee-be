@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )
 @Sql(
-        statements = { "DELETE FROM store; DELETE FROM company;" },
+        statements = { "DELETE FROM store_statistic; DELETE FROM store; DELETE FROM company;" },
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD,
         config = @SqlConfig(transactionMode = SqlConfig.TransactionMode.ISOLATED)
 )
