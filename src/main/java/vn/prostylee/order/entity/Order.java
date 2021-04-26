@@ -78,6 +78,6 @@ public class Order extends AuditEntity {
 	}
 
 	public void setStatus(OrderStatus status) {
-		this.status = status.getValue();
+		this.status = status.getStatus();
 	}
 }

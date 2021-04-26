@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import vn.prostylee.core.dto.filter.MasterDataFilter;
 import vn.prostylee.core.service.MasterDataService;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 public class MasterDataController<R> {
 
