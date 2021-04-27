@@ -332,12 +332,32 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public Page<StoreResponse> searchStoresByKeyword(StoreFilter storeFilter){
-        Pageable pageable = baseFilterSpecs.page(storeFilter);
-        List<Store> stores = storeRepository.searchStoreByKeyword(storeFilter.getKeyword().toLowerCase(), pageable);
-        List<StoreResponse> responses = stores.stream()
-                .map(store -> convertToFullResponse(store, PagingConstant.DEFAULT_NUMBER_OF_PRODUCT_IN_EACH_STORE))
-                .collect(Collectors.toList());
+        Specification<Store> searchableSpec = buildSearchable(storeFilter);
+        Map<Long, LocationResponse> mapNearByLocations = null;
         boolean isSearchNearBy = storeFilter.getLatitude() != null && storeFilter.getLongitude() != null;
+        if (isSearchNearBy) {
+            List<LocationResponse> locations = getLocationsNearBy(storeFilter);
+            if (CollectionUtils.isNotEmpty(locations)) {
+                mapNearByLocations = locations.stream()
+                        .collect(Collectors.toMap(LocationResponse::getId, location -> location));
+                searchableSpec = buildNearBySpec(searchableSpec, mapNearByLocations.keySet());
+            }
+        }
+
+        Pageable pageable = baseFilterSpecs.page(storeFilter);
+        Page<Store> page = storeRepository.searchStoreByKeyword(storeFilter.getKeyword().toLowerCase(), pageable);
+
+        final Map<Long, LocationResponse> nearByLocations = Optional.ofNullable(mapNearByLocations).orElseGet(HashMap::new);
+        List<StoreResponse> responses = page.getContent()
+                .stream()
+                .map(store -> {
+                    StoreResponse response = convertToResponse(store);
+                    Optional.ofNullable(response.getLocationId())
+                            .ifPresent(locationId -> response.setLocation(nearByLocations.getOrDefault(locationId, null)));
+                    return convertToFullResponse(store, response, storeFilter.getNumberOfProducts());
+                })
+                .collect(Collectors.toList());
+
         if (isSearchNearBy) {
             responses.sort((store1, store2) -> {
                 if (store1.getLocation() == null) {
@@ -346,7 +366,7 @@ public class StoreServiceImpl implements StoreService {
                 return store1.getLocation().compareTo(store2.getLocation());
             });
         }
-        return new PageImpl<>(responses);
+        return new PageImpl<>(responses, pageable, responses.size());
     }
 
 }
