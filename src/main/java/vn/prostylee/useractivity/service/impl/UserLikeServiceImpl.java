@@ -1,9 +1,13 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,6 +16,9 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.post.service.PostService;
+import vn.prostylee.product.service.ProductService;
+import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
@@ -23,14 +30,18 @@ import vn.prostylee.useractivity.repository.UserLikeRepository;
 import vn.prostylee.useractivity.service.UserLikeService;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
-@AllArgsConstructor
 public class UserLikeServiceImpl implements UserLikeService {
     private final UserLikeRepository repository;
     private final BaseFilterSpecs<UserLike> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
+    private PostService postService;
+    private ProductService productService;
 
     @Override
     public long count(UserLikeFilter filter) {
@@ -43,7 +54,16 @@ public class UserLikeServiceImpl implements UserLikeService {
         Specification<UserLike> searchable = getUserLikeSpecification(filter);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<UserLike> page = repository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, UserLikeResponse.class));
+
+        List<UserLikeResponse> responses = page.getContent()
+                .stream()
+                .map(entity -> {
+                    UserLikeResponse response = convertToResponse(entity);
+                    return response;
+                })
+                .collect(Collectors.toList());
+        return new PageImpl<>(responses,pageable,responses.size());
+
     }
 
     @Override
@@ -102,5 +122,33 @@ public class UserLikeServiceImpl implements UserLikeService {
             searchable = searchable.and(userIdParam);
         }
         return searchable;
+    }
+
+    private UserLikeResponse convertToResponse(UserLike userLike) {
+        UserLikeResponse userLikeResponse = BeanUtil.copyProperties(userLike, UserLikeResponse.class);
+        TargetType targetType = TargetType.valueOf(userLike.getTargetType());
+        switch (targetType){
+            case PRODUCT:
+                Optional.ofNullable(userLikeResponse.getTargetId())
+                        .ifPresent(targetID -> userLikeResponse.setProduct(productService.findById(targetID)));
+                break;
+            case POST:
+                Optional.ofNullable(userLikeResponse.getTargetId())
+                        .ifPresent(targetId -> userLikeResponse.setPost(postService.findById(targetId)));
+                break;
+            default:
+                break;
+        }
+        if (userLike.getTargetType() == TargetType.PRODUCT.toString()){
+
+        }
+        return userLikeResponse;
+    }
+
+    @Autowired
+    public void setInit(@Lazy ProductService productService,
+                                  @Lazy PostService postService) {
+        this.productService = productService;
+        this.postService = postService;
     }
 }
