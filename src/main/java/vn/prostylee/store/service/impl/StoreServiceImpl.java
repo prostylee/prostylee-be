@@ -23,6 +23,7 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.product.constant.PagingConstant;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.service.ProductService;
@@ -328,4 +329,44 @@ public class StoreServiceImpl implements StoreService {
     public void setProductService(ProductService productService) {
         this.productService = productService;
     }
+
+    @Override
+    public Page<StoreResponse> searchStoresByKeyword(StoreFilter storeFilter){
+        Specification<Store> searchableSpec = buildSearchable(storeFilter);
+        Map<Long, LocationResponse> mapNearByLocations = null;
+        boolean isSearchNearBy = storeFilter.getLatitude() != null && storeFilter.getLongitude() != null;
+        if (isSearchNearBy) {
+            List<LocationResponse> locations = getLocationsNearBy(storeFilter);
+            if (CollectionUtils.isNotEmpty(locations)) {
+                mapNearByLocations = locations.stream()
+                        .collect(Collectors.toMap(LocationResponse::getId, location -> location));
+                searchableSpec = buildNearBySpec(searchableSpec, mapNearByLocations.keySet());
+            }
+        }
+
+        Pageable pageable = baseFilterSpecs.page(storeFilter);
+        Page<Store> page = storeRepository.searchStoreByKeyword(storeFilter.getKeyword().toLowerCase(), pageable);
+
+        final Map<Long, LocationResponse> nearByLocations = Optional.ofNullable(mapNearByLocations).orElseGet(HashMap::new);
+        List<StoreResponse> responses = page.getContent()
+                .stream()
+                .map(store -> {
+                    StoreResponse response = convertToResponse(store);
+                    Optional.ofNullable(response.getLocationId())
+                            .ifPresent(locationId -> response.setLocation(nearByLocations.getOrDefault(locationId, null)));
+                    return convertToFullResponse(store, response, storeFilter.getNumberOfProducts());
+                })
+                .collect(Collectors.toList());
+
+        if (isSearchNearBy) {
+            responses.sort((store1, store2) -> {
+                if (store1.getLocation() == null) {
+                    return 1;
+                }
+                return store1.getLocation().compareTo(store2.getLocation());
+            });
+        }
+        return new PageImpl<>(responses, pageable, responses.size());
+    }
+
 }
