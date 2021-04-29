@@ -53,10 +53,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         Page<UserFollower> page = repository.findAll(searchable, pageable);
         List<UserFollowerResponse> responses = page.getContent()
                 .stream()
-                .map(entity -> {
-                    UserFollowerResponse response = convertToResponse(entity);
-                    return response;
-                })
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
         return new PageImpl<>(responses,pageable,responses.size());
     }
