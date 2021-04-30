@@ -2,6 +2,8 @@ package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.filter.UserFollowerPageable;
+import vn.prostylee.useractivity.dto.filter.UserFollowingFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
@@ -22,4 +24,12 @@ public interface UserFollowerService {
     List<Long> loadStatusFollows(StatusFollowRequest checkFollowRequest);
 
     List<Long> getTopBeFollows(MostActiveRequest request);
+
+    Page<Long> getFollowersByMe(UserFollowerPageable userFollowerPageable);
+
+    Page<Long> getFollowersByUserId(Long userId, UserFollowerPageable userFollowerPageable);
+
+    Page<Long> getFollowingsByMe(UserFollowingFilter filter);
+
+    Page<Long> getFollowingsByUserId(Long userId, UserFollowingFilter filter);
 }
