@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,7 @@ import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
+import vn.prostylee.order.dto.response.ProductOrderResponse;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
@@ -33,6 +35,7 @@ import vn.prostylee.store.dto.request.PaidStoreRequest;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static vn.prostylee.order.constants.OrderStatus.*;
 
@@ -50,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderResponse> findAll(BaseFilter filter) {
         OrderFilter orderFilter = (OrderFilter) filter;
         Specification<Order> mainSpec = (root, query, cb) -> {
-            QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
+            QueryBuilder<Order> queryBuilder = new QueryBuilder<>(cb, root);
             findByStatus(orderFilter, queryBuilder);
             findByLoggedInUser(orderFilter, queryBuilder);
             Predicate[] orPredicates = queryBuilder.build();
@@ -65,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
         return orders.map(orderConverter::toDto);
     }
 
-    private void findByStatus(OrderFilter orderFilter, QueryBuilder queryBuilder) {
+    private void findByStatus(OrderFilter orderFilter, QueryBuilder<Order> queryBuilder) {
         if(orderFilter.getStatus() == null) {
             return;
         }
@@ -86,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
         queryBuilder.equals("status", statusId);
     }
 
-    private void findByLoggedInUser(OrderFilter orderFilter, QueryBuilder queryBuilder) {
+    private void findByLoggedInUser(OrderFilter orderFilter, QueryBuilder<Order> queryBuilder) {
         queryBuilder.equals("createdBy", orderFilter.getLoggedInUser());
     }
 
@@ -185,5 +188,13 @@ public class OrderServiceImpl implements OrderService {
     public Page<ProductSoldCountResponse> countProductSold(PagingParam pagingParam) {
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
         return orderDetailRepository.countProductSold(pageSpecification);
+    }
+
+    @Override
+    public Page<Long> getPurchasedProductIdsByUserId(Long userId, PagingParam pagingParam) {
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        Page<ProductOrderResponse> page = orderDetailRepository.getPurchasedProductIdsByUserId(userId, pageSpecification);
+        List<Long> productIds = page.stream().map(ProductOrderResponse::getProductId).collect(Collectors.toList());
+        return new PageImpl<>(productIds, page.getPageable(), page.getTotalElements());
     }
 }
