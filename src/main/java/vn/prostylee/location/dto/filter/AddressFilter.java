@@ -11,14 +11,4 @@ public class AddressFilter extends BaseFilter {
     private String code;
 
     private String parentCode;
-
-    @Override
-    public String[] getSearchableFields() {
-        return new String[0];
-    }
-
-    @Override
-    public String[] getSortableFields() {
-        return new String[0];
-    }
 }

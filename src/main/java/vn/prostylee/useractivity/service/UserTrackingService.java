@@ -12,4 +12,8 @@ public interface UserTrackingService {
 
     List<Long> getLastVisitedIdsBy(UserTrackingFilter userTrackingFilter);
 
+    List<String> getRecentKeywordsBy(UserTrackingFilter userTrackingFilter);
+
+    List<String> getTopKeywordsBy(UserTrackingFilter userTrackingFilter);
+
 }

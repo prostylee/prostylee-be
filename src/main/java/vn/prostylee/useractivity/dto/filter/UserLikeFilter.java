@@ -13,11 +13,6 @@ public class UserLikeFilter extends BaseFilter {
     private String userId;
 
     @Override
-    public String[] getSearchableFields() {
-        return new String[0];
-    }
-
-    @Override
     public String[] getSortableFields() {
         return new String[] {
                 "createdBy",

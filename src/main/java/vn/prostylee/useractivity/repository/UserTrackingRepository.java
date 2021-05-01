@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.entity.UserTracking;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -18,25 +19,48 @@ import java.util.List;
 @Repository
 public interface UserTrackingRepository extends BaseRepository<UserTracking, Long> {
 
-    @Query(value = "SELECT distinct * " +
-            " FROM (SELECT product_id " +
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (SELECT e.product_id " +
             "   FROM user_tracking e " +
-            "   WHERE product_id IS NOT NULL AND e.created_by = :userId " +
+            "   WHERE e.product_id IS NOT NULL AND e.created_by = :userId " +
             "   ORDER BY e.created_at DESC) AS tmp", nativeQuery = true)
-    List<Long> getProductIds(@Param("userId") Long userId, Pageable pageable);
+    List<Long> getProductIds(@Nonnull @Param("userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT distinct * " +
-            " FROM (SELECT store_id " +
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (SELECT e.store_id " +
             "   FROM user_tracking e " +
-            "   WHERE store_id IS NOT NULL AND e.created_by = :userId " +
+            "   WHERE e.store_id IS NOT NULL AND e.created_by = :userId " +
             "   ORDER BY e.created_at DESC) AS tmp", nativeQuery = true)
-    List<Long> getStoreIds(@Param("userId") Long userId, Pageable pageable);
+    List<Long> getStoreIds(@Nonnull @Param("userId") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT distinct * " +
-            " FROM (SELECT category_id " +
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (SELECT e.category_id " +
             "   FROM user_tracking e " +
-            "   WHERE category_id IS NOT NULL AND e.created_by = :userId " +
+            "   WHERE e.category_id IS NOT NULL AND e.created_by = :userId " +
             "   ORDER BY e.created_at DESC) AS tmp", nativeQuery = true)
-    List<Long> getCategoryIds(@Param("userId") Long userId, Pageable pageable);
+    List<Long> getCategoryIds(@Nonnull @Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (SELECT e.search_keyword " +
+            "   FROM user_tracking e " +
+            "   WHERE e.search_keyword IS NOT NULL AND e.path LIKE :apiPath AND e.created_by = :userId " +
+            "   ORDER BY e.created_at DESC) AS tmp", nativeQuery = true)
+    List<String> getRecentKeywords(
+            @Nonnull @Param("userId") Long userId,
+            @Param("apiPath") String apiPath,
+            Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (SELECT e.search_keyword " +
+            "   FROM user_tracking e " +
+            "   WHERE e.search_keyword IS NOT NULL AND e.path LIKE :apiPath " +
+            "       AND (:userId = 0 OR e.created_by = :userId) " +
+            "   GROUP BY e.search_keyword " +
+            "   ORDER BY COUNT(e.search_keyword) DESC " +
+            " ) AS tmp", nativeQuery = true)
+    List<String> getTopKeywords(
+            @Nonnull @Param("userId") Long userId,
+            @Param("apiPath") String apiPath,
+            Pageable pageable);
 
 }
