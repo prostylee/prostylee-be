@@ -36,4 +36,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
                                         @Param("fromDate") Date fromDate,
                                         @Param("toDate") Date toDate,
                                         Pageable pageable);
+
+    @Query("SELECT DISTINCT e.name FROM #{#entityName} e WHERE LOWER(e.name) LIKE :productName")
+    List<String> getProductNamesLike(@Param("productName") String productName, Pageable pageable);
 }
