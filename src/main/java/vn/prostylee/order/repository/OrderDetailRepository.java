@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.order.dto.response.ProductOrderResponse;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.OrderDetail;
 
@@ -42,5 +43,14 @@ public interface OrderDetailRepository extends BaseRepository<OrderDetail, Long>
     List<Long> getPaidStoreIds(
             @Param("buyerId") Long buyerId,
             Pageable pageable);
+
+    @Query(value = "SELECT DISTINCT * " +
+            " FROM (" +
+            "   SELECT e.product_id AS productId " +
+            "   FROM order_detail e " +
+            "   WHERE e.created_by = :userId " +
+            "   ORDER BY e.created_at DESC " +
+            " ) tmp ", nativeQuery = true)
+    Page<ProductOrderResponse> getPurchasedProductIdsByUserId(@Param("userId") Long userId, Pageable pageable);
 
 }
