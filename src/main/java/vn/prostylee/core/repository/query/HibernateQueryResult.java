@@ -1,81 +1,103 @@
 package vn.prostylee.core.repository.query;
 
+import lombok.NonNull;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class HibernateQueryResult {
+public class HibernateQueryResult<R> {
 
-	private EntityManager em;
-	private StringBuilder queryBuilder;
-	private Pageable pageable;
-	/** When request send page size = 1, ignore paging **/
-	private static final int UNPAGED_SIZE = 1;
-	
-	public HibernateQueryResult(EntityManager em, StringBuilder queryBuilder, Pageable pageable) {
-		super();
+	private final EntityManager em;
+	private final Class<R> domainClass;
+	private final StringBuilder queryBuilder;
+	private final Pageable pageable;
+
+	public HibernateQueryResult(@NonNull EntityManager em, @NonNull Class<R> domainClass, @NonNull StringBuilder queryBuilder) {
+		this(em, domainClass, queryBuilder, null);
+	}
+
+	public HibernateQueryResult(@NonNull EntityManager em, @NonNull Class<R> domainClass, @NonNull StringBuilder queryBuilder, Pageable pageable) {
 		this.em = em;
+		this.domainClass = domainClass;
 		this.queryBuilder = queryBuilder;
-		this.pageable = pageable;
-	}
-
-	public <K> Page<K> getResultList(Map<String, Object> filterParameters, Class<K> responseClass) {
-		Page<K> resulstList;
-		if (pageable.getPageSize() == UNPAGED_SIZE) {
-			resulstList = getAllUnPagedList(filterParameters, responseClass);
+		if (pageable == null) {
+			this.pageable = Pageable.unpaged();
 		} else {
-			resulstList = getAllPagedList(filterParameters, responseClass);
+			this.pageable = pageable;
 		}
-	    return resulstList;
 	}
 
-	private <K> Page<K> getAllUnPagedList(Map<String, Object> filterParameters, Class<K> responseClass) {
-		Query query = em.createQuery(queryBuilder.toString(), responseClass);
-		this.setParameters(query, filterParameters);
-		List<K> resultList = query.getResultList();
-		return new PageImpl<>(resultList, pageable, resultList.size());
-		
-	}
-	
-	private <K> Page<K> getAllPagedList(Map<String, Object> filterParameters, Class<K> responseClass) {
-		//Query countQuery = em.createQuery("SELECT COUNT(*) FROM ( " + queryBuilder.toString().replaceAll("FETCH", "") + " ) dataTable");
-		Query countQuery = em.createQuery(queryBuilder.toString(), responseClass);
-		this.setParameters(countQuery, filterParameters);
-		long total = countQuery.getResultList().size();
-		List<K> resultList = new ArrayList<>();
-		if (total > 0) {
-			Query query = em.createQuery(queryBuilder.toString(), responseClass);
-			this.setParameters(query, filterParameters);
-			query.setFirstResult((int) pageable.getOffset());
-			query.setMaxResults(pageable.getPageSize());
-			resultList = query.getResultList();
-		}
-		
-		return new PageImpl<>(resultList, pageable, total);
-	}
-	
-	public <K> Optional<K> getQuerySingleResult(Map<String, Object> filterparameterMap, Class<K> responseClass) {
-		Query query = em.createQuery(queryBuilder.toString(), responseClass);
-		this.setParameters(query, filterparameterMap);
-		K result;
+	public Optional<R> getSingleResult(Map<String, Object> filterParameterMap) {
+		TypedQuery<R> query = em.createQuery(queryBuilder.toString(), domainClass);
+		this.setParameters(query, filterParameterMap);
 		try {
-			result = (K) query.getSingleResult();
+			return Optional.ofNullable(query.getSingleResult());
 		} catch (NoResultException e) {
 			return Optional.empty();
 		}
-	    return Optional.of(result);
+	}
+
+	public Page<R> getResultList(Map<String, Object> filterParameters, String... customCountQuery) {
+		if (pageable.isUnpaged()) {
+			return getAllUnPagedList(filterParameters);
+		}
+		return getAllPagedList(filterParameters, customCountQuery);
+	}
+
+	private Page<R> getAllUnPagedList(Map<String, Object> filterParameters) {
+		appendSortQuery(pageable);
+
+		TypedQuery<R> query = em.createQuery(queryBuilder.toString(), domainClass);
+		this.setParameters(query, filterParameters);
+
+		List<R> content = query.getResultList();
+		return new PageImpl<>(content, pageable, content.size());
+	}
+	
+	private Page<R> getAllPagedList(Map<String, Object> filterParameters, String... customCountQuery) {
+		String countQueryStr = "SELECT COUNT(*) " + queryBuilder.substring(queryBuilder.indexOf("FROM")).replace("FETCH", "");
+		if (ArrayUtils.isNotEmpty(customCountQuery)) {
+			countQueryStr = customCountQuery[0];
+		}
+		TypedQuery<Long> countQuery = em.createQuery(countQueryStr, Long.class);
+		this.setParameters(countQuery, filterParameters);
+		long total = countQuery.getSingleResult();
+		List<R> content = new ArrayList<>();
+		if (total > 0) {
+			appendSortQuery(pageable);
+
+			TypedQuery<R> query = em.createQuery(queryBuilder.toString(), domainClass);
+			this.setParameters(query, filterParameters);
+
+			query.setFirstResult((int) pageable.getOffset());
+			query.setMaxResults(pageable.getPageSize());
+
+			content = query.getResultList();
+		}
+		
+		return new PageImpl<>(content, pageable, total);
 	}
 
 	private void setParameters(Query query, Map<String, Object> filterParameters) {
 		filterParameters.forEach(query::setParameter);
+	}
 
+	private void appendSortQuery(Pageable pageable) {
+		String sort = pageable.getSort().toString().replace(":", "");
+        if (StringUtils.isNotBlank(sort) && !StringUtils.equals(Sort.unsorted().toString(), sort)) {
+        	queryBuilder.append(" ORDER BY ").append(sort);
+        }
 	}
 }

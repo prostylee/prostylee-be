@@ -144,7 +144,8 @@ public class ProductSpecificationBuilder {
     private boolean isAttributesAvailable(Map<String, String> attributes) {
         return MapUtils.isNotEmpty(attributes);
     }
-    private void findByAttributes(Root root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
+
+    private void findByAttributes(Root<Product> root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
         Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
         List<Long> attrs = findByAttributes(attributesRequest);
         queryBuilder.valueIn(joinProductPrice, "id", attrs.toArray());

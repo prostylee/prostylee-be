@@ -2,15 +2,19 @@ package vn.prostylee.product.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import vn.prostylee.core.repository.query.HibernateQueryResult;
 import vn.prostylee.core.utils.DbUtil;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductExtRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Repository
@@ -32,18 +36,23 @@ public class ProductExtRepositoryImpl implements ProductExtRepository {
         }
         sb.append(" ORDER BY random()");
 
-        TypedQuery<Product> query = em
-                .createQuery(sb.toString(), Product.class);
+
+        Pageable pageable = PageRequest.of(suggestionProductFilter.getPage(), suggestionProductFilter.getLimit());
+        HibernateQueryResult<Product> queryResult = new HibernateQueryResult<>(em, Product.class, sb, pageable);
+        return queryResult.getResultList(buildQueryParams(suggestionProductFilter)).getContent();
+    }
+
+    private Map<String, Object> buildQueryParams(SuggestionProductFilter suggestionProductFilter) {
+        Map<String, Object> params = new HashMap<>();
 
         if (StringUtils.isNotBlank(suggestionProductFilter.getKeyword())) {
-            query.setParameter("keyword", DbUtil.buildSearchLikeQuery(suggestionProductFilter.getKeyword()));
-        }
-        if (suggestionProductFilter.getStoreId() != null) {
-            query.setParameter("storeId", suggestionProductFilter.getStoreId());
+            params.put("keyword", DbUtil.buildSearchLikeQuery(suggestionProductFilter.getKeyword()));
         }
 
-        return query.setFirstResult(suggestionProductFilter.getPage() * suggestionProductFilter.getLimit())
-                .setMaxResults(suggestionProductFilter.getLimit())
-                .getResultList();
+        if (suggestionProductFilter.getStoreId() != null) {
+            params.put("storeId", suggestionProductFilter.getStoreId());
+        }
+
+        return params;
     }
 }

@@ -1,12 +1,8 @@
 package vn.prostylee.store.dto.filter;
 
-import com.google.firebase.database.annotations.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
-import vn.prostylee.location.dto.LatLngDto;
-
-import javax.validation.Valid;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
