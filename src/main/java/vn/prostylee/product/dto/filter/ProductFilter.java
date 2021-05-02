@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.location.dto.LatLngDto;
 import vn.prostylee.product.constant.NewFeedType;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ public class ProductFilter extends BaseFilter {
     private Boolean bestSeller;
     private Boolean bestRating;
     private Boolean sale;
+    private LatLngDto nearByLocation;
 
     /**
      * The default number of days that will be count for considering as top following.

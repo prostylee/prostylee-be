@@ -20,6 +20,8 @@ import vn.prostylee.product.service.ProductForStoryService;
 import vn.prostylee.product.service.ProductOrderService;
 import vn.prostylee.product.service.ProductService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(ApiVersion.API_V1 + "/products")
 public class ProductController extends TrackingCrudController<ProductRequest, ProductResponse, Long, ProductFilter> {
@@ -43,7 +45,7 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     }
 
     @GetMapping("/new-feeds")
-    public Page<ProductResponse> getNewFeeds(ProductFilter productFilter) {
+    public Page<ProductResponse> getNewFeeds(@Valid ProductFilter productFilter) {
         if (productFilter.getNewFeedType() == null) {
             productFilter.setNewFeedType(NewFeedType.STORE);
         }
@@ -66,27 +68,27 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     }
 
     @GetMapping("/suggestions")
-    public Page<ProductResponse> getSuggestionProducts(SuggestionProductFilter suggestionProductFilter) {
+    public Page<ProductResponse> getSuggestionProducts(@Valid SuggestionProductFilter suggestionProductFilter) {
         return productCollectionService.getSuggestionProducts(null, suggestionProductFilter);
     }
 
     @GetMapping("/best-seller")
-    public Page<ProductResponse> getBestSellerProducts(BestSellerFilter bestSellerFilter) {
+    public Page<ProductResponse> getBestSellerProducts(@Valid BestSellerFilter bestSellerFilter) {
         return productCollectionService.getBestSellerProducts(bestSellerFilter);
     }
 
     @GetMapping("/recent-view")
-    public Page<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter) {
+    public Page<ProductResponse> getRecentViewProducts(@Valid RecentViewProductFilter recentViewProductFilter) {
         return new PageImpl<>(productService.getRecentViewProducts(recentViewProductFilter));
     }
 
     @GetMapping("/me/purchased")
-    public Page<ProductResponse> getPurchasedProductsByMe(PurchasedProductFilter purchasedProductFilter) {
+    public Page<ProductResponse> getPurchasedProductsByMe(@Valid PurchasedProductFilter purchasedProductFilter) {
         return productOrderService.getPurchasedProductsByMe(purchasedProductFilter);
     }
 
     @GetMapping("/{userId}/purchased")
-    public Page<ProductResponse> getPurchasedProductsByMe(@PathVariable(value = "userId") Long userId, PurchasedProductFilter purchasedProductFilter) {
+    public Page<ProductResponse> getPurchasedProductsByMe(@PathVariable(value = "userId") Long userId, @Valid PurchasedProductFilter purchasedProductFilter) {
         return productOrderService.getPurchasedProductsByUserId(userId, purchasedProductFilter);
     }
 }
