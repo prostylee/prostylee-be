@@ -52,6 +52,11 @@ public class ProductSpecificationBuilder {
             return cb.and(orPredicates);
         };
 
+        if (BooleanUtils.isTrue(productFilter.getSale())) {
+            mainSpec = mainSpec.and((root, query, cb) -> cb.isNotNull(root.get("priceSale")));
+            mainSpec = mainSpec.and((root, query, cb) -> cb.lessThan(root.get("priceSale"), root.get("price")));
+        }
+
         //TODO will config in database and try another way to show useful
         Set<Long> storeIds =  new LinkedHashSet<>();
         //storeIds.addAll(getAdsStores(5, productFilter));
