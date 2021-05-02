@@ -15,7 +15,7 @@ import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
-import vn.prostylee.store.service.StoreService;
+import vn.prostylee.product.service.ProductStoreService;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ProductConverter {
     private final LocationService locationService;
     private final FileUploadService fileUploadService;
     private final UserService userService;
-    private final StoreService storeService;
+    private final ProductStoreService productStoreService;
 
     public ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
@@ -65,12 +65,7 @@ public class ProductConverter {
     private ProductOwnerResponse buildProductOwner(Product product) {
         final ProductOwnerResponse[] productOwnerResponse = new ProductOwnerResponse[1];
         if (product.getStoreId() != null) {
-            storeService.fetchById(product.getStoreId()).ifPresent(store ->
-                    productOwnerResponse[0] = ProductOwnerResponse.builder()
-                            .id(store.getId())
-                            .name(store.getName())
-                            .logoUrl(store.getLogoUrl())
-                            .build());
+            productOwnerResponse[0] = productStoreService.getStoreOwner(product.getStoreId());
         } else {
             userService.fetchById(product.getCreatedBy()).ifPresent(user ->
                     productOwnerResponse[0] = ProductOwnerResponse.builder()
