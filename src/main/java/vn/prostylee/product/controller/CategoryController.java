@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.product.dto.filter.AttributeFilter;
 import vn.prostylee.product.dto.filter.CategoryFilter;
@@ -23,12 +22,10 @@ public class CategoryController extends TrackingCrudController<CategoryRequest, 
 
     private final AttributeService attributeService;
 
-    private final CategoryService categoryService;
     @Autowired
     public CategoryController(CategoryService categoryService, AttributeService attributeService) {
         super(categoryService);
         this.attributeService = attributeService;
-        this.categoryService = categoryService;
     }
 
     @GetMapping("/{id}/attributes")
