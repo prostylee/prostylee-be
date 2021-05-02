@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ProductCollectionConverterImpl implements ProductCollectionService {
+public class ProductCollectionServiceImpl implements ProductCollectionService {
 
     private final BaseFilterSpecs<Product> baseFilterSpecs;
     private final ProductRepository productRepository;
