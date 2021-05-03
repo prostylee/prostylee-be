@@ -5,9 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.core.controller.TrackingCrudController;
-import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
@@ -35,10 +33,5 @@ public class StoreController extends TrackingCrudController<StoreRequest, StoreR
     @GetMapping("/mini-stores")
     public Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeProductFilter) {
         return storeService.getMiniStoreResponse(storeProductFilter);
-    }
-
-    @GetMapping("/search")
-    public Page<StoreResponse> searchStoresByKeyword(StoreFilter storeFilter){
-        return storeService.searchStoresByKeyword(storeFilter);
     }
 }

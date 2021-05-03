@@ -22,5 +22,7 @@ public interface OrderService extends CrudService<OrderRequest, OrderResponse, L
 
     Page<ProductSoldCountResponse> countProductSold(PagingParam pagingParam);
 
+    Page<Long> getPurchasedProductIdsByUserId(Long userId, PagingParam pagingParam);
+
     OrderResponse reOrder(Long id);
 }

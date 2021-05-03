@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.filter.UserFollowerPageable;
+import vn.prostylee.useractivity.dto.filter.UserFollowingFilter;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserFollowerRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
@@ -42,6 +44,26 @@ public class UserFollowerController {
     @PutMapping("/unfollow")
     public SimpleResponse unfollow(@Valid @RequestBody UserFollowerRequest request) {
         return SimpleResponse.builder().data(service.unfollow(request)).build();
+    }
+
+    @GetMapping("/me/followers")
+    public Page<Long> getFollowersByMe(UserFollowerPageable userFollowerPageable) {
+        return service.getFollowersByMe(userFollowerPageable);
+    }
+
+    @GetMapping("/{id}/followers")
+    public Page<Long> getFollowersByUserId(@PathVariable Long id, UserFollowerPageable userFollowerPageable) {
+        return service.getFollowersByUserId(id, userFollowerPageable);
+    }
+
+    @GetMapping("/me/followings")
+    public Page<Long> getFollowingsByMe(@Valid UserFollowingFilter filter) {
+        return service.getFollowingsByMe(filter);
+    }
+
+    @GetMapping("/{id}/followings")
+    public Page<Long> getFollowingsByUserId(@PathVariable Long id, @Valid UserFollowingFilter filter) {
+        return service.getFollowingsByUserId(id, filter);
     }
 
     @PostMapping("/load-status-follow")

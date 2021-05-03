@@ -30,9 +30,4 @@ public class NearestLocationFilter extends BaseFilter {
                 "zipcode"
         };
     }
-
-    @Override
-    public String[] getSortableFields() {
-        return new String[0];
-    }
 }

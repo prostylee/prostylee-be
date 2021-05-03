@@ -11,15 +11,13 @@ import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.product.constant.NewFeedType;
-import vn.prostylee.product.dto.filter.ProductFilter;
-import vn.prostylee.product.dto.filter.RecentViewProductFilter;
-import vn.prostylee.product.dto.filter.RelatedProductFilter;
-import vn.prostylee.product.dto.filter.SuggestionProductFilter;
+import vn.prostylee.product.dto.filter.*;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.service.ProductCollectionService;
 import vn.prostylee.product.service.ProductForStoryService;
+import vn.prostylee.product.service.ProductOrderService;
 import vn.prostylee.product.service.ProductService;
 
 @RestController
@@ -29,16 +27,19 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     private final ProductService productService;
     private final ProductForStoryService productForStoryService;
     private final ProductCollectionService productCollectionService;
+    private final ProductOrderService productOrderService;
 
     @Autowired
     public ProductController(
             ProductService productService,
             ProductForStoryService productForStoryService,
-            ProductCollectionService productCollectionService) {
+            ProductCollectionService productCollectionService,
+            ProductOrderService productOrderService) {
         super(productService);
         this.productService = productService;
         this.productForStoryService = productForStoryService;
         this.productCollectionService = productCollectionService;
+        this.productOrderService = productOrderService;
     }
 
     @GetMapping("/new-feeds")
@@ -77,5 +78,15 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     @GetMapping("/recent-view")
     public Page<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter) {
         return new PageImpl<>(productService.getRecentViewProducts(recentViewProductFilter));
+    }
+
+    @GetMapping("/me/purchased")
+    public Page<ProductResponse> getPurchasedProductsByMe(PurchasedProductFilter purchasedProductFilter) {
+        return productOrderService.getPurchasedProductsByMe(purchasedProductFilter);
+    }
+
+    @GetMapping("/{userId}/purchased")
+    public Page<ProductResponse> getPurchasedProductsByMe(@PathVariable(value = "userId") Long userId, PurchasedProductFilter purchasedProductFilter) {
+        return productOrderService.getPurchasedProductsByUserId(userId, purchasedProductFilter);
     }
 }

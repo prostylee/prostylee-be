@@ -13,6 +13,4 @@ public interface ProductCollectionService {
     Page<ProductResponse> getSuggestionProducts(Long productId, SuggestionProductFilter suggestionProductFilter);
 
     Page<ProductResponse> getBestSellerProducts(BestSellerFilter bestSellerFilter);
-
-
 }
