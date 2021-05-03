@@ -1,6 +1,8 @@
 package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
+import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.store.dto.response.StoreResponse;
 
 import java.util.Date;
 
@@ -16,6 +18,10 @@ public class UserFollowerResponse {
     private Long targetId;
 
     private String targetType;
+
+    private StoreResponse store;
+
+    private UserResponse user;
 
     private Long customFieldId1;
 

@@ -1,6 +1,8 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -8,10 +10,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.store.service.StoreService;
 import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
@@ -26,6 +30,7 @@ import vn.prostylee.useractivity.repository.UserFollowerRepository;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +40,8 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     private final UserFollowerRepository repository;
     private final BaseFilterSpecs<UserFollower> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
+    private StoreService storeService;
+    private UserService userService;
 
     @Override
     public long count(UserFollowerFilter filter) {
@@ -47,7 +54,11 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         Specification<UserFollower> searchable = getUserFollowerSpecification(filter);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<UserFollower> page = repository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, UserFollowerResponse.class));
+        List<UserFollowerResponse> responses = page.getContent()
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        return new PageImpl<>(responses,pageable,responses.size());
     }
 
     @Override
@@ -149,5 +160,30 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         }
 
         return searchable;
+    }
+
+    private UserFollowerResponse convertToResponse(UserFollower userFollower){
+        UserFollowerResponse userFollowerResponse = BeanUtil.copyProperties(userFollower,UserFollowerResponse.class);
+        TargetType targetType = TargetType.valueOf(userFollower.getTargetType().toUpperCase());
+        switch (targetType){
+            case STORE:
+                Optional.ofNullable(userFollowerResponse.getTargetId())
+                        .ifPresent(targetId -> userFollowerResponse.setStore(storeService.findById(targetId)));
+                break;
+            case USER:
+                Optional.ofNullable(userFollowerResponse.getTargetId())
+                        .ifPresent(targetId -> userFollowerResponse.setUser(userService.findById(targetId)));
+                break;
+            default:
+                break;
+        }
+        return userFollowerResponse;
+    }
+
+    @Autowired
+    public void setInit(@Lazy StoreService storeService,
+                        @Lazy UserService userService){
+        this.storeService = storeService;
+        this.userService = userService;
     }
 }
