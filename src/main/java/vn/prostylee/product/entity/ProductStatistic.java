@@ -36,6 +36,9 @@ public class ProductStatistic extends AuditEntity {
     @Column(name = "number_of_comment")
     private Long numberOfComment;
 
+    @Column(name = "result_of_rating")
+    private Double resultOfRating;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "id")

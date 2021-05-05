@@ -3,16 +3,20 @@ package vn.prostylee.useractivity.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;
+import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
 import vn.prostylee.useractivity.dto.response.UserRatingResponse;
 import vn.prostylee.useractivity.entity.UserRating;
 import vn.prostylee.useractivity.repository.UserRatingRepository;
@@ -100,5 +104,11 @@ public class UserRatingServiceImpl implements UserRatingService {
             searchable = searchable.and(targetId);
         }
         return searchable;
+    }
+
+    @Override
+    public Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam) {
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT.toString());
     }
 }
