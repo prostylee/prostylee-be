@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.DbUtil;
 import vn.prostylee.useractivity.dto.filter.UserTrackingFilter;
 import vn.prostylee.useractivity.dto.request.UserTrackingRequest;
 import vn.prostylee.useractivity.dto.response.UserTrackingResponse;
@@ -43,5 +44,34 @@ public class UserTrackingServiceImpl implements UserTrackingService {
                 break;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> getRecentKeywordsBy(UserTrackingFilter userTrackingFilter) {
+        String path = "";
+        if (userTrackingFilter.getTrackingType() != null) {
+            path = userTrackingFilter.getTrackingType().getRelativeApiPath();
+        }
+        path = DbUtil.buildSearchLikeQuery(path);
+
+        Pageable pageable = PageRequest.of(userTrackingFilter.getPage(), userTrackingFilter.getLimit());
+        return repository.getRecentKeywords(userTrackingFilter.getUserId(), path, pageable);
+    }
+
+    @Override
+    public List<String> getTopKeywordsBy(UserTrackingFilter userTrackingFilter) {
+        String path = "";
+        if (userTrackingFilter.getTrackingType() != null) {
+            path = userTrackingFilter.getTrackingType().getRelativeApiPath();
+        }
+        path = DbUtil.buildSearchLikeQuery(path);
+
+        Long userId = userTrackingFilter.getUserId();
+        if (userId == null) {
+            userId = 0L;
+        }
+
+        Pageable pageable = PageRequest.of(userTrackingFilter.getPage(), userTrackingFilter.getLimit());
+        return repository.getTopKeywords(userId, path, pageable);
     }
 }

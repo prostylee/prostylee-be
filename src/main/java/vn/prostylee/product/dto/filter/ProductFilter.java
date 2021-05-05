@@ -24,6 +24,7 @@ public class ProductFilter extends BaseFilter {
 
     private NewFeedType newFeedType;
     private Boolean bestSeller;
+    private Boolean sale;
 
     /**
      * The default number of days that will be count for considering as top following.

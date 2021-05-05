@@ -11,8 +11,17 @@ import javax.validation.Valid;
 @Valid
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class BaseFilter extends PagingAndSortingParam implements SearchingDefinitions {
+public class BaseFilter extends PagingAndSortingParam implements SearchingDefinitions {
 
     private String keyword;
 
+    @Override
+    public String[] getSearchableFields() {
+        return new String[0];
+    }
+
+    @Override
+    public String[] getSortableFields() {
+        return new String[0];
+    }
 }

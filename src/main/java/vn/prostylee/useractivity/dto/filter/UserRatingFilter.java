@@ -10,14 +10,4 @@ public class UserRatingFilter extends BaseFilter {
     private Long targetId;
     private String targetType;
     private Integer value;
-
-    @Override
-    public String[] getSearchableFields() {
-        return new String[0];
-    }
-
-    @Override
-    public String[] getSortableFields() {
-        return new String[0];
-    }
 }

@@ -3,7 +3,6 @@ package vn.prostylee.store.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,17 +20,12 @@ import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
-import vn.prostylee.media.constant.ImageSize;
-import vn.prostylee.media.service.FileUploadService;
-import vn.prostylee.product.dto.filter.ProductFilter;
-import vn.prostylee.product.dto.response.ProductResponse;
-import vn.prostylee.product.service.ProductService;
+import vn.prostylee.store.converter.StoreConverter;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
 import vn.prostylee.store.dto.filter.StoreProductFilter;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.StoreRequest;
-import vn.prostylee.store.dto.response.CompanyResponse;
 import vn.prostylee.store.dto.response.StoreMiniResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
@@ -60,13 +54,11 @@ public class StoreServiceImpl implements StoreService {
 
     private final AuthenticatedProvider authenticatedProvider;
 
-    private final FileUploadService fileUploadService;
-
     private final LocationService locationService;
 
     private final UserMostActiveService userMostActiveService;
 
-    private ProductService productService;
+    private final StoreConverter storeConverter;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -91,10 +83,10 @@ public class StoreServiceImpl implements StoreService {
         List<StoreResponse> responses = page.getContent()
                 .stream()
                 .map(store -> {
-                    StoreResponse response = convertToResponse(store);
+                    StoreResponse response = storeConverter.convertToResponse(store);
                     Optional.ofNullable(response.getLocationId())
                             .ifPresent(locationId -> response.setLocation(nearByLocations.getOrDefault(locationId, null)));
-                    return convertToFullResponse(store, response, storeFilter.getNumberOfProducts());
+                    return storeConverter.convertToFullResponse(store, response, storeFilter.getNumberOfProducts());
                 })
                 .collect(Collectors.toList());
 
@@ -113,13 +105,13 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public StoreResponse findById(Long id) {
         Store store = getById(id);
-        return convertToFullResponse(store, 0);
+        return storeConverter.convertToFullResponse(store, 0);
     }
 
     @Override
     public Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeFilter) {
         Page<StoreResponse> storeResponses = findAll(storeFilter);
-        return storeResponses.map(this::convertToMiniResponse);
+        return storeResponses.map(storeConverter::convertToMiniResponse);
     }
 
     @Override
@@ -147,7 +139,7 @@ public class StoreServiceImpl implements StoreService {
 
         Store savedStore = storeRepository.save(store);
 
-        return convertToResponse(savedStore);
+        return storeConverter.convertToResponse(savedStore);
     }
 
     @Override
@@ -160,7 +152,7 @@ public class StoreServiceImpl implements StoreService {
         store.setCompany(company);
 
         Store savedStore = storeRepository.save(store);
-        return convertToResponse(savedStore);
+        return storeConverter.convertToResponse(savedStore);
     }
 
     @Override
@@ -236,16 +228,6 @@ public class StoreServiceImpl implements StoreService {
         return locationService.getNearestLocations(locationFilter);
     }
 
-    private StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {
-        StoreMiniResponse storeMiniResponse = BeanUtil.copyProperties(storeResponse, StoreMiniResponse.class);
-        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()), ImageSize.LOGO.getWidth(), ImageSize.LOGO.getHeight());
-        if (CollectionUtils.isNotEmpty(imageUrls)) {
-            storeMiniResponse.setLogoUrl(imageUrls.get(0));
-        }
-        storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
-        return storeMiniResponse;
-    }
-
     private Store getById(Long id) {
         return storeRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Store is not found with id [" + id + "]"));
@@ -253,79 +235,13 @@ public class StoreServiceImpl implements StoreService {
 
     private List<StoreResponse> getMostActiveStoresByStoreIds(List<Store> stores, int numberOfProducts) {
         return stores.stream()
-                .map(store -> convertToFullResponse(store, numberOfProducts))
+                .map(store -> storeConverter.convertToFullResponse(store, numberOfProducts))
                 .collect(Collectors.toList());
-    }
-
-    private StoreResponse convertToResponse(Store store) {
-        StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
-        Optional.ofNullable(store.getCompany()).ifPresent(company -> storeResponse.setCompanyId(company.getId()));
-        return storeResponse;
-    }
-
-    private StoreResponse convertToFullResponse(Store store, int numberOfProducts) {
-        StoreResponse storeResponse = convertToResponse(store);
-        return convertToFullResponse(store, storeResponse, numberOfProducts);
-    }
-
-    private StoreResponse convertToFullResponse(Store store, StoreResponse storeResponse, int numberOfProducts) {
-        storeResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
-
-        setStoreLogo(storeResponse, store.getLogo());
-        setStoreLocation(storeResponse, store.getLocationId());
-        setStoreProducts(storeResponse, numberOfProducts);
-        setStoreCompany(storeResponse, store.getCompany());
-        return storeResponse;
-    }
-
-    private void setStoreCompany(StoreResponse storeResponse, Company company) {
-        Optional.ofNullable(company)
-                .ifPresent(com -> storeResponse.setCompany(BeanUtil.copyProperties(com, CompanyResponse.class)));
-    }
-
-    private void setStoreLogo(StoreResponse storeResponse, Long logo) {
-        if (logo == null) {
-            return;
-        }
-        List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(logo), ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
-        if (CollectionUtils.isNotEmpty(imageUrls)) {
-            storeResponse.setLogoUrl(imageUrls.get(0));
-        }
-    }
-
-    private void setStoreLocation(StoreResponse storeResponse, Long locationId) {
-        if (locationId != null && storeResponse.getLocation() == null) {
-            try {
-                storeResponse.setLocation(locationService.findById(locationId));
-            } catch (ResourceNotFoundException e) {
-                log.debug("Could not found a location with id={}", locationId);
-            }
-        }
-    }
-
-    private void setStoreProducts(StoreResponse storeResponse, int numberOfProducts) {
-        if (numberOfProducts > 0) {
-            List<ProductResponse> products = getLatestProducts(storeResponse.getId(), numberOfProducts);
-            storeResponse.setProducts(products);
-        }
-    }
-
-    private List<ProductResponse> getLatestProducts(Long storeId, int numberOfProducts) {
-        ProductFilter productFilter = new ProductFilter();
-        productFilter.setLimit(numberOfProducts);
-        productFilter.setStoreId(storeId);
-        productFilter.setSorts(new String[] {"-createdAt"});
-        return productService.findAll(productFilter).getContent();
     }
 
     @Override
     public StoreResponseLite getStoreResponseLite(Long id) {
         Store store = getById(id);
         return BeanUtil.copyProperties(store, StoreResponseLite.class);
-    }
-
-    @Autowired
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
     }
 }

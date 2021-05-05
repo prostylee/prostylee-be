@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;

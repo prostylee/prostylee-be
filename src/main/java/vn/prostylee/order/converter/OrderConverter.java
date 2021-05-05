@@ -95,7 +95,7 @@ public class OrderConverter {
                         .collect(Collectors.toList())
         );
         orderResponse.setPaymentType(order.getPaymentType().getName());
-        orderResponse.setStatus(order.getStatus().name());
+        orderResponse.setStatus(order.getStatus() == null ? null : order.getStatus().name());
         orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
         orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
         return orderResponse;

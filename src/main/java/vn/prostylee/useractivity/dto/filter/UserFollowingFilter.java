@@ -2,14 +2,15 @@ package vn.prostylee.useractivity.dto.filter;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserFollowerFilter extends UserFollowerPageable {
+public class UserFollowingFilter extends UserFollowerPageable {
 
+    @NotBlank
     private String targetType;
-    private Long targetId;
-    private Long userId;
 }

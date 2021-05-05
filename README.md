@@ -113,7 +113,13 @@ Run end to end test
 Run the following command:
 
 ```shell
-./gradlew build
+./gradlew clean build
+```
+
+or run without test:
+
+```shell
+./gradlew clean build -x test -x integrationTest -x e2eTest
 ```
 
 After build succesfully, we will have a jar file at folder `build/libs`.
