@@ -17,6 +17,8 @@ public class CategoryFilter extends BaseFilter {
 
     private Long parentId;
 
+    private Boolean hotStatus;
+
     private List<Attribute> attributes;
 
     @Override
