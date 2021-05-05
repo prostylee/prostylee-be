@@ -1,0 +1,339 @@
+server:
+  servlet:
+    contextPath: /
+  tomcat:
+    relaxed-query-chars: "|,{,},[,]"
+    relaxedPathChars: "[,],|"
+
+services:
+  firebase:
+    database-url: https://prostylee-9c568.firebaseio.com/
+    admin-sdk: google/prostylee-9c568-firebase-adminsdk-rh0b8-f2d09f23d5.json
+
+  zalo:
+    endpoint: https://graph.zalo.me
+    version: 2.0
+    path:
+      profile: me
+
+  email:
+    receive-contact: stylee.common@gmail.com
+    reply-to: support@prostylee.vn
+    send-from: support@prostylee.vn
+
+  drive:
+    app-name: prostylee
+    folder-id: 1NpC9-lZe4LgjvR89-w3YGsexbVniPTad
+    service-account-credential: classpath:google/prostylee-1605631821116-5a787decf53b.json
+
+  local-storage:
+    local-folder:
+      location: prostylee-files
+    temp-folder:
+      location: prostylee-temp
+      timeToLiveInHours: 720
+
+app:
+  ## Order configurations
+  order-code:
+    length: 8 # The length of order code.
+
+  ## Mobile push notification using Expo API
+  push-notification:
+    url: https://exp.host/--/api/v2/push/send
+
+  ## Scheduler using Spring Quartz
+  ## Reference cron expression: https://crontab.guru/
+  quartz:
+    enable: true
+    jobs:
+      - # product-statistic
+        name: 'Product Statistic Job'
+        group: 'PRODUCT'
+        description: 'For product statistic job'
+        job-clazz: vn.prostylee.product.job.ProductStatisticJob
+        job-id: 1
+        job-type: 'STATISTIC'
+        detail:
+          name: 'Product Statistic Trigger'
+          group: 'ProductStatisticTrigger'
+          cron: '0 0/1 * * * ?' # At every 30th minute.
+      - # store-statistic
+        name: 'Store Statistic Job'
+        group: 'STORE'
+        description: 'For store statistic job'
+        job-clazz: vn.prostylee.store.job.StoreStatisticJob
+        job-id: 2
+        job-type: 'STATISTIC'
+        detail:
+          name: 'Store Statistic Trigger'
+          group: 'StoreStatisticTrigger'
+          cron: '0 * 0/1 * * ?' # At every hour.
+      - # user-statistic
+        name: 'User Statistic Job'
+        group: 'USER'
+        description: 'For user statistic job'
+        job-clazz: vn.prostylee.auth.job.UserStatisticJob
+        job-id: 3
+        job-type: 'STATISTIC'
+        detail:
+          name: 'User Statistic Trigger'
+          group: 'UserStatisticTrigger'
+          cron: '0 0/30 * * * ?' # At every 30th minute.
+
+  ## Multi-thread
+  thread-executor:
+    core-pool-size: 2
+    max-pool-size: 16
+    queue-capacity: 1000
+
+  ## App Monitoring config
+  monitor:
+    create-event:
+      ### Enable/ Disable monitor on create event
+      enable: true
+
+      ### entities will be monitor and publish a create event
+      ### Each entity separated by a comma, for example com.prostylee.entity.User,com.stylee.entity.Role
+      entities: vn.prostylee.auth.entity.User
+
+    performance:
+      ### Enable/ Disable monitor on the time executing each methods
+      enable: true
+
+    trace:
+      ### Enable log trace, must also change the setting: logging.level.root=TRACE to enable this feature
+      enable: true
+
+    user-access:
+      ### Enable/ Disable monitor on each method save / delete of user
+      enable: true
+
+  ## Security config
+  security:
+    reset-password-policies:
+      expiredInMinutes: 5
+      length: 5
+
+    ## JWT Authentication config
+    jwt:
+      # The access token will be expired in 4 hours
+      accessTokenExpirationInMinutes: 240
+
+      # The access token will be expired in 7 days
+      refreshTokenExpirationInMinutes: 10080
+
+      # The issuer
+      tokenIssuer: https://prostylee.vn/
+
+      # The token signing key
+      tokenSigningKey: ProStylee-JWT-Secret-Key
+
+    max-age: 36000
+    allowed-origins:
+      - https://${CORS_DOMAIN}
+      - http://localhost:4200
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - Authorization
+      - Origin
+      - Content-Type
+      - Accept
+      - Accept-Encoding
+      - Accept-Language
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Headers
+      - Access-Control-Request-Method
+      - X-Requested-With
+      - X-Auth-Token
+      - X-Xsrf-Token
+      - Cache-Control
+      - Id-Token
+    allowed-public-apis:
+      - /ping/**
+      - /v1/public/*
+      - /v1/auth/**
+      - /v1/auth/**/**
+      - /v1/masters/**
+      - /v1/supports/**
+      - /v1/oauth/**
+  aws:
+    # AWS Credential -
+    credential:
+      accessKey: AKIA5IRSGPONZVRYLWV5
+      secretKey: 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
+    # AWS S3
+    s3:
+      bucket: psmedia211437-dev
+      region: ap-southeast-1
+      bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
+      cloudFrontId: d1fq4uh0wyvt14
+      cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/
+      s3ResizeImagePrefix: fit-in/
+      s3MediaPublicFolder: public
+    # AWS Cognito
+    cognito:
+      clientId: 1cjpg4lfnim8m1p7iiokcvbrld
+      poolId: ap-southeast-1_c0EMF4obI
+      endpoint: prostylee-dev.auth.ap-southeast-1.amazoncognito.com
+      region: ap-southeast-1
+      identityPoolId: ap-southeast-1:289b0d35-9dd6-4164-a2f8-073a72d88e84
+      issuer: https://cognito-idp.${app.aws.cognito.region}.amazonaws.com/${app.aws.cognito.poolId}
+      jwkUrl: ${app.aws.cognito.issuer}/.well-known/jwks.json
+      connectionTimeout: 2000
+      readTimeout: 2000
+
+  http:
+    connectTimeout: 5000
+    responseTimeout: 5000
+    httpUseProxy: false
+    proxyHost: localhost
+    proxyPort: 3128
+
+spring:
+  application:
+    name: prostylee-be
+
+  profiles:
+    active: dev
+
+  flyway:
+    locations: db/migration,db/masterdata
+    check-location: false
+    enabled: true
+    placeholderReplacement: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/prostylee
+    username: postgres
+    password: ENC(LIutR+3yZgTVvs2yu+IzPQ==)
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 10
+      maximumPoolSize: 50
+      connectionTimeout: 20000
+      idle-timeout: 30000
+      pool-name: SpringBootJPAHikariCP
+      max-lifetime: 2000000
+      connection-test-query: select 1
+      connection-init-sql: select 1
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        globally_quoted_identifiers: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+    open-in-view: false
+
+  ## Scheduler using Spring Quartz
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always # Auto initialize the Quartz tables
+      comment-prefix: '-- '
+
+  ## Upload file config
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 64KB
+      max-file-size: 4MB
+      max-request-size: 100MB
+
+  ## Email config
+  mail:
+    ### Gmail SMTP Server
+    host: smtp.gmail.com
+    port: 587
+    username: stylee.common@gmail.com
+    password: ENC(Gh1K+Paii8f4Bujro1UUFMcNnqLkkmTYso119r5j1oU=)
+    default-encoding: UTF-8
+    properties:
+      mail:
+        debug: false
+        smtp:
+          auth: true
+          starttls:
+            enable: false
+            required: true
+        transport:
+          protocol: smtp
+
+    ### AWS SES
+#    host: email-smtp.us-west-2.amazonaws.com
+#    username: username
+#    password: password
+#    properties:
+#      mail:
+#        debug: true
+#        smtp:
+#          auth: true
+#          port: 25
+#          starttls:
+#            enable: true
+#            required: true
+#        transport:
+#          protocol: smtp
+
+# Swagger config
+# @See https://springdoc.org
+springdoc:
+  api-docs:
+    # /api-docs endpoint custom path
+    # http://localhost:8090/{context-path}/v3/api-docs/
+    # http://localhost:8090/{context-path}/v3/api-docs.yaml
+    path: /v3/api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  group-configs:
+    -   group: Business API v1
+        packages-to-scan: vn.prostylee
+        paths-to-match: /v1/**
+  swagger-ui:
+    # swagger-ui custom path
+    # http://localhost:8090/{context-path}/swagger-ui.html
+    path: /swagger-ui.html
+
+### Api information
+swagger:
+  api:
+    basePackage: vn.prostylee
+    contact:
+      email: support@prostylee.vn
+      name: ProStylee System
+      url: https://prostylee.vn
+    description: ProStylee Documents with Swagger OpenAPI Specification v3
+    license: https://prostylee.vn
+    licenseUrl: https://prostylee.vn/license
+    termsOfServiceUrl: https://prostylee.vn
+    title: ProStylee API Documents
+    version: v1
+
+# encrypting and checking a password
+# Can be set from:
+# - CLI: java -Djasypt.encryptor.password=SECRET_KEY Application
+# - Java code: System.setProperty("jasypt.encryptor.password", "SECRET_KEY");
+# - Environment:
+#   + Window: set JASYPT_ENCRYPTOR_PASSWORD=secretkey
+#   + Linux: export JASYPT_ENCRYPTOR_PASSWORD=secretkey
+# Reference: http://www.jasypt.org/cli.html
+jasypt:
+  encryptor:
+    password: pro-stylee.2020@secret
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
