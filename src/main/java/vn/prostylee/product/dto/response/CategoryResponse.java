@@ -16,6 +16,7 @@ public class CategoryResponse {
     private String icon;
     private Boolean active;
     private String languageCode;
+    private Boolean hotStatus;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<AttributeResponse> attributes;
 }

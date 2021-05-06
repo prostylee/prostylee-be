@@ -31,5 +31,7 @@ public class CategoryRequest {
 
     private String languageCode;
 
+    private Boolean hotStatus;
+
     private Set<AttributeRequest> attributes;
 }
