@@ -39,4 +39,6 @@ public class ProductResponse {
     private LocationResponse location;
 
     private Boolean isAdvertising;
+
+    private ProductStatisticResponse productStatisticResponse;
 }

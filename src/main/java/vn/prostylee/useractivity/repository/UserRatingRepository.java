@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
+import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.entity.UserRating;
 
 /**
@@ -28,4 +29,11 @@ public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
             "   GROUP BY ur.target_id " +
             "   ORDER BY ur.target_id", nativeQuery = true)
     Page<RatingResultCountResponse> countRatingResult(Pageable pageable,@Param("targetType") String targetType);
+
+    @Query(value = "SELECT ur.target_id AS productId, COUNT(ur.id) AS count" +
+            " FROM user_rating ur" +
+            " WHERE ur.target_type = :targetType" +
+            " GROUP BY ur.target_id" +
+            " ORDER BY ur.target_id", nativeQuery = true)
+    Page<ReviewCountResponse> countNumberReview(Pageable pageable,@Param("targetType") String targetType);
 }

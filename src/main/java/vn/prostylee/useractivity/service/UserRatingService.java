@@ -6,6 +6,7 @@ import vn.prostylee.core.service.CrudService;
 import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
+import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.dto.response.UserRatingResponse;
 
 public interface UserRatingService extends CrudService<UserRatingRequest, UserRatingResponse, Long> {
@@ -24,4 +25,6 @@ public interface UserRatingService extends CrudService<UserRatingRequest, UserRa
     double average(UserRatingFilter filter);
 
     Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam);
+
+    Page<ReviewCountResponse> countNumberReview(PagingParam pagingParam);
 }

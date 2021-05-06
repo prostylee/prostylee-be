@@ -175,6 +175,7 @@ public class ProductServiceImpl implements ProductService {
                 .numberOfLike(0L)
                 .numberOfComment(0L)
                 .resultOfRating((double)0L)
+                .numberOfReview(0L)
                 .build();
     }
 

@@ -13,8 +13,10 @@ import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.dto.response.ProductStatisticResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.service.ProductStatisticService;
 import vn.prostylee.product.service.ProductStoreService;
 
 import java.util.Collections;
@@ -32,6 +34,7 @@ public class ProductConverter {
     private final FileUploadService fileUploadService;
     private final UserService userService;
     private final ProductStoreService productStoreService;
+    private final ProductStatisticService productStatisticService;
 
     public ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
@@ -39,6 +42,7 @@ public class ProductConverter {
         productResponse.setLocation(buildLocation(productResponse.getLocationId()));
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
+        productResponse.setProductStatisticResponse(buildProductStatistic(product.getId()));
         return productResponse;
     }
 
@@ -75,5 +79,11 @@ public class ProductConverter {
                             .build());
         }
         return productOwnerResponse[0];
+    }
+
+    private ProductStatisticResponse buildProductStatistic(Long id){
+        return Optional.ofNullable(id)
+                .map(productStatisticService::findById)
+                .orElse(null);
     }
 }

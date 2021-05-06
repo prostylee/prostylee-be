@@ -17,6 +17,7 @@ import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
+import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.dto.response.UserRatingResponse;
 import vn.prostylee.useractivity.entity.UserRating;
 import vn.prostylee.useractivity.repository.UserRatingRepository;
@@ -110,5 +111,11 @@ public class UserRatingServiceImpl implements UserRatingService {
     public Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam) {
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
         return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT.toString());
+    }
+
+    @Override
+    public Page<ReviewCountResponse> countNumberReview(PagingParam pagingParam){
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT.toString());
     }
 }

@@ -14,6 +14,7 @@ import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
+import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.service.UserRatingService;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class ProductStatisticJob extends QuartzJobBean {
         countNumberOfLike();
         countNumberOfComment();
         countResultOfRating();
+        countNumberOfReview();
     }
 
     private void countNumberOfSold() {
@@ -74,6 +76,18 @@ public class ProductStatisticJob extends QuartzJobBean {
             upsertRatingStatistic(pageRatingResult.getContent());
             page++;
             pageRatingResult = userRatingService.countRatingResult(new PagingParam(page, LIMIT));
+            log.debug("totalPages={}, totalElements={}, productSoldSize={}", pageRatingResult.getTotalPages(), pageRatingResult.getTotalElements(), pageRatingResult.getNumberOfElements());
+        }
+    }
+
+    private void countNumberOfReview(){
+        int page = 0;
+        Page<ReviewCountResponse> pageRatingResult = userRatingService.countNumberReview(new PagingParam(page, LIMIT));
+        log.debug("totalPages={}, totalElements={}, productSoldSize={}", pageRatingResult.getTotalPages(), pageRatingResult.getTotalElements(), pageRatingResult.getNumberOfElements());
+        while (pageRatingResult.getNumberOfElements() > 0) {
+            upsertReviewStatistic(pageRatingResult.getContent());
+            page++;
+            pageRatingResult = userRatingService.countNumberReview(new PagingParam(page, LIMIT));
             log.debug("totalPages={}, totalElements={}, productSoldSize={}", pageRatingResult.getTotalPages(), pageRatingResult.getTotalElements(), pageRatingResult.getNumberOfElements());
         }
     }
@@ -123,6 +137,33 @@ public class ProductStatisticJob extends QuartzJobBean {
                     return ProductStatistic.builder()
                             .product(product)
                             .resultOfRating(mapProductCount.getOrDefault(productId, (double) 0L))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        statistics.addAll(adds);
+
+        productStatisticRepository.saveAll(statistics);
+    }
+
+    private void upsertReviewStatistic(List<ReviewCountResponse> reviewCountResponses) {
+        final Map<Long, Long> mapProductCount = reviewCountResponses.stream()
+                .collect(Collectors.toMap(ReviewCountResponse::getProductId, ReviewCountResponse::getCount));
+
+        List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
+
+        statistics.forEach(productStatistic -> {
+            productStatistic.setNumberOfReview(mapProductCount.getOrDefault(productStatistic.getProduct().getId(), 0L));
+            mapProductCount.remove(productStatistic.getProduct().getId());
+        });
+
+        List<ProductStatistic> adds = mapProductCount.keySet()
+                .stream()
+                .map(productId -> {
+                    Product product = new Product(productId);
+                    return ProductStatistic.builder()
+                            .product(product)
+                            .numberOfReview(mapProductCount.getOrDefault(productId, 0L))
                             .build();
                 })
                 .collect(Collectors.toList());
