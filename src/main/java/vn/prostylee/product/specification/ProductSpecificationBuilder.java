@@ -1,19 +1,16 @@
 package vn.prostylee.product.specification;
 
+import com.google.common.base.CaseFormat;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.specs.BaseFilterSpecs;
-import vn.prostylee.core.specs.QueryBuilder;
+import vn.prostylee.core.constant.ApiParamConstant;
 import vn.prostylee.core.utils.DateUtils;
-import vn.prostylee.order.service.OrderService;
+import vn.prostylee.core.utils.DbUtil;
 import vn.prostylee.product.dto.filter.ProductFilter;
-import vn.prostylee.product.entity.Product;
-import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
@@ -22,133 +19,201 @@ import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
-import javax.persistence.criteria.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductSpecificationBuilder {
-    private final BaseFilterSpecs<Product> baseFilterSpecs;
-    private final OrderService orderService;
+    private static final int NUMBER_OF_TOP_FOLLOWING_STORE = 50;
+    private static final int NUMBER_OF_PAID_STORE = 30;
+    private static final int NUMBER_OF_NEW_STORE = 100;
+    private static final int NUMBER_OF_RECORD_TO_BE_CALCULATED_DISTANCE = 10000;
+
     private final UserFollowerService userFollowerService;
     private final StoreService storeService;
     private final ProductAttributeRepository productAttributeRepository;
 
-    public Specification<Product> buildSearchable(ProductFilter productFilter) {
-        Specification<Product> mainSpec = (root, query, cb) -> {
-            QueryBuilder queryBuilder = new QueryBuilder<>(cb, root);
-            findByUser(productFilter, queryBuilder);
-            findByCategory(productFilter, queryBuilder);
-            findByStore(productFilter, queryBuilder);
-            if (isAttributesAvailable(productFilter.getAttributes())) {
-                findByAttributes(root, productFilter.getAttributes(), queryBuilder);
-            }
+    public StringBuilder buildQuery(ProductFilter productFilter) {
+        List<Long> storeIds = new ArrayList<>(Optional.ofNullable(productFilter.getStoreIds())
+                .orElseGet(Collections::emptyList));
+        if (BooleanUtils.isTrue(productFilter.getTopFollowingStore())) {
+            storeIds.addAll(getTopFollowingStores(NUMBER_OF_TOP_FOLLOWING_STORE, productFilter));
+        } else if (BooleanUtils.isTrue(productFilter.getPaidStore())) {
+            storeIds.addAll(getPaidStores(NUMBER_OF_PAID_STORE, productFilter));
+        } else if (BooleanUtils.isTrue(productFilter.getNewStore())) {
+            storeIds.addAll(getNewStores(NUMBER_OF_NEW_STORE, productFilter));
+        }
+        productFilter.setStoreIds(storeIds);
 
-            if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
-                root.join( "statistic", JoinType.LEFT);
-            }
+        return new StringBuilder("SELECT p.*")
+                .append(buildFromClause(productFilter))
+                .append(buildWhereClause(productFilter))
+                .append(buildOrderClause(productFilter));
+    }
 
-            Predicate[] orPredicates = queryBuilder.build();
-            return cb.and(orPredicates);
-        };
+    private StringBuilder buildFromClause(ProductFilter productFilter) {
+        final StringBuilder sbFrom = new StringBuilder(" FROM product p");
+
+        if (productFilter.getCategoryId() != null) {
+            sbFrom.append(" INNER JOIN category c ON c.id = p.category_id");
+        } else if (StringUtils.isNotBlank(productFilter.getKeyword())) {
+            sbFrom.append(" LEFT JOIN category c ON c.id = p.category_id");
+        }
+
+        if (isAttributesAvailable(productFilter.getAttributes())) {
+            sbFrom.append(" INNER JOIN product_price pp ON pp.product_id = p.id");
+        }
+
+        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+            sbFrom.append(" LEFT JOIN product_statistic ps ON ps.id = p.id");
+        }
+
+        if (productFilter.getLatitude() != null && productFilter.getLongitude() != null) {
+            sbFrom.append(" LEFT JOIN func_get_nearest_locations(:pLongitude, :pLatitude, :pTargetType, :pLimit, :pOffset) loc ON loc.id = p.location_id");
+        }
+
+        return sbFrom;
+    }
+
+    private StringBuilder buildWhereClause(ProductFilter productFilter) {
+        final StringBuilder sbWhere = new StringBuilder(" WHERE 1=1");
+        if (productFilter.getUserId() != null) {
+            sbWhere.append(" AND p.created_by = :createdBy");
+        }
+
+        if (productFilter.getCategoryId() != null) {
+            sbWhere.append(" AND p.category_id = :categoryId");
+        }
+
+        if (productFilter.getStoreId() != null || CollectionUtils.isNotEmpty(productFilter.getStoreIds())) {
+            sbWhere.append(" AND p.store_id IN (:storeIds)");
+        }
+
+        if (isAttributesAvailable(productFilter.getAttributes())) {
+            sbWhere.append(" AND pp.id IN (:productPriceIds)");
+        }
 
         if (BooleanUtils.isTrue(productFilter.getSale())) {
-            mainSpec = mainSpec.and((root, query, cb) -> cb.isNotNull(root.get("priceSale")));
-            mainSpec = mainSpec.and((root, query, cb) -> cb.lessThan(root.get("priceSale"), root.get("price")));
+            sbWhere.append(" AND p.price_sale IS NOT NULL AND p.price_sale < p.price");
         }
-
-        //TODO will config in database and try another way to show useful
-        Set<Long> storeIds =  new LinkedHashSet<>();
-        //storeIds.addAll(getAdsStores(5, productFilter));
-        storeIds.addAll(getTopFollowingStores(5, productFilter));
-        storeIds.addAll(getPaidStores(5, productFilter));
-        storeIds.addAll(getNewStores(30, productFilter));
-        getProductSpecification(mainSpec,  new ArrayList<>(storeIds));
 
         if (StringUtils.isNotBlank(productFilter.getKeyword())) {
-            Specification<Product> searchSpec = baseFilterSpecs.search(productFilter);
-            mainSpec = mainSpec.and(searchSpec);
+            sbWhere.append(" AND (LOWER(p.name) LIKE :keyword OR LOWER(c.name) LIKE :keyword)");
         }
-        return mainSpec;
+
+        return sbWhere;
     }
 
-    private Specification<Product> getProductSpecification(Specification<Product> spec, List<Long> storeIds) {
-        if (CollectionUtils.isNotEmpty(storeIds)) {
-            spec = spec.and((root, query, cb) -> {
-                CriteriaBuilder.In<Long> inClause = cb.in(root.get("storeId"));
-                storeIds.forEach(inClause::value);
-                return inClause;
-            });
+    private StringBuilder buildOrderClause(ProductFilter productFilter) {
+        final StringBuilder sbOrder = new StringBuilder();
+        if (BooleanUtils.isTrue(productFilter.getSale())) {
+            sbOrder.append(" ORDER BY (100 - (COALESCE(p.price_sale, 0) / p.price) * 100) DESC, p.created_at DESC");
+        } else if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+            sbOrder.append(" ORDER BY COALESCE(ps.number_of_sold, 0) DESC, p.created_at DESC");
+        } else if (productFilter.getLatitude() != null && productFilter.getLongitude() != null) {
+            sbOrder.append(" ORDER BY COALESCE(loc.distance, 100000000) ASC, p.created_at DESC");
+        } else {
+            final List<String> supportedSortFields = Arrays.asList(productFilter.getSortableFields());
+            List<String> orderByColumns = Optional.ofNullable(productFilter.getSorts())
+                    .map(Arrays::asList)
+                    .filter(CollectionUtils::isNotEmpty)
+                    .orElseGet(() -> Collections.singletonList("-createdAt"))
+                    .stream()
+                    .map(item -> {
+                        if (item.startsWith(ApiParamConstant.SORT_DESC)) {
+                            String columnName = item.substring(1);
+                            if (supportedSortFields.contains(columnName)) {
+                                return " p." + convertFromCamelToUnderscore(columnName) + " DESC";
+                            }
+                        } else if (supportedSortFields.contains(item)) {
+                            return " p." + convertFromCamelToUnderscore(item);
+                        }
+                        return "";
+                    }).collect(Collectors.toList());
+            String orderBySQL = String.join(", ", orderByColumns);
+            if (orderBySQL.trim().length() > 0) {
+                sbOrder.append(" ORDER BY").append(orderBySQL);
+            } else {
+                sbOrder.append(" ORDER BY p.created_at DESC");
+            }
         }
-        return spec;
+
+        return sbOrder;
     }
 
-    //TODO
-    /*private List<Long> getAdsStores(int numberOfTakeProduct, ProductFilter productFilter){
-        return new ArrayList<>();
-    }*/
+    private String convertFromCamelToUnderscore(String str) {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, str);
+    }
 
-    private List<Long> getNewStores(int numberOfTakeProduct, ProductFilter productFilter) {
+    public Map<String, Object> buildParams(ProductFilter productFilter) {
+        Map<String, Object> params = new HashMap<>();
+
+        if (productFilter.getUserId() != null) {
+            params.put("createdBy", productFilter.getUserId());
+        }
+
+        if (productFilter.getCategoryId() != null) {
+            params.put("categoryId", productFilter.getCategoryId());
+        }
+
+        if (productFilter.getStoreId() != null || CollectionUtils.isNotEmpty(productFilter.getStoreIds())) {
+            List<Long> storeIds = new ArrayList<>(Optional.ofNullable(productFilter.getStoreIds())
+                    .orElseGet(Collections::emptyList));
+            if (productFilter.getStoreId() != null) {
+                storeIds.add(productFilter.getStoreId());
+            }
+            params.put("storeIds", storeIds);
+        }
+
+        if (isAttributesAvailable(productFilter.getAttributes())) {
+            List<Long> attrs = findByAttributes(productFilter.getAttributes());
+            params.put("productPriceIds", attrs);
+        }
+
+        if (StringUtils.isNotBlank(productFilter.getKeyword())) {
+            params.put("keyword", DbUtil.buildSearchLikeQuery(productFilter.getKeyword()));
+        }
+
+        if (productFilter.getLatitude() != null && productFilter.getLongitude() != null) {
+            params.put("pLongitude", productFilter.getLongitude());
+            params.put("pLatitude", productFilter.getLatitude());
+            params.put("pTargetType", TargetType.PRODUCT.name());
+            params.put("pLimit", NUMBER_OF_RECORD_TO_BE_CALCULATED_DISTANCE);
+            params.put("pOffset", 0);
+        }
+
+        return params;
+    }
+
+    private List<Long> getNewStores(int numberOfStore, ProductFilter productFilter) {
         NewestStoreRequest request = NewestStoreRequest.builder()
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
-        request.setLimit(numberOfTakeProduct);
+        request.setLimit(numberOfStore);
         return storeService.getNewStoreIds(request);
     }
 
-    private List<Long> getPaidStores(int numberOfTakeProduct, ProductFilter productFilter) {
+    private List<Long> getPaidStores(int numberOfStore, ProductFilter productFilter) {
         PaidStoreRequest request = PaidStoreRequest.builder()
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
-        request.setLimit(numberOfTakeProduct);
-        return orderService.getPaidStores(request);
+        request.setLimit(numberOfStore);
+        // TODO https://prostylee.atlassian.net/browse/BE-426
+        return Collections.emptyList();
     }
 
-    private List<Long> getTopFollowingStores(int numberOfTakeProduct, ProductFilter productFilter) {
+    private List<Long> getTopFollowingStores(int numberOfStore, ProductFilter productFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
                 .targetTypes(Collections.singletonList(TargetType.STORE.name()))
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
-        request.setLimit(numberOfTakeProduct);
+        request.setLimit(numberOfStore);
         return userFollowerService.getTopBeFollows(request);
-    }
-
-  /*  private List<Long> buildNewestProducts(List<Long> storeIds) {
-        List<Long> productIds = new ArrayList();
-        for (Long storeId: storeIds) {
-            NewestProductRequest newestProductRequest = NewestProductRequest.builder().storeId(storeId).build();
-            productIds.addAll(this.getNewestProduct(newestProductRequest));
-        }
-        return productIds;
-    }
-
-     private List<Long> getNewestProduct(NewestProductRequest request) {
-        Pageable pageSpecification = PageRequest.of(request.getPage(), request.getNumberOfProducts());
-        return productRepository.findNewestProductIdByIds(request.getStoreId(), request.getFromDate()
-                , request.getToDate(), pageSpecification);
-    }
-    */
-
-    private void findByUser(ProductFilter productFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equals("createdBy", productFilter.getUserId());
-    }
-
-    private void findByCategory(ProductFilter productFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equalsRef("category", "id", productFilter.getCategoryId(), JoinType.INNER);
-    }
-
-    private void findByStore(ProductFilter productFilter, QueryBuilder queryBuilder) {
-        queryBuilder.equals("storeId", productFilter.getStoreId());
     }
 
     private boolean isAttributesAvailable(Map<String, String> attributes) {
         return MapUtils.isNotEmpty(attributes);
-    }
-
-    private void findByAttributes(Root<Product> root, Map<String, String> attributesRequest, QueryBuilder queryBuilder) {
-        Join<Product, ProductPrice> joinProductPrice = root.join( "productPrices");
-        List<Long> attrs = findByAttributes(attributesRequest);
-        queryBuilder.valueIn(joinProductPrice, "id", attrs.toArray());
     }
 
     private List<Long> findByAttributes(Map<String, String> attributesRequest) {

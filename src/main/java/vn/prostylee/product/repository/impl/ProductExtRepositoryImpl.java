@@ -2,14 +2,18 @@ package vn.prostylee.product.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.query.HibernateQueryResult;
+import vn.prostylee.core.repository.query.NativeQueryResult;
 import vn.prostylee.core.utils.DbUtil;
+import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductExtRepository;
+import vn.prostylee.product.specification.ProductSpecificationBuilder;
 
 import javax.persistence.EntityManager;
 import java.util.HashMap;
@@ -21,6 +25,15 @@ import java.util.Map;
 public class ProductExtRepositoryImpl implements ProductExtRepository {
 
     private final EntityManager em;
+    private final ProductSpecificationBuilder productSpecificationBuilder;
+
+    @Override
+    public Page<Product> findAll(ProductFilter productFilter) {
+        Pageable pageable = PageRequest.of(productFilter.getPage(), productFilter.getLimit());
+        NativeQueryResult<Product> nativeQueryResult = new NativeQueryResult<>(
+                em, Product.class, productSpecificationBuilder.buildQuery(productFilter), pageable);
+        return nativeQueryResult.getResultList(productSpecificationBuilder.buildParams(productFilter));
+    }
 
     @Override
     public List<Product> getRandomProducts(SuggestionProductFilter suggestionProductFilter) {

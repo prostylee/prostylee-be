@@ -19,7 +19,7 @@ public class NewestStoreRequest extends PagingParam {
     private Date toDate;
 
     public NewestStoreRequest pagingParam(PagingParam paging) {
-        setLimit(paging.getLimit() <= 0 ? PagingConstant.DEFAULT_NUMBER_OF_PRODUCT : paging.getLimit());
+        setLimit(paging.getLimit() <= 0 ? PagingConstant.DEFAULT_NUMBER_OF_STORE : paging.getLimit());
         setPage(paging.getPage());
         return this;
     }

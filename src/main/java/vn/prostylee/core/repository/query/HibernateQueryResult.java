@@ -96,7 +96,7 @@ public class HibernateQueryResult<R> {
 
 	private void appendSortQuery(Pageable pageable) {
 		String sort = pageable.getSort().toString().replace(":", "");
-        if (StringUtils.isNotBlank(sort) && !StringUtils.equals(Sort.unsorted().toString(), sort)) {
+        if (StringUtils.isNotBlank(sort) && !StringUtils.equalsIgnoreCase(Sort.unsorted().toString(), sort)) {
         	queryBuilder.append(" ORDER BY ").append(sort);
         }
 	}

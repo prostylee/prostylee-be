@@ -43,7 +43,9 @@ public class ProductConverter {
     }
 
     private List<String> buildImageUrls(Set<ProductImage> productImages) {
-        List<Long> attachmentIds = productImages.stream()
+        List<Long> attachmentIds = Optional.ofNullable(productImages)
+                .orElseGet(Collections::emptySet)
+                .stream()
                 .map(ProductImage::getAttachmentId)
                 .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
