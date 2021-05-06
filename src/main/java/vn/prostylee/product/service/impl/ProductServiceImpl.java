@@ -66,6 +66,15 @@ public class ProductServiceImpl implements ProductService {
                 sort = sortByBestSeller.and(sort);
             }
             pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getLimit(), sort);
+        } else if (BooleanUtils.isTrue(productFilter.getBestRating())){
+            Sort sortByBestRating = Sort.by("statistic.resultOfRating").descending();
+            Sort sort = pageable.getSort();
+            if(pageable.getSort() == Sort.unsorted()){
+                sort = sortByBestRating;
+            } else {
+                sort = sortByBestRating.and(sort);
+            }
+            pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getLimit(), sort);
         }
 
         Page<Product> page = this.productRepository.findAllActive(searchableBuilder.buildSearchable(productFilter), pageable);
@@ -165,6 +174,7 @@ public class ProductServiceImpl implements ProductService {
                 .numberOfSold(0L)
                 .numberOfLike(0L)
                 .numberOfComment(0L)
+                .resultOfRating((double)0L)
                 .build();
     }
 

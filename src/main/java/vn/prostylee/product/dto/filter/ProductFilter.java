@@ -24,6 +24,7 @@ public class ProductFilter extends BaseFilter {
 
     private NewFeedType newFeedType;
     private Boolean bestSeller;
+    private Boolean bestRating;
     private Boolean sale;
 
     /**
