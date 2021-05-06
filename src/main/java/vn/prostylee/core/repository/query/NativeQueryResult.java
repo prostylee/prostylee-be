@@ -71,7 +71,13 @@ public class NativeQueryResult<R> {
 	}
 
 	private Page<R> getAllPagedList(Map<String, Object> filterParameters) {
-		Query query = em.createNativeQuery("SELECT COUNT(*) FROM ( " + queryBuilder.toString() + " ) dataTable");
+		String optimizedQuery = queryBuilder.toString();
+		int indexOfOrderClause = optimizedQuery.indexOf("ORDER BY");
+		if (indexOfOrderClause > 0) {
+			optimizedQuery = optimizedQuery.substring(0, indexOfOrderClause);
+		}
+
+		Query query = em.createNativeQuery("SELECT COUNT(*) FROM ( " + optimizedQuery + " ) dataTable");
 		this.setParameters(query, filterParameters);
 		long total = Long.parseLong(query.getSingleResult().toString());
 		List<R> content = new ArrayList<>();
@@ -95,9 +101,7 @@ public class NativeQueryResult<R> {
 	}
 
 	private void appendSortQuery(String sort) {
-		if (StringUtils.isBlank(sort) || Sort.unsorted().toString().equals(sort)) {
-			queryBuilder.append(" ORDER BY createdAt DESC");
-		} else {
+		if (StringUtils.isNotBlank(sort) && !StringUtils.equalsIgnoreCase(Sort.unsorted().toString(), sort)) {
 			queryBuilder.append(" ORDER BY ").append(sort);
 		}
 	}

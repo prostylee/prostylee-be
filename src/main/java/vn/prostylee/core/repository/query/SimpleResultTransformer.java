@@ -1,6 +1,7 @@
 package vn.prostylee.core.repository.query;
 
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.property.access.internal.PropertyAccessStrategyBasicImpl;
@@ -19,6 +20,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @EqualsAndHashCode(callSuper = false)
 public class SimpleResultTransformer extends AliasToBeanResultTransformer {
 
@@ -42,7 +44,7 @@ public class SimpleResultTransformer extends AliasToBeanResultTransformer {
 		try {
 			if (!isInitialized) {
 				performInitialize(aliases);
-			} 
+			}
 
 			result = resultClass.getDeclaredConstructor().newInstance();
 
@@ -54,7 +56,7 @@ public class SimpleResultTransformer extends AliasToBeanResultTransformer {
 				Object tupleValue = tuple[i];
 				if (tupleValue instanceof Timestamp) {
 					convertTimestampToLocalDateSetter(setters[i], (Timestamp) tupleValue, result);
-				} else if (tupleValue instanceof BigInteger) {
+				} else if (tupleValue instanceof BigInteger || shouldSetLongValue(setters[i])) {
 					setters[i].set(result, Long.valueOf(tupleValue.toString()), null);
 				} else {
 					setters[i].set(result, tupleValue, null);
@@ -64,6 +66,13 @@ public class SimpleResultTransformer extends AliasToBeanResultTransformer {
 			throw new HibernateException("Could not instantiate resultClass: " + resultClass.getName(), e);
 		}
 		return result;
+	}
+
+	private boolean shouldSetLongValue(Setter setter) {
+		Method method = setter.getMethod();
+		return method != null
+				&& method.getParameters().length > 0
+				&& method.getParameters()[0].getType().isAssignableFrom(Long.class);
 	}
 
 	private void convertTimestampToLocalDateSetter(Setter setter, Timestamp timestamp, Object result) {
