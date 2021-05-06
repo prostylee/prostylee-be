@@ -65,7 +65,7 @@ public class ProductSpecificationBuilder {
             sbFrom.append(" INNER JOIN product_price pp ON pp.product_id = p.id");
         }
 
-        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
+        if (BooleanUtils.isTrue(productFilter.getBestSeller()) || BooleanUtils.isTrue(productFilter.getBestRating())) {
             sbFrom.append(" LEFT JOIN product_statistic ps ON ps.id = p.id");
         }
 
@@ -111,6 +111,8 @@ public class ProductSpecificationBuilder {
             sbOrder.append(" ORDER BY (100 - (COALESCE(p.price_sale, 0) / p.price) * 100) DESC, p.created_at DESC");
         } else if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
             sbOrder.append(" ORDER BY COALESCE(ps.number_of_sold, 0) DESC, p.created_at DESC");
+        } else if (BooleanUtils.isTrue(productFilter.getBestRating())) {
+            sbOrder.append(" ORDER BY COALESCE(ps.result_of_rating, 0) DESC, p.created_at DESC");
         } else if (productFilter.getLatitude() != null && productFilter.getLongitude() != null) {
             sbOrder.append(" ORDER BY COALESCE(loc.distance, 100000000) ASC, p.created_at DESC");
         } else {
