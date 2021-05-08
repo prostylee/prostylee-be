@@ -233,7 +233,7 @@ spring:
       hibernate:
         enable_lazy_load_no_trans: true
         globally_quoted_identifiers: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: vn.prostylee.core.configuration.database.CustomPostgresDialect
         jdbc:
           lob:
             non_contextual_creation: true

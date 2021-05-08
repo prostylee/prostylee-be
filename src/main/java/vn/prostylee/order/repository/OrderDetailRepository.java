@@ -36,14 +36,6 @@ public interface OrderDetailRepository extends BaseRepository<OrderDetail, Long>
             " ORDER BY count(e.product.id) DESC ")
     Page<ProductSoldCountResponse> countProductSold(Pageable pageable);
 
-    @Query("SELECT e.store.id FROM #{#entityName} e " +
-            " WHERE e.order.status = 100" + // OrderStatus.COMPLETED.getStatus() +
-            " AND e.order.buyerId = :buyerId " +
-            " ORDER BY e.order.createdAt DESC ")
-    List<Long> getPaidStoreIds(
-            @Param("buyerId") Long buyerId,
-            Pageable pageable);
-
     @Query(value = "SELECT DISTINCT * " +
             " FROM (" +
             "   SELECT e.product_id AS productId " +

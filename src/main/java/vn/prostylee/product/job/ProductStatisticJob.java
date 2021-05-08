@@ -13,6 +13,8 @@ import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
+import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
+import vn.prostylee.useractivity.service.UserRatingService;
 
 import java.util.List;
 import java.util.Map;
@@ -32,12 +34,16 @@ public class ProductStatisticJob extends QuartzJobBean {
     @Autowired
     private ProductStatisticRepository productStatisticRepository;
 
+    @Autowired
+    private UserRatingService userRatingService;
+
     @Override
     protected void executeInternal(JobExecutionContext context) {
         log.debug("ProductStatisticJob executing ...");
         countNumberOfSold();
         countNumberOfLike();
         countNumberOfComment();
+        countResultOfRating();
     }
 
     private void countNumberOfSold() {
@@ -60,6 +66,18 @@ public class ProductStatisticJob extends QuartzJobBean {
         // TODO
     }
 
+    private void countResultOfRating(){
+        int page = 0;
+        Page<RatingResultCountResponse> pageRatingResult = userRatingService.countRatingResult(new PagingParam(page, LIMIT));
+        log.debug("totalPages={}, totalElements={}, productSoldSize={}", pageRatingResult.getTotalPages(), pageRatingResult.getTotalElements(), pageRatingResult.getNumberOfElements());
+        while (pageRatingResult.getNumberOfElements() > 0) {
+            upsertRatingStatistic(pageRatingResult.getContent());
+            page++;
+            pageRatingResult = userRatingService.countRatingResult(new PagingParam(page, LIMIT));
+            log.debug("totalPages={}, totalElements={}, productSoldSize={}", pageRatingResult.getTotalPages(), pageRatingResult.getTotalElements(), pageRatingResult.getNumberOfElements());
+        }
+    }
+
     private void upsertProductStatistic(List<ProductSoldCountResponse> productSoldCountResponses) {
         final Map<Long, Long> mapProductCount = productSoldCountResponses.stream()
                 .collect(Collectors.toMap(ProductSoldCountResponse::getProductId, ProductSoldCountResponse::getCount));
@@ -78,6 +96,33 @@ public class ProductStatisticJob extends QuartzJobBean {
                     return ProductStatistic.builder()
                             .product(product)
                             .numberOfSold(mapProductCount.getOrDefault(productId, 0L))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        statistics.addAll(adds);
+
+        productStatisticRepository.saveAll(statistics);
+    }
+
+    private void upsertRatingStatistic(List<RatingResultCountResponse> ratingResultCountResponses) {
+        final Map<Long, Double> mapProductCount = ratingResultCountResponses.stream()
+                .collect(Collectors.toMap(RatingResultCountResponse::getProductId, RatingResultCountResponse::getCount));
+
+        List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
+
+        statistics.forEach(productStatistic -> {
+            productStatistic.setResultOfRating(mapProductCount.getOrDefault(productStatistic.getProduct().getId(), (double) 0L));
+            mapProductCount.remove(productStatistic.getProduct().getId());
+        });
+
+        List<ProductStatistic> adds = mapProductCount.keySet()
+                .stream()
+                .map(productId -> {
+                    Product product = new Product(productId);
+                    return ProductStatistic.builder()
+                            .product(product)
+                            .resultOfRating(mapProductCount.getOrDefault(productId, (double) 0L))
                             .build();
                 })
                 .collect(Collectors.toList());

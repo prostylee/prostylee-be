@@ -8,7 +8,6 @@ import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
-import vn.prostylee.store.dto.request.PaidStoreRequest;
 
 import java.util.List;
 
@@ -17,8 +16,6 @@ public interface OrderService extends CrudService<OrderRequest, OrderResponse, L
     OrderResponse updateStatus(Long id, OrderStatusRequest statusRequest);
 
     List<Long> getBestSellerProductIds(BestSellerFilter bestSellerFilter);
-
-    List<Long> getPaidStores(PaidStoreRequest paidStoreRequest);
 
     Page<ProductSoldCountResponse> countProductSold(PagingParam pagingParam);
 

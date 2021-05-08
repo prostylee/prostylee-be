@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Range;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.product.constant.NewFeedType;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -20,11 +21,20 @@ public class ProductFilter extends BaseFilter {
     private Long productId;
     private Long categoryId;
     private Long storeId;
+    private List<Long> storeIds;
     private Map<String, String> attributes;
+
+    private Boolean topFollowingStore;
+    private Boolean paidStore;
+    private Boolean newStore;
 
     private NewFeedType newFeedType;
     private Boolean bestSeller;
+    private Boolean bestRating;
     private Boolean sale;
+
+    private Double latitude;
+    private Double longitude;
 
     /**
      * The default number of days that will be count for considering as top following.
@@ -50,8 +60,7 @@ public class ProductFilter extends BaseFilter {
                 "name",
                 "createdAt",
                 "priceSale",
-                "price",
-                "category.name"
+                "price"
         };
     }
 

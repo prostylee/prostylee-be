@@ -66,6 +66,9 @@ public class Category extends AuditEntity {
 	@Column(name = "active")
 	private Boolean active;
 
+	@Column(name = "hot_status")
+	private Boolean hotStatus;
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

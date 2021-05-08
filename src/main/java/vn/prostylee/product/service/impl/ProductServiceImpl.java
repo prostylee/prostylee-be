@@ -2,17 +2,13 @@ package vn.prostylee.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
-import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.service.LocationService;
@@ -24,9 +20,9 @@ import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.*;
+import vn.prostylee.product.repository.ProductExtRepository;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.*;
-import vn.prostylee.product.specification.ProductSpecificationBuilder;
 import vn.prostylee.useractivity.constant.TrackingType;
 import vn.prostylee.useractivity.dto.filter.UserTrackingFilter;
 import vn.prostylee.useractivity.service.UserTrackingService;
@@ -40,36 +36,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ProductServiceImpl implements ProductService {
-    private final BaseFilterSpecs<Product> baseFilterSpecs;
+
     private final ProductRepository productRepository;
+    private final ProductExtRepository productExtRepository;
     private final LocationService locationService;
     private final ProductImageService productImageService;
     private final ProductPaymentTypeService productPaymentTypeService;
     private final ProductShippingProviderService productShippingProviderService;
     private final ProductPriceService productPriceService;
     private final ProductConverter productConverter;
-    private final ProductSpecificationBuilder searchableBuilder;
     private final UserTrackingService userTrackingService;
     private final AuthenticatedProvider authenticatedProvider;
 
     @Override
     public Page<ProductResponse> findAll(BaseFilter baseFilter) {
-        ProductFilter productFilter = (ProductFilter) baseFilter;
-        Pageable pageable = baseFilterSpecs.page(productFilter);
-
-        if (BooleanUtils.isTrue(productFilter.getBestSeller())) {
-            Sort sortByBestSeller = Sort.by("statistic.numberOfSold").descending();
-            Sort sort = pageable.getSort();
-            if (pageable.getSort() == Sort.unsorted()) {
-                sort = sortByBestSeller;
-            } else {
-                sort = sortByBestSeller.and(sort);
-            }
-            pageable = PageRequest.of(baseFilter.getPage(), baseFilter.getLimit(), sort);
-        }
-
-        Page<Product> page = this.productRepository.findAllActive(searchableBuilder.buildSearchable(productFilter), pageable);
-        return page.map(productConverter::toResponse);
+        Page<Product> page = productExtRepository.findAll((ProductFilter) baseFilter);
+        List<ProductResponse> responses = page.getContent()
+                .stream()
+                .map(productConverter::toResponse)
+                .collect(Collectors.toList());
+        return new PageImpl<>(responses, page.getPageable(), page.getTotalElements());
     }
 
     @Override
@@ -165,6 +151,7 @@ public class ProductServiceImpl implements ProductService {
                 .numberOfSold(0L)
                 .numberOfLike(0L)
                 .numberOfComment(0L)
+                .resultOfRating((double)0L)
                 .build();
     }
 

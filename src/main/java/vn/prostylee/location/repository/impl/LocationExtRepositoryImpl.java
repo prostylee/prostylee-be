@@ -1,20 +1,15 @@
 package vn.prostylee.location.repository.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.DoubleType;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
+import vn.prostylee.core.repository.query.NativeQueryResult;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.entity.Location;
 import vn.prostylee.location.repository.LocationExtRepository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,21 +33,8 @@ public class LocationExtRepositoryImpl extends BaseRepositoryImpl<Location, Long
         }
         stringBuilder.append(")");
 
-        Query query = getEntityManager().createNativeQuery(stringBuilder.toString());
-        setParameters(query, buildQueryParams(nearestLocationFilter));
-        return query
-                .unwrap(NativeQuery.class)
-                .addScalar("id", LongType.INSTANCE)
-                .addScalar("address", StringType.INSTANCE)
-                .addScalar("latitude", DoubleType.INSTANCE)
-                .addScalar("longitude", DoubleType.INSTANCE)
-                .addScalar("state", StringType.INSTANCE)
-                .addScalar("city", StringType.INSTANCE)
-                .addScalar("country", StringType.INSTANCE)
-                .addScalar("zipcode", StringType.INSTANCE)
-                .addScalar("distance", DoubleType.INSTANCE)
-                .setResultTransformer(Transformers.aliasToBean(LocationResponse.class))
-                .getResultList();
+        NativeQueryResult<LocationResponse> nativeQueryResult = new NativeQueryResult<>(getEntityManager(), LocationResponse.class, stringBuilder);
+        return nativeQueryResult.getResultList(buildQueryParams(nearestLocationFilter)).getContent();
     }
 
     private Map<String, Object> buildQueryParams(NearestLocationFilter nearestLocationFilter) {
@@ -77,9 +59,5 @@ public class LocationExtRepositoryImpl extends BaseRepositoryImpl<Location, Long
         params.put("pLimit", limit);
         params.put("pOffset", offset);
         return params;
-    }
-
-    private void setParameters(Query query, Map<String, Object> params) {
-        params.forEach(query::setParameter);
     }
 }

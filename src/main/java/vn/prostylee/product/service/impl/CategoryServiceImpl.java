@@ -57,6 +57,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (category.getParentId() == null) {
             category.setParentId(0L);
         }
+        if(category.getHotStatus() == null){
+            category.setHotStatus(false);
+        }
         this.setAttributes(category, request.getAttributes());
         return toResponse(categoryRepository.saveAndFlush(category));
     }
@@ -112,6 +115,9 @@ public class CategoryServiceImpl implements CategoryService {
         Specification<Category> spec = this.baseFilterSpecs.search(categoryFilter);
         if (categoryFilter.getParentId() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("parentId"), categoryFilter.getParentId()));
+        }
+        if (categoryFilter.getHotStatus() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("hotStatus"), categoryFilter.getHotStatus()));
         }
         return spec;
     }
