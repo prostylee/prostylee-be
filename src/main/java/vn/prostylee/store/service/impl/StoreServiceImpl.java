@@ -3,6 +3,9 @@ package vn.prostylee.store.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -102,6 +106,7 @@ public class StoreServiceImpl implements StoreService {
         return new PageImpl<>(responses, pageable, page.getTotalElements());
     }
 
+    @Cacheable(cacheNames = CachingKey.STORES, key = "#id")
     @Override
     public StoreResponse findById(Long id) {
         Store store = getById(id);
@@ -142,6 +147,7 @@ public class StoreServiceImpl implements StoreService {
         return storeConverter.convertToResponse(savedStore);
     }
 
+    @CachePut(cacheNames = CachingKey.STORES, key = "#id")
     @Override
     public StoreResponse update(Long id, StoreRequest storeRequest) {
         Company company = new Company();
@@ -155,6 +161,7 @@ public class StoreServiceImpl implements StoreService {
         return storeConverter.convertToResponse(savedStore);
     }
 
+    @CacheEvict(cacheNames = CachingKey.STORES, allEntries = true)
     @Override
     public boolean deleteById(Long id) {
         try {
@@ -166,6 +173,7 @@ public class StoreServiceImpl implements StoreService {
         }
     }
 
+    @Cacheable(value = CachingKey.STORES, key = "#storeFilter")
     @Override
     public Page<StoreResponse> getTopProductsOfStores(MostActiveStoreFilter storeFilter) {
         MostActiveRequest request = MostActiveRequest.builder()

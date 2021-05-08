@@ -3,11 +3,12 @@ package vn.prostylee.story.dto.response;
 import lombok.Data;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class UserStoryResponse {
+public class UserStoryResponse implements Serializable {
 
     private Long id;
     private Long targetId;

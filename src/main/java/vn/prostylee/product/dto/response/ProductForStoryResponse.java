@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import vn.prostylee.story.dto.response.StoreForStoryResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductForStoryResponse {
+public class ProductForStoryResponse implements Serializable {
     private Long id;
     private String name;
     private Double price;

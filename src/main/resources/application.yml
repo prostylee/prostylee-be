@@ -81,6 +81,10 @@ app:
           group: 'UserStatisticTrigger'
           cron: '0 0/30 * * * ?' # At every 30th minute.
 
+  ## Caching
+  cache:
+    time-to-live-in-seconds: 14400 # 4 hours
+
   ## Multi-thread
   thread-executor:
     core-pool-size: 2

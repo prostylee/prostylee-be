@@ -1,6 +1,8 @@
 package vn.prostylee.useractivity.dto.response;
 
-public interface RatingResultCountResponse {
+import java.io.Serializable;
+
+public interface RatingResultCountResponse extends Serializable {
 
     Long getProductId();
 

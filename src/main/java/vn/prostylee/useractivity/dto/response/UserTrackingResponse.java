@@ -2,8 +2,10 @@ package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class UserTrackingResponse {
+public class UserTrackingResponse implements Serializable {
     private Long productId;
     private Long storeId;
     private Long categoryId;

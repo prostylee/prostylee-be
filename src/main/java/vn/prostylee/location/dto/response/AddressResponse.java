@@ -2,8 +2,10 @@ package vn.prostylee.location.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class AddressResponse {
+public class AddressResponse implements Serializable {
 
     private String code;
 

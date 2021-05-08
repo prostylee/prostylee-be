@@ -1,4 +1,6 @@
 package vn.prostylee.statistics.dto.response;
 
-public class StoreStatisticsResponse {
+import java.io.Serializable;
+
+public class StoreStatisticsResponse implements Serializable {
 }

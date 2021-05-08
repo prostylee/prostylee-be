@@ -4,9 +4,10 @@ import lombok.Data;
 import vn.prostylee.post.dto.response.PostResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 
+import java.io.Serializable;
 import java.util.Date;
 @Data
-public class UserLikeResponse {
+public class UserLikeResponse implements Serializable {
 
     private Long id;
 

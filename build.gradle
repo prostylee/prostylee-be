@@ -151,6 +151,11 @@ dependencies {
 	// Email Test Server
 	compile 'com.icegreen:greenmail-spring:1.6.1'
 
+	// Cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.hazelcast:hazelcast:4.2'
+	implementation 'com.hazelcast:hazelcast-spring:4.2'
+
 }
 
 // For TESTING

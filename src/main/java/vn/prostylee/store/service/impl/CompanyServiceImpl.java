@@ -2,11 +2,15 @@ package vn.prostylee.store.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
@@ -43,6 +47,7 @@ public class CompanyServiceImpl implements CompanyService {
         return BeanUtil.copyProperties(company, CompanyResponse.class);
     }
 
+    @Cacheable(value = CachingKey.COMPANIES, key = "#id")
     @Override
     public CompanyResponse findById(Long id) {
         Company company = getById(id);
@@ -65,6 +70,7 @@ public class CompanyServiceImpl implements CompanyService {
         return convertToResponse(savedCompany);
     }
 
+    @CachePut(cacheNames = CachingKey.COMPANIES, key = "#id")
     @Override
     public CompanyResponse update(Long id, CompanyRequest companyRequest) {
         Company company = getById(id);
@@ -73,6 +79,7 @@ public class CompanyServiceImpl implements CompanyService {
         return convertToResponse(savedCompany);
     }
 
+    @CacheEvict(value = CachingKey.COMPANIES, key = "#id")
     @Override
     public boolean deleteById(Long id) {
         try {
