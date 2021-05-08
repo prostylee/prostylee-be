@@ -9,3 +9,5 @@ create table category_attribute
     constraint category_attribute_pkey
         primary key (category_id, attribute_id)
 );
+
+ALTER TABLE attribute DROP COLUMN category_id;

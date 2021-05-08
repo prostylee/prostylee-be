@@ -5,8 +5,6 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.product.entity.Attribute;
 
-import java.util.Optional;
-
 /**
  * Repository for domain model class Attribute.
  * @see Attribute;
@@ -15,5 +13,4 @@ import java.util.Optional;
 @Repository
 public interface AttributeRepository extends BaseRepository<Attribute, Long> {
 
-    Optional<Attribute> findByCategoryIdAndId(Long categoryId, Long id);
 }

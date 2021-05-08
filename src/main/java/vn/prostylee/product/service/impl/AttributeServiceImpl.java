@@ -60,11 +60,6 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
-    public AttributeResponse findByIdCategoryIdAndId(Long categoryId, Long id) {
-        return this.toResponse(this.getByCategoryIdAndId(categoryId, id));
-    }
-
-    @Override
     public AttributeResponse save(AttributeRequest productRequest) {
         Attribute attribute = BeanUtil.copyProperties(productRequest, Attribute.class);
       //  attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());
@@ -98,11 +93,6 @@ public class AttributeServiceImpl implements AttributeService {
             log.debug("Category id {} does not exists", id);
             return false;
         }
-    }
-
-    private Attribute getByCategoryIdAndId(Long categoryId, Long id) {
-        return this.attributeRepository.findByCategoryIdAndId(categoryId, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category or Attribute is not found with id [" + id + "]"));
     }
 
     private AttributeResponse toResponse(Attribute attribute) {
