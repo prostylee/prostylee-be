@@ -3,10 +3,11 @@ package vn.prostylee.product.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
-public class CategoryResponse {
+public class CategoryResponse implements Serializable {
     private Long id;
     private Long parentId;
     private Long attachmentId;

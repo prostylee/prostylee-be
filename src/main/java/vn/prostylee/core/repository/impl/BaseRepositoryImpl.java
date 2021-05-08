@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import vn.prostylee.core.repository.BaseRepository;
 
@@ -22,6 +23,7 @@ import java.util.*;
  * @param <T> The type of entity
  * @param <ID> The primary key of entity
  */
+@Transactional
 public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
 
     private static final String DELETED_FIELD = "deletedAt";

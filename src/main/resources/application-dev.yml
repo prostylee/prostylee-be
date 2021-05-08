@@ -7,6 +7,10 @@ app:
   security:
     allowed-origins:
       - "*"
+      -
+  ## Caching
+  cache:
+    time-to-live-in-seconds: 300 # 5 minutes
 
 spring:
   flyway:

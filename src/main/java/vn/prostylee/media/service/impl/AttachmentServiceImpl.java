@@ -1,8 +1,10 @@
 package vn.prostylee.media.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.entity.Attachment;
@@ -62,12 +64,14 @@ public class AttachmentServiceImpl implements AttachmentService {
         return attachmentRepository.saveAll(entities).size();
     }
 
+    @Cacheable(value = CachingKey.ATTACHMENTS, key = "#id")
     @Override
     public Attachment getById(Long id) {
         return attachmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post is not found with id [" + id + "]"));
     }
 
+    @Cacheable(value = CachingKey.ATTACHMENTS, key = "#ids")
     @Override
     public List<Attachment> getByIds(List<Long> ids) {
         return attachmentRepository.findAllById(ids);

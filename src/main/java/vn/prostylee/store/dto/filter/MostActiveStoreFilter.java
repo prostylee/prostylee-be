@@ -5,8 +5,10 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 import vn.prostylee.product.constant.PagingConstant;
 
+import java.io.Serializable;
+
 @Data
-public class MostActiveStoreFilter {
+public class MostActiveStoreFilter implements Serializable {
 
     /**
      * The default number of days that will be count for considering as most active stores.

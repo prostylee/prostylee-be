@@ -2,8 +2,10 @@ package vn.prostylee.shipping.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class ShippingAddressResponse {
+public class ShippingAddressResponse implements Serializable {
 
     private Long id;
 

@@ -2,10 +2,11 @@ package vn.prostylee.product.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
-public class AttributeResponse {
+public class AttributeResponse implements Serializable {
 
     private Long id;
 

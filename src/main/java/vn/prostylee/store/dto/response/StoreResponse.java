@@ -4,10 +4,11 @@ import lombok.Data;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class StoreResponse {
+public class StoreResponse implements Serializable {
 
     private Long id;
 

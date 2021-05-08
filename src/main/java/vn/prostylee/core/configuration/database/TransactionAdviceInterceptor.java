@@ -1,6 +1,7 @@
 package vn.prostylee.core.configuration.database;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
@@ -15,6 +16,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import java.util.Collections;
 
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 @Aspect
@@ -29,6 +31,7 @@ public class TransactionAdviceInterceptor {
 
 	@Bean
 	public TransactionInterceptor txAdvice() {
+		log.info("Init bean TransactionAdviceInterceptor > TransactionInterceptor");
 		MatchAlwaysTransactionAttributeSource source = new MatchAlwaysTransactionAttributeSource();
 		RuleBasedTransactionAttribute transactionAttribute = new RuleBasedTransactionAttribute();
 
@@ -46,6 +49,7 @@ public class TransactionAdviceInterceptor {
 
 	@Bean
 	public Advisor txAdviceAdvisor() {
+		log.info("Init bean TransactionAdviceInterceptor > Advisor");
 		AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
 		pointcut.setExpression(AOP_POINTCUT_EXPRESSION); // define Pointcut (where - looking for trigger)
 		return new DefaultPointcutAdvisor(pointcut, txAdvice());

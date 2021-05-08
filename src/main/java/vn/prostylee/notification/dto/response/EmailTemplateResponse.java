@@ -3,10 +3,11 @@ package vn.prostylee.notification.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-public class EmailTemplateResponse {
+public class EmailTemplateResponse implements Serializable {
 
     private Long id;
 

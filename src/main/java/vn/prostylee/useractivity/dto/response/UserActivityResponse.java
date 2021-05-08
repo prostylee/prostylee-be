@@ -3,8 +3,10 @@ package vn.prostylee.useractivity.dto.response;
 import lombok.Data;
 import vn.prostylee.location.dto.response.LocationResponse;
 
+import java.io.Serializable;
+
 @Data
-public class UserActivityResponse {
+public class UserActivityResponse implements Serializable {
 
     private Long id;
 
