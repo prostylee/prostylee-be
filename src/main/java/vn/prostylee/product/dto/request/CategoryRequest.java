@@ -33,5 +33,5 @@ public class CategoryRequest {
 
     private Boolean hotStatus;
 
-    private Set<AttributeRequest> attributes;
+    private Set<Long> attributeIds;
 }

@@ -89,9 +89,9 @@ public class CategoryServiceImplTest {
     @Test
     void saveShouldReturnCategoryAndAttributeRecordOnlyWhenGivenRequestWithAttribute() {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
-        Set<AttributeRequest> attributeRequests = new HashSet<>();
-        attributeRequests.add(BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class));
-        request.setAttributes(attributeRequests);
+        Set<Long> attributeRequests = new HashSet<>();
+        attributeRequests.add(mockAttributeId());
+        request.setAttributeIds(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -108,11 +108,11 @@ public class CategoryServiceImplTest {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
         Set<AttributeOptionRequest> attributeOptionRequests = new HashSet<>();
         attributeOptionRequests.add(BeanUtil.copyProperties(this.mockAttributeOption(), AttributeOptionRequest.class));
-        Set<AttributeRequest> attributeRequests = new HashSet<>();
+        Set<Long> attributeRequests = new HashSet<>();
         AttributeRequest attributeRequest = BeanUtil.copyProperties(this.mockAttribute(), AttributeRequest.class);
         // attributeRequest.setAttributeOptions(attributeOptionRequests);
-        attributeRequests.add(attributeRequest);
-        request.setAttributes(attributeRequests);
+        attributeRequests.add(mockAttributeId());
+        request.setAttributeIds(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
         when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
@@ -177,6 +177,10 @@ public class CategoryServiceImplTest {
         Set<Attribute> attributes = new HashSet<>();
         attributes.add(Attribute.builder().id(1L).key("size 1").label("size").languageCode("vi").build());
         return attributes;
+    }
+
+    private Long mockAttributeId() {
+        return 1L;
     }
 
     private Set<AttributeOption> mockAttributeOption() {

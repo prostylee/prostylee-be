@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.product.entity.Attribute;
 
+import java.util.Set;
+
 /**
  * Repository for domain model class Attribute.
  * @see Attribute;
@@ -13,4 +15,5 @@ import vn.prostylee.product.entity.Attribute;
 @Repository
 public interface AttributeRepository extends BaseRepository<Attribute, Long> {
 
+    Set<Attribute> findByIdIn(Set<Long> ids);
 }

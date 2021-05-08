@@ -17,9 +17,6 @@ public class AttributeRequest {
 
     private Long id;
 
-    @NotNull
-    private Long categoryId;
-
     @NotBlank
     private String key;
 

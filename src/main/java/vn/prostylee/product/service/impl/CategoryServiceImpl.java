@@ -11,20 +11,17 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.core.utils.EntityUtils;
 import vn.prostylee.product.dto.filter.CategoryFilter;
-import vn.prostylee.product.dto.request.AttributeRequest;
 import vn.prostylee.product.dto.request.CategoryRequest;
 import vn.prostylee.product.dto.response.CategoryResponse;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.Category;
+import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.CategoryRepository;
 import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     private final BaseFilterSpecs<Category> baseFilterSpecs;
+
+    private final AttributeRepository attributeRepository;
 
     @Override
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
@@ -60,8 +59,8 @@ public class CategoryServiceImpl implements CategoryService {
         if(category.getHotStatus() == null){
             category.setHotStatus(false);
         }
-        this.setAttributes(category, request.getAttributes());
-        return toResponse(categoryRepository.saveAndFlush(category));
+        this.setAttributes(category, request.getAttributeIds());
+        return toResponse(categoryRepository.save(category));
     }
 
     @Override
@@ -91,19 +90,14 @@ public class CategoryServiceImpl implements CategoryService {
         return BeanUtil.copyProperties(category, CategoryResponse.class);
     }
 
-    private void setAttributes(Category category, Set<AttributeRequest> attributeRequests) {
+    private void setAttributes(Category category, Set<Long> attributeIdsRequest) {
         if (category.getAttributes() == null) {
             category.setAttributes(new HashSet<>());
         }
-        Set<Attribute> mergedAttributes = EntityUtils.merge(category.getAttributes(), attributeRequests, "id", Attribute.class);
-        mergedAttributes.forEach(attribute -> {
-            if (attribute.getAttributeOptions() == null) {
-                attribute.setAttributeOptions(new HashSet<>());
-            }
-            attribute.getAttributeOptions().forEach(item -> item.setAttribute(attribute));
-            attribute.setCategories(Stream.of(category).collect(Collectors.toSet()));
-        });
-        category.setAttributes(mergedAttributes);
+//        List<Long> attributeIds = new ArrayList<>();
+//        attributeIds.addAll(attributeIdsRequest);
+        Set<Attribute> attributes = attributeRepository.findByIdIn(attributeIdsRequest);
+        category.getAttributes().addAll(attributes);
     }
 
     private Category getById(Long id) {

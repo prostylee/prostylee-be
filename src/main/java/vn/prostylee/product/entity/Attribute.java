@@ -33,7 +33,7 @@ public class Attribute extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "category_attribute", joinColumns = {
 			@JoinColumn(name = "attribute_id", nullable = false, updatable = false)}, inverseJoinColumns = {
 			@JoinColumn(name = "category_id", nullable = false, updatable = false)

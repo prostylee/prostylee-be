@@ -60,13 +60,12 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
-    public AttributeResponse save(AttributeRequest productRequest) {
-        Attribute attribute = BeanUtil.copyProperties(productRequest, Attribute.class);
-      //  attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());
+    public AttributeResponse save(AttributeRequest attributeRequest) {
+        Attribute attribute = BeanUtil.copyProperties(attributeRequest, Attribute.class);
         if (attribute.getAttributeOptions() == null) {
             attribute.setAttributeOptions(new HashSet<>());
         }
-        Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), productRequest.getAttributeOptions(), "id", AttributeOption.class);
+        Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), attributeRequest.getAttributeOptions(), "id", AttributeOption.class);
         mergedAttributes.forEach(attributeOption -> attributeOption.setAttribute(attribute));
         return toResponse(this.attributeRepository.save(attribute));
     }
@@ -97,7 +96,6 @@ public class AttributeServiceImpl implements AttributeService {
 
     private AttributeResponse toResponse(Attribute attribute) {
         AttributeResponse attributeResponse = BeanUtil.copyProperties(attribute, AttributeResponse.class);
-      //  attributeResponse.setCategoryId(attribute.getCategory().getId());
         return attributeResponse;
     }
 
