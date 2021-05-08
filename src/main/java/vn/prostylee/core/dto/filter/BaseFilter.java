@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.Valid;
+import java.io.Serializable;
 
 /**
  * The base class for search with keyword, paging and sorting
@@ -11,7 +12,7 @@ import javax.validation.Valid;
 @Valid
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BaseFilter extends PagingAndSortingParam implements SearchingDefinitions {
+public class BaseFilter extends PagingAndSortingParam implements SearchingDefinitions, Serializable {
 
     private String keyword;
 

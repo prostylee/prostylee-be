@@ -4,10 +4,11 @@ import lombok.Data;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class UserFollowerResponse {
+public class UserFollowerResponse implements Serializable {
 
     private Long id;
 

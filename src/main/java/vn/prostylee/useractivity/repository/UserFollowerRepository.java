@@ -18,7 +18,6 @@ import java.util.List;
  * @author prostylee
  */
 @Repository
-@Transactional
 public interface UserFollowerRepository extends BaseRepository<UserFollower, Long> {
 
     @Modifying

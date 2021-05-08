@@ -2,8 +2,10 @@ package vn.prostylee.order.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class OrderDiscountResponse {
+public class OrderDiscountResponse implements Serializable {
 
     private Long id;
 

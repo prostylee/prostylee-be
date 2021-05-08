@@ -5,11 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
+import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PagingParam {
+public class PagingParam implements Serializable {
 
     public static final int NUMBER_OF_RECORD_DEFAULT = 30;
 

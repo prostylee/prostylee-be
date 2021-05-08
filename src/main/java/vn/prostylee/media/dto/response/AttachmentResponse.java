@@ -2,8 +2,10 @@ package vn.prostylee.media.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class AttachmentResponse {
+public class AttachmentResponse implements Serializable {
 
 	private Long id;
 

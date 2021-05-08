@@ -8,12 +8,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class AuditEntity {
+public class AuditEntity implements Serializable {
 
     @LastModifiedBy
     @Column(name = "updated_by")

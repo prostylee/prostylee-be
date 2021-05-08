@@ -59,9 +59,13 @@ public class ProductConverter {
     }
 
     private LocationResponse buildLocation(Long locationId) {
-        return Optional.ofNullable(locationId)
-                .flatMap(locationService::fetchById)
-                .orElse(null);
+        try {
+            return Optional.ofNullable(locationId)
+                    .map(locationService::findById)
+                    .orElse(null);
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
     }
 
     private ProductOwnerResponse buildProductOwner(Product product) {

@@ -1,6 +1,8 @@
 package vn.prostylee.order.dto.response;
 
-public interface ProductOrderResponse {
+import java.io.Serializable;
+
+public interface ProductOrderResponse extends Serializable {
 
     Long getProductId();
 }
