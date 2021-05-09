@@ -1,6 +1,5 @@
 package vn.prostylee.product.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,9 +9,6 @@ import java.util.Set;
 public class AttributeResponse implements Serializable {
 
     private Long id;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long categoryId;
 
     private String key;
 

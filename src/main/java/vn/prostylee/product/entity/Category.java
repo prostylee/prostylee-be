@@ -71,7 +71,11 @@ public class Category extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "category_attribute", joinColumns = {
+			@JoinColumn(name = "category_id", nullable = false, updatable = false)}, inverseJoinColumns = {
+			@JoinColumn(name = "attribute_id", nullable = false, updatable = false)
+	})
 	private Set<Attribute> attributes;
 
 	@EqualsAndHashCode.Exclude

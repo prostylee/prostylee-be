@@ -51,7 +51,7 @@ public class AttributeServiceImpl implements AttributeService {
         Specification<Attribute> spec = baseFilterSpecs.search(attributeFilter);
         if (attributeFilter.getCategoryId() != null) {
             Specification<Attribute> joinCategorySpec = (root, query, cb) -> {
-                Join<Attribute, Category> category = root.join("category");
+                Join<Attribute, Category> category = root.join("categories");
                 return cb.equal(category.get("id"), attributeFilter.getCategoryId());
             };
             spec = spec.and(joinCategorySpec);
@@ -60,18 +60,12 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
-    public AttributeResponse findByIdCategoryIdAndId(Long categoryId, Long id) {
-        return this.toResponse(this.getByCategoryIdAndId(categoryId, id));
-    }
-
-    @Override
-    public AttributeResponse save(AttributeRequest productRequest) {
-        Attribute attribute = BeanUtil.copyProperties(productRequest, Attribute.class);
-        attribute.setCategory(Category.builder().id(productRequest.getCategoryId()).build());
+    public AttributeResponse save(AttributeRequest attributeRequest) {
+        Attribute attribute = BeanUtil.copyProperties(attributeRequest, Attribute.class);
         if (attribute.getAttributeOptions() == null) {
             attribute.setAttributeOptions(new HashSet<>());
         }
-        Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), productRequest.getAttributeOptions(), "id", AttributeOption.class);
+        Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), attributeRequest.getAttributeOptions(), "id", AttributeOption.class);
         mergedAttributes.forEach(attributeOption -> attributeOption.setAttribute(attribute));
         return toResponse(this.attributeRepository.save(attribute));
     }
@@ -100,15 +94,8 @@ public class AttributeServiceImpl implements AttributeService {
         }
     }
 
-    private Attribute getByCategoryIdAndId(Long categoryId, Long id) {
-        return this.attributeRepository.findByCategoryIdAndId(categoryId, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category or Attribute is not found with id [" + id + "]"));
-    }
-
     private AttributeResponse toResponse(Attribute attribute) {
-        AttributeResponse attributeResponse = BeanUtil.copyProperties(attribute, AttributeResponse.class);
-        attributeResponse.setCategoryId(attribute.getCategory().getId());
-        return attributeResponse;
+        return BeanUtil.copyProperties(attribute, AttributeResponse.class);
     }
 
     private Attribute getById(Long id) {

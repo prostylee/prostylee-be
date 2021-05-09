@@ -35,8 +35,4 @@ public class CategoryController extends TrackingCrudController<CategoryRequest, 
        return this.attributeService.findAll(attributeFilter);
     }
 
-    @GetMapping("/{id}/attributes/{attributeId}")
-    public AttributeResponse getAttribute(@PathVariable("id") Long categoryId, @PathVariable("attributeId") Long attributeId) {
-        return this.attributeService.findByIdCategoryIdAndId(categoryId, attributeId);
-    }
 }

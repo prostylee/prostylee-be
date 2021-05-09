@@ -25,8 +25,7 @@ public class AttributeFilter extends BaseFilter {
         return new String[] {
                 "key",
                 "order",
-                "label",
-                "categoryId"
+                "label"
         };
     }
 }

@@ -7,23 +7,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.core.utils.EntityUtils;
 import vn.prostylee.product.dto.filter.CategoryFilter;
-import vn.prostylee.product.dto.request.AttributeRequest;
 import vn.prostylee.product.dto.request.CategoryRequest;
 import vn.prostylee.product.dto.response.CategoryResponse;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.Category;
+import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.CategoryRepository;
 import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +33,8 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     private final BaseFilterSpecs<Category> baseFilterSpecs;
+
+    private final AttributeRepository attributeRepository;
 
     @Override
     public Page<CategoryResponse> findAll(BaseFilter baseFilter) {
@@ -59,20 +61,28 @@ public class CategoryServiceImpl implements CategoryService {
         if(category.getHotStatus() == null){
             category.setHotStatus(false);
         }
-        this.setAttributes(category, request.getAttributes());
-        return toResponse(categoryRepository.saveAndFlush(category));
+        this.setAttributes(category, request.getAttributeIds());
+        return toResponse(categoryRepository.save(category));
     }
 
     @Override
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = this.getById(id);
         BeanUtil.mergeProperties(request, category);
+        category.setAttributes(this.getAttributes(request.getAttributeIds()));
         if (category.getOrder() == null) {
             category.setOrder(1);
         }
-        CategoryResponse response = toResponse(this.categoryRepository.save(category));
-        response.setAttributes(null);
-        return response;
+        return toResponse(this.categoryRepository.save(category));
+    }
+
+    private Set<Attribute> getAttributes(Set<Long> attributeIds) {
+        return Optional.ofNullable(attributeIds)
+                .orElseGet(HashSet::new)
+                .stream().map(attributeRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -90,19 +100,12 @@ public class CategoryServiceImpl implements CategoryService {
         return BeanUtil.copyProperties(category, CategoryResponse.class);
     }
 
-    private void setAttributes(Category category, Set<AttributeRequest> attributeRequests) {
+    private void setAttributes(Category category, Set<Long> attributeIdsRequest) {
         if (category.getAttributes() == null) {
             category.setAttributes(new HashSet<>());
         }
-        Set<Attribute> mergedAttributes = EntityUtils.merge(category.getAttributes(), attributeRequests, "id", Attribute.class);
-        mergedAttributes.forEach(attribute -> {
-            if (attribute.getAttributeOptions() == null) {
-                attribute.setAttributeOptions(new HashSet<>());
-            }
-            attribute.getAttributeOptions().forEach(item -> item.setAttribute(attribute));
-            attribute.setCategory(category);
-        });
-        category.setAttributes(mergedAttributes);
+        Set<Attribute> attributes = attributeRepository.findByIdIn(attributeIdsRequest);
+        category.getAttributes().addAll(attributes);
     }
 
     private Category getById(Long id) {
