@@ -98,7 +98,7 @@ public class LocationServiceImpl implements LocationService {
             locationRepository.deleteById(id);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
-            log.debug("Delete a company without existing in database", e);
+            log.debug("Delete a location without existing in database", e);
             return false;
         }
     }

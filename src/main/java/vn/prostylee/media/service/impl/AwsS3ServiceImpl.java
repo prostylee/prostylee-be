@@ -5,9 +5,11 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
+import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.configuration.AwsS3Properties;
@@ -54,6 +56,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         return getImageUrls(fileIds, 0, 0);
     }
 
+    @Cacheable(value = CachingKey.AWS_S3, key = "{ #id, #width, #height }")
     @Override
     public String getImageUrl(Long id, int width, int height) {
         return generateUrlByDimension(attachmentService.getById(id), width, height);
