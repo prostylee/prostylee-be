@@ -21,7 +21,9 @@ import vn.prostylee.product.repository.CategoryRepository;
 import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -67,12 +69,20 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = this.getById(id);
         BeanUtil.mergeProperties(request, category);
+        category.setAttributes(this.getAttributes(request.getAttributeIds()));
         if (category.getOrder() == null) {
             category.setOrder(1);
         }
-        CategoryResponse response = toResponse(this.categoryRepository.save(category));
-        response.setAttributes(null);
-        return response;
+        return toResponse(this.categoryRepository.save(category));
+    }
+
+    private Set<Attribute> getAttributes(Set<Long> attributeIds) {
+        return Optional.ofNullable(attributeIds)
+                .orElseGet(HashSet::new)
+                .stream().map(attributeRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -94,8 +104,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (category.getAttributes() == null) {
             category.setAttributes(new HashSet<>());
         }
-//        List<Long> attributeIds = new ArrayList<>();
-//        attributeIds.addAll(attributeIdsRequest);
         Set<Attribute> attributes = attributeRepository.findByIdIn(attributeIdsRequest);
         category.getAttributes().addAll(attributes);
     }

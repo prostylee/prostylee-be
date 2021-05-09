@@ -77,13 +77,13 @@ public class CategoryServiceImplTest {
     @Test
     void saveShouldReturnCategoryRecordOnlyWhenGivenRequestWithoutAttributeAndAttributeOption() {
         CategoryRequest request = CategoryRequest.builder().name("Category 1").languageCode("vi").order(1).build();
-        when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn((mockCategory()));
+        when(this.categoryRepository.save(Mockito.any())).thenReturn((mockCategory()));
         CategoryResponse response = this.categoryService.save(request);
         assertNotNull(response);
         assertEquals(request.getName(), response.getName());
         assertEquals(request.getLanguageCode(), response.getLanguageCode());
         assertNull(response.getAttributes());
-        verify(this.categoryRepository, times(1)).saveAndFlush(Mockito.any());
+        verify(this.categoryRepository, times(1)).save(Mockito.any());
     }
 
     @Test
@@ -94,13 +94,13 @@ public class CategoryServiceImplTest {
         request.setAttributeIds(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
-        when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
+        when(this.categoryRepository.save(Mockito.any())).thenReturn(mockCategory);
         CategoryResponse response = this.categoryService.save(request);
         assertNotNull(response);
         assertEquals(request.getName(), response.getName());
         assertEquals(request.getLanguageCode(), response.getLanguageCode());
         assertNotNull(response.getAttributes());
-        verify(this.categoryRepository, times(1)).saveAndFlush(Mockito.any());
+        verify(this.categoryRepository, times(1)).save(Mockito.any());
     }
 
     @Test
@@ -115,13 +115,13 @@ public class CategoryServiceImplTest {
         request.setAttributeIds(attributeRequests);
         Category mockCategory = this.mockCategory();
         mockCategory.setAttributes(this.mockAttribute());
-        when(this.categoryRepository.saveAndFlush(Mockito.any())).thenReturn(mockCategory);
+        when(this.categoryRepository.save(Mockito.any())).thenReturn(mockCategory);
         CategoryResponse response = this.categoryService.save(request);
         assertNotNull(response);
         assertEquals(request.getName(), response.getName());
         assertEquals(request.getLanguageCode(), response.getLanguageCode());
         assertNotNull(response.getAttributes());
-        verify(this.categoryRepository, times(1)).saveAndFlush(Mockito.any());
+        verify(this.categoryRepository, times(1)).save(Mockito.any());
     }
 
     @Test

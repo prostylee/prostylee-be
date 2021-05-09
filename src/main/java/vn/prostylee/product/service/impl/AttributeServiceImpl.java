@@ -51,7 +51,7 @@ public class AttributeServiceImpl implements AttributeService {
         Specification<Attribute> spec = baseFilterSpecs.search(attributeFilter);
         if (attributeFilter.getCategoryId() != null) {
             Specification<Attribute> joinCategorySpec = (root, query, cb) -> {
-                Join<Attribute, Category> category = root.join("category");
+                Join<Attribute, Category> category = root.join("categories");
                 return cb.equal(category.get("id"), attributeFilter.getCategoryId());
             };
             spec = spec.and(joinCategorySpec);
@@ -95,8 +95,7 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     private AttributeResponse toResponse(Attribute attribute) {
-        AttributeResponse attributeResponse = BeanUtil.copyProperties(attribute, AttributeResponse.class);
-        return attributeResponse;
+        return BeanUtil.copyProperties(attribute, AttributeResponse.class);
     }
 
     private Attribute getById(Long id) {
