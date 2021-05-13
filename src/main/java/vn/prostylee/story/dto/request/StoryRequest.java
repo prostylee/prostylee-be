@@ -17,4 +17,6 @@ public class StoryRequest {
     private String targetType;
 
     private Long productId;
+
+    private Long storeId;
 }

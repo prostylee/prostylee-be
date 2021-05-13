@@ -80,6 +80,7 @@ public class StoryServiceImpl implements StoryService {
             response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
             response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
             response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
+            response.setStoreResponseLite(Optional.ofNullable(response.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
         });
         return responses;
     }
@@ -105,7 +106,7 @@ public class StoryServiceImpl implements StoryService {
         return fileUploadService.getImageUrls(attachmentIds, sizeType.getWidth(), sizeType.getHeight());
     }
 
-    private StoreForStoryResponse getStoreForStoryBy(Long id) {
+    private StoreForStoryResponse  getStoreForStoryBy(Long id) {
         StoreResponse storeResponse = storeService.findById(id);
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
                 ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
@@ -140,7 +141,12 @@ public class StoryServiceImpl implements StoryService {
         if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
             entity.setStoryImages(buildStoryImages(req.getAttachmentIds(), entity));
         Story savedEntity = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
+        UserStoryResponse userStoryResponse = BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
+        userStoryResponse.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, authenticatedProvider.getUserIdValue()));
+        userStoryResponse.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, authenticatedProvider.getUserIdValue()));
+        userStoryResponse.setUserForStoryResponse(this.getUserForStoryBy(savedEntity.getCreatedBy()));
+        userStoryResponse.setStoreResponseLite(Optional.ofNullable(savedEntity.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
+        return userStoryResponse;
     }
 
     @Override
