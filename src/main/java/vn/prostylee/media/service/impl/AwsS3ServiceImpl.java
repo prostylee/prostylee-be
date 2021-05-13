@@ -65,7 +65,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
     @Override
     public List<String> getImageUrls(List<Long> fileIds, int width, int height) {
         List<Attachment> attachments = attachmentService.getByIds(fileIds);
-        if(Collections.isEmpty(attachments)) {
+        if (Collections.isEmpty(attachments)) {
             throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
         return generateUrlsByDimension(attachments, width, height);
@@ -78,16 +78,18 @@ public class AwsS3ServiceImpl implements FileUploadService {
     }
 
     private String generateUrlByDimension(Attachment attachment, int width, int height) {
-        return buildUrl(attachment,width, height);
+        return buildUrl(attachment, width, height);
     }
 
-    private String buildUrl(Attachment attachment, int width, int height){
+    private String buildUrl(Attachment attachment, int width, int height) {
         String prefix = cloudfrontUrl;
         if (width > 0 && height > 0) {
             prefix = String.format("%s%s%dx%d%s", cloudfrontUrl,
                     s3ResizePrefix, width, height, AppConstant.PATH_SEPARATOR);
         }
-        return prefix + attachment.getPath() + AppConstant.PATH_SEPARATOR + attachment.getName();
+        return prefix + attachment.getPath()
+                + (attachment.getPath().endsWith(AppConstant.PATH_SEPARATOR) ? "" : AppConstant.PATH_SEPARATOR)
+                + attachment.getName();
     }
 
     @Override
@@ -117,7 +119,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
                 Thread.sleep(AppConstant.WAIT_ASYNC_DONE_IN_MS);
             }
 
-            for(Future<AttachmentResponse> future : futures) {
+            for (Future<AttachmentResponse> future : futures) {
                 attachments.add(future.get());
             }
         } catch (AmazonClientException | InterruptedException | ExecutionException | IOException e) {
@@ -131,7 +133,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         try {
             List<String> fileNames = new ArrayList<>();
             List<Attachment> attachments = attachmentService.getByIds(fileIds);
-            for(Attachment attachment : attachments) {
+            for (Attachment attachment : attachments) {
                 fileNames.add(attachment.getName());
             }
             attachmentService.deleteAttachmentsByIdIn(fileIds);

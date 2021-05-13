@@ -10,7 +10,7 @@ import org.springframework.web.context.WebApplicationContext;
 import vn.prostylee.AuthSupporterIT;
 import vn.prostylee.IntegrationTest;
 import vn.prostylee.core.utils.JsonUtils;
-import vn.prostylee.post.dto.request.PostImageRequest;
+import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.post.dto.request.PostRequest;
 
 import java.util.ArrayList;
@@ -43,12 +43,12 @@ public class PostControllerIT extends AuthSupporterIT {
     @Test
     void create_Successfully() throws Exception {
         super.setAuth();
-        List<PostImageRequest> postImageRequests = new ArrayList<>();
-        postImageRequests.add(PostImageRequest.builder().name("prostylee1.jpg").path("abc/test/").build());
+        List<MediaRequest> images = new ArrayList<>();
+        images.add(MediaRequest.builder().name("prostylee1.jpg").path("abc/test/").build());
         PostRequest request = PostRequest.builder()
                 .description("Add new store")
                 .storeId(1L)
-                .postImageRequests(postImageRequests)
+                .images(images)
                 .build();
 
         this.mockMvc
@@ -86,17 +86,18 @@ public class PostControllerIT extends AuthSupporterIT {
     @Order(3)
     @Test
     void update_AddNewPhotos_RemoveOne_Successfully() throws Exception {
-        List<PostImageRequest> postImageRequests = new ArrayList<>();
-        postImageRequests.add(PostImageRequest.builder().name("prostylee1.jpg").path("abc/test1/").build());
-        postImageRequests.add(PostImageRequest.builder().name("prostylee2.jpg").path("abc/test2/").build());
+        List<MediaRequest> images = new ArrayList<>();
+        images.add(MediaRequest.builder().name("prostylee1.jpg").path("abc/test1/").build());
+        images.add(MediaRequest.builder().name("prostylee2.jpg").path("abc/test2/").build());
 
         final long id = 1;
         PostRequest request = PostRequest.builder()
                 .description("Updated store 10")
                 .storeId(1L)
-                .postImageRequests(postImageRequests)
+                .images(images)
                 .attachmentDeleteIds(Collections.singletonList(1L))
                 .build();
+
         this.mockMvc.perform(put(ENDPOINT + "/" + id)
                 .content(JsonUtils.toJson(request))
                 .contentType(MediaType.APPLICATION_JSON)

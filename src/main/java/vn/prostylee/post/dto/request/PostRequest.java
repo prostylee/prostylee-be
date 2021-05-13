@@ -2,6 +2,7 @@ package vn.prostylee.post.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
+import vn.prostylee.media.dto.request.MediaRequest;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -17,7 +18,7 @@ public class PostRequest {
     @NotNull
     private Long storeId;
 
-    private List<PostImageRequest> postImageRequests;
+    private List<MediaRequest> images;
 
     private List<Long> attachmentDeleteIds;
 }

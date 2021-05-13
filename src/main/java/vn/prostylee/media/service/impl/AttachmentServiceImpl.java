@@ -7,13 +7,17 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.dto.request.MediaFileRequest;
+import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.repository.AttachmentRepository;
 import vn.prostylee.media.service.AttachmentService;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Attachment Service
@@ -31,7 +35,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment attachment = new Attachment();
         attachment.setType(file.getContentType());
         attachment.setPath(fileUrl.toString());
-        attachment.setName(fileUrl.getFile().replaceAll("/", ""));
+        attachment.setName(fileUrl.getFile().replace("/", ""));
         attachment.setDisplayName(file.getOriginalFilename());
         attachment.setSizeInKb(file.getSize() / 1024);
         return attachmentRepository.save(attachment);
@@ -39,11 +43,35 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public Attachment saveAttachmentByNameAndPath(String name, String path) {
-        Attachment attachment = new Attachment();
-        attachment.setPath(path);
-        attachment.setName(name);
-        attachment.setDisplayName(name);
+        MediaRequest request = MediaRequest.builder()
+                .name(name)
+                .path(path)
+                .build();
+        return save(request);
+    }
+
+    @Override
+    public Attachment save(MediaRequest mediaRequest) {
+        Attachment attachment = convert(mediaRequest);
         return attachmentRepository.save(attachment);
+    }
+
+    @Override
+    public List<Attachment> saveAll(List<MediaRequest> mediaRequests) {
+        List<Attachment> attachments = Optional.ofNullable(mediaRequests)
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(this::convert)
+                .collect(Collectors.toList());
+        return attachmentRepository.saveAll(attachments);
+    }
+
+    private Attachment convert(MediaRequest mediaRequest) {
+        return Attachment.builder()
+                .path(mediaRequest.getPath())
+                .name(mediaRequest.getName())
+                .displayName(mediaRequest.getName())
+                .build();
     }
 
     /**
