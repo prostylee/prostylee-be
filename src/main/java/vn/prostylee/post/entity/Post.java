@@ -33,6 +33,7 @@ public class Post extends AuditEntity {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @OrderBy("order ASC, id ASC")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
     private Set<PostImage> postImages;
 }

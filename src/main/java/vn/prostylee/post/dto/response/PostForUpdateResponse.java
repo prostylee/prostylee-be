@@ -4,10 +4,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PostForUpdateResponse extends PostResponse implements Serializable {
-    private Set<PostImageResponse> postImages;
+
+    private List<PostImageResponse> postImages;
 }

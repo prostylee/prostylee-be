@@ -249,7 +249,8 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponseLite getStoreResponseLite(Long id) {
-        Store store = getById(id);
-        return BeanUtil.copyProperties(store, StoreResponseLite.class);
+        return fetchById(id)
+                .map(storeResponse -> BeanUtil.copyProperties(storeResponse, StoreResponseLite.class))
+                .orElse(null);
     }
 }
