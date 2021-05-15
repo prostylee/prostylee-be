@@ -22,7 +22,7 @@ public class PushNotificationDto {
     private List<UserToken> userTokens;
 
     @NotNull
-    private Integer type;
+    private String provider;
 
     @NotNull
     private String title;

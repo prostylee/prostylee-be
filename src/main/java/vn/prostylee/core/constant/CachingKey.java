@@ -16,6 +16,8 @@ public final class CachingKey {
     public static final String ADS_GROUP = "adsGroup";
     public static final String ADS_BANNER = "adsBanner";
     public static final String ADS_CAMPAIGN = "adsCampaign";
+    public static final String PUSH_NOTIFICATION_TEMPLATES = "pushNotificationTemplate";
+    public static final String EMAIL_TEMPLATES = "emailTemplate";
 
     private CachingKey() {}
 }

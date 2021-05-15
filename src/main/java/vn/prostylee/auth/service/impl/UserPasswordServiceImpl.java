@@ -14,8 +14,8 @@ import vn.prostylee.auth.service.UserTempService;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
-import vn.prostylee.notification.configure.event.EmailEvent;
-import vn.prostylee.notification.configure.event.EmailEventDto;
+import vn.prostylee.notification.event.email.EmailEvent;
+import vn.prostylee.notification.event.email.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
 @Service

@@ -1,4 +1,4 @@
-package vn.prostylee.notification.configure.event;
+package vn.prostylee.notification.event.email;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
