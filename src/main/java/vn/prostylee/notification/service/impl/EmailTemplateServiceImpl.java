@@ -1,25 +1,32 @@
 package vn.prostylee.notification.service.impl;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import vn.prostylee.core.constant.CachingKey;
+import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ApplicationException;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.exception.ValidatingException;
+import vn.prostylee.core.specs.BaseFilterSpecs;
+import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.MailTemplateConfig;
 import vn.prostylee.notification.dto.request.EmailTemplateRequest;
 import vn.prostylee.notification.dto.response.EmailTemplateResponse;
 import vn.prostylee.notification.entity.EmailTemplate;
 import vn.prostylee.notification.repository.EmailTemplateRepository;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.notification.service.EmailService;
 import vn.prostylee.notification.service.EmailTemplateService;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,16 +35,28 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
     private final EmailTemplateRepository emailTemplateRepository;
     private final EmailService emailService;
+    private final BaseFilterSpecs<EmailTemplate> baseFilterSpecs;
 
     @Override
-    public List<EmailTemplateResponse> findAll() {
-        return emailTemplateRepository.findAll().stream().map(this::convertToResponse).collect(Collectors.toList());
+    public Page<EmailTemplateResponse> findAll(BaseFilter baseFilter) {
+        Specification<EmailTemplate> searchable = baseFilterSpecs.search(baseFilter);
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Page<EmailTemplate> page = emailTemplateRepository.findAll(searchable, pageable);
+        return page.map(this::convertToResponse);
     }
 
+    @Cacheable(value = CachingKey.EMAIL_TEMPLATES, key = "#id")
     @Override
     public EmailTemplateResponse findById(Long id) {
         EmailTemplate emailTemplate = getById(id);
         return convertToResponse(emailTemplate);
+    }
+
+    @Override
+    public EmailTemplateResponse save(EmailTemplateRequest request) {
+        EmailTemplate emailTemplate = BeanUtil.copyProperties(request, EmailTemplate.class);
+        EmailTemplate savedEmailTemplate = emailTemplateRepository.save(emailTemplate);
+        return convertToResponse(savedEmailTemplate);
     }
 
     private EmailTemplate getById(Long id) {
@@ -45,6 +64,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
                 () -> new ResourceNotFoundException("Email template is not found with id [" + id + "]"));
     }
 
+    @CacheEvict(value = CachingKey.EMAIL_TEMPLATES, allEntries = true)
     @Override
     public EmailTemplateResponse update(Long id, EmailTemplateRequest request) {
         EmailTemplate emailTemplate = getById(id);
@@ -53,6 +73,19 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         return convertToResponse(savedEmailTemplate);
     }
 
+    @CacheEvict(value = CachingKey.EMAIL_TEMPLATES, allEntries = true)
+    @Override
+    public boolean deleteById(Long id) {
+        try {
+            emailTemplateRepository.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
+            log.debug("Delete a email template without existing in database", e);
+            return false;
+        }
+    }
+
+    @Cacheable(value = CachingKey.EMAIL_TEMPLATES, key = "#type")
     @Override
     public EmailTemplateResponse findByType(String type) {
         EmailTemplate emailTemplate = emailTemplateRepository.findByType(type).orElseThrow(

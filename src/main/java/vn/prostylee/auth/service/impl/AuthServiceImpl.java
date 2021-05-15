@@ -16,8 +16,8 @@ import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.exception.AuthenticationException;
 import vn.prostylee.auth.service.*;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.notification.configure.event.EmailEvent;
-import vn.prostylee.notification.configure.event.EmailEventDto;
+import vn.prostylee.notification.event.email.EmailEvent;
+import vn.prostylee.notification.event.email.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
 import java.util.Collections;

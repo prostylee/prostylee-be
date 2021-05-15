@@ -4,11 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.response.AuditResponse;
 
-import java.io.Serializable;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class EmailTemplateResponse extends AuditResponse implements Serializable {
+public class PushNotificationTemplateResponse extends AuditResponse {
 
     private Long id;
 
@@ -17,9 +15,4 @@ public class EmailTemplateResponse extends AuditResponse implements Serializable
     private String content;
 
     private String type;
-
-    private String keyword;
-
-    private Long originalId;
-
 }

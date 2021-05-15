@@ -1,18 +1,9 @@
 package vn.prostylee.notification.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import vn.prostylee.core.configuration.properties.ServiceProperties;
-import vn.prostylee.notification.dto.mail.MailAttachment;
-import vn.prostylee.notification.dto.mail.MailInfo;
-import vn.prostylee.notification.dto.mail.MailTemplateConfig;
-import vn.prostylee.notification.dto.mail.SimpleMailInfo;
-import vn.prostylee.notification.exception.NotificationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,8 +11,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
+import vn.prostylee.core.configuration.properties.ServiceProperties;
+import vn.prostylee.core.provider.ThymeleafTemplateProcessor;
+import vn.prostylee.notification.dto.mail.MailAttachment;
+import vn.prostylee.notification.dto.mail.MailInfo;
+import vn.prostylee.notification.dto.mail.MailTemplateConfig;
+import vn.prostylee.notification.dto.mail.SimpleMailInfo;
+import vn.prostylee.notification.exception.NotificationException;
 import vn.prostylee.notification.service.EmailService;
 
 import javax.activation.DataHandler;
@@ -34,9 +30,6 @@ import javax.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -49,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
 
 	private final JavaMailSender emailSender;
 
-	private final SpringTemplateEngine templateEngine;
+	private final ThymeleafTemplateProcessor templateProcessor;
 
 	private final ServiceProperties serviceProperties;
 
@@ -164,13 +157,8 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public <T> Future<Boolean> sendAsync(@NonNull MailInfo mailInfo, @NonNull String mailTemplate, T data) {
 		log.debug(MessageFormat.format("Send an email mailInfo {0}, mailTemplate {1}, data {2}", mailInfo, mailTemplate, data));
-		Locale locale = LocaleContextHolder.getLocale();
-		Context context = new Context(locale);
-
-		Map<String, Object> mailVariables = this.convertObjectToMap(data);
-		String mailContent = this.replaceThymeleafMarker(mailTemplate, context, mailVariables);
+		String mailContent = templateProcessor.process(mailTemplate, data);
 		mailInfo.setContent(mailContent);
-
 		return this.sendAsync(mailInfo);
 	}
 
@@ -178,17 +166,14 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public <T> Future<Boolean> sendAsync(@NonNull MailInfo mailInfo, @NonNull MailTemplateConfig mailTemplateConfig, T data) {
 		log.debug(MessageFormat.format("Send an email mailInfo {0}, mailTemplateConfig {1}, data {2}", mailInfo, mailTemplateConfig, data));
-		Locale locale = LocaleContextHolder.getLocale();
-		Context context = new Context(locale);
 
-		Map<String, Object> mailVariables = this.convertObjectToMap(data);
 		if (StringUtils.isNotBlank(mailTemplateConfig.getMailSubject())) {
-			String mailSubject = this.replaceThymeleafMarker(mailTemplateConfig.getMailSubject(), context, mailVariables);
+			String mailSubject = templateProcessor.process(mailTemplateConfig.getMailSubject(), data);
 			mailInfo.setSubject(mailSubject);
 		}
 
 		if (StringUtils.isNotBlank(mailTemplateConfig.getMailContent())) {
-			String mailContent = this.replaceThymeleafMarker(mailTemplateConfig.getMailContent(), context, mailVariables);
+			String mailContent = templateProcessor.process(mailTemplateConfig.getMailContent(), data);
 			mailInfo.setContent(mailContent);
 			mailInfo.setHtml(mailTemplateConfig.getMailIsHtml());
 		}
@@ -208,34 +193,6 @@ public class EmailServiceImpl implements EmailService {
 		} catch (IOException | MessagingException e) {
 			throw new NotificationException("Can't send an email with attachment " + att.getName(), e);
 		}
-	}
-
-	/**
-	 * Convert java object to map
-	 * 
-	 * @param data The object data
-	 * @return the map with key value of the given object data
-	 */
-	private <T> Map<String, Object> convertObjectToMap(T data) {
-		if (data == null) {
-			return new HashMap<>();
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.convertValue(data, new TypeReference<Map<String, Object>>() {
-		});
-	}
-
-	/**
-	 * Replace mail marker by thymeleaf
-	 * 
-	 * @param thymeleafMarker The thymeleaf template with markers
-	 * @param context The thymeleaf process context
-	 * @param vars The parameters for replacing the markers
-	 * @return The string after replacing values for the markers
-	 */
-	private String replaceThymeleafMarker(String thymeleafMarker, Context context, Map<String, Object> vars) {
-		context.setVariables(vars);
-		return templateEngine.process(thymeleafMarker, context);
 	}
 
 }

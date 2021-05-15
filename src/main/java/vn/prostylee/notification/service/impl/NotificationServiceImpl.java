@@ -17,7 +17,6 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.notification.constant.NotificationProvider;
-import vn.prostylee.notification.constant.NotificationType;
 import vn.prostylee.notification.dto.PushNotificationDto;
 import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
 import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
@@ -29,7 +28,6 @@ import vn.prostylee.notification.factory.PushNotificationServiceFactory;
 import vn.prostylee.notification.repository.NotificationRepository;
 import vn.prostylee.notification.service.NotificationService;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,13 +140,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendPushNotification(PushNotificationDto request) {
-        NotificationType.getByType(request.getType()).ifPresent(notificationType -> {
-            switch (notificationType.getProvider()){
+        NotificationProvider.findProvider(request.getProvider()).ifPresent(provider -> {
+            switch (provider){
                 case EXPO:
-                    sendViaExpoPush(request, notificationType.getProvider());
+                    sendViaExpoPush(request, provider);
                     break;
                 case FIREBASE:
-                    sendViaFcm(request, notificationType.getProvider());
+                    sendViaFcm(request, provider);
                     break;
                 default:
                     break;
@@ -164,6 +162,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .body(request.getBody())
                 .data(request.getData())
                 .build();
+        log.debug("Push data={}", pushNotificationRequest);
         PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(pushNotificationRequest);
     }
 
@@ -179,8 +178,10 @@ public class NotificationServiceImpl implements NotificationService {
                     .topicName(request.getTopicName())
                     .build();
             subscriptionRequest.withParentBuilder(notificationRequest);
+            log.debug("Push data={}", subscriptionRequest);
             PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(subscriptionRequest);
         } else {
+            log.debug("Push data={}", notificationRequest.build());
             PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(notificationRequest.build());
         }
     }

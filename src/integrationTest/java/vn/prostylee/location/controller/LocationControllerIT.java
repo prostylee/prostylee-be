@@ -172,7 +172,7 @@ class LocationControllerIT {
                 .perform(delete(ENDPOINT + "/" + id))
                 .andDo(print())
                 .andExpect(status().isNoContent())
-                .andExpect(jsonPath("$").value("true"))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 }
