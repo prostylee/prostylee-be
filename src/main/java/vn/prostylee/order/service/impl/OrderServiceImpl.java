@@ -71,20 +71,7 @@ public class OrderServiceImpl implements OrderService {
         if(orderFilter.getStatus() == null) {
             return;
         }
-        int statusId = AWAITING_CONFIRMATION.getStatus();
-        switch (orderFilter.getStatus()) {
-            case "IN_PROGRESS":
-                statusId = IN_PROGRESS.getStatus();
-                break;
-            case "CANCELLED":
-                statusId = CANCELLED.getStatus();
-                break;
-            case "COMPLETED":
-                statusId = COMPLETED.getStatus();
-                break;
-            default:
-                break;
-        }
+        int statusId = OrderStatus.getByStatusValue(orderFilter.getStatus()).getStatus();
         queryBuilder.equals("status", statusId);
     }
 

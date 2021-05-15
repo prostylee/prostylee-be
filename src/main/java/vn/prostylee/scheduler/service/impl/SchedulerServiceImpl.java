@@ -61,6 +61,19 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
+    public SchedulerResponse triggerJob(String jobGroup, String jobName) {
+        try {
+            scheduler.triggerJob(jobKey(jobName, jobGroup));
+            log.info("Triggered a job now with jobGroup={}, jobName={}", jobGroup, jobName);
+            return SchedulerResponse.builder().result(true).build();
+        } catch (SchedulerException e) {
+            String errorMsg = String.format("Could not update a job with jobGroup=%s, jobName=%s, error=%s",
+                    jobGroup, jobName, e.getMessage());
+            throw new ApplicationException(errorMsg, e);
+        }
+    }
+
+    @Override
     public SchedulerResponse updateJob(String jobGroup, String jobName, JobDetailRequest jobDetailRequest) {
         try {
             Optional<JobDetail> newJobDetail = Optional.ofNullable(scheduler.getJobDetail(jobKey(jobName, jobGroup)))

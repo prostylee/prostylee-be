@@ -4,6 +4,7 @@ package vn.prostylee.order.entity;
 import lombok.*;
 import vn.prostylee.core.entity.AuditEntity;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
 
 import javax.persistence.*;
@@ -34,6 +35,11 @@ public class OrderDetail extends AuditEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id", nullable = false)
 	private Store store;
+
+	@ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "branch_id")
+	private Branch branch;
 
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)

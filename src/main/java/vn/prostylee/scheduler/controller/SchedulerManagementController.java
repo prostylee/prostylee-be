@@ -14,6 +14,7 @@ public class SchedulerManagementController {
 
     public static final String JOBS = "/job-group/{jobGroup}/jobs";
     public static final String JOBS_BY_NAME = "/job-group/{jobGroup}/jobs/{jobName}";
+    public static final String JOBS_TRIGGER = "/job-group/{jobGroup}/jobs/{jobName}/trigger";
     public static final String JOBS_PAUSE = "/job-group/{jobGroup}/jobs/{jobName}/pause";
     public static final String JOBS_RESUME = "/job-group/{jobGroup}/jobs/{jobName}/resume";
 
@@ -27,6 +28,11 @@ public class SchedulerManagementController {
     @GetMapping(path = JOBS_BY_NAME)
     public SchedulerResponse findJob(@PathVariable String jobGroup, @PathVariable String jobName) {
         return schedulerService.getJob(jobGroup, jobName);
+    }
+
+    @PostMapping(path = JOBS_TRIGGER)
+    public SchedulerResponse triggerJob(@PathVariable String jobGroup, @PathVariable String jobName) {
+        return schedulerService.triggerJob(jobGroup, jobName);
     }
 
     @PutMapping(path = JOBS_BY_NAME)

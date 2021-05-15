@@ -89,7 +89,7 @@ public class ProductConverter {
 
     private ProductStatisticResponse buildProductStatistic(Long id){
         return Optional.ofNullable(id)
-                .map(productStatisticService::findById)
+                .flatMap(productStatisticService::fetchById)
                 .orElse(null);
     }
 }

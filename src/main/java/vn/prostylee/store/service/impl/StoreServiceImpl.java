@@ -24,6 +24,7 @@ import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
+import vn.prostylee.store.constants.StoreStatus;
 import vn.prostylee.store.converter.StoreConverter;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
 import vn.prostylee.store.dto.filter.StoreFilter;
@@ -95,15 +96,19 @@ public class StoreServiceImpl implements StoreService {
                 .collect(Collectors.toList());
 
         if (isSearchNearBy) {
-            responses.sort((store1, store2) -> {
-                if (store1.getLocation() == null) {
-                    return 1;
-                }
-                return store1.getLocation().compareTo(store2.getLocation());
-            });
+            responses.sort(storeResponseComparator());
         }
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());
+    }
+
+    private Comparator<StoreResponse> storeResponseComparator() {
+        return (store1, store2) -> {
+            if (store1.getLocation() == null) {
+                return 1;
+            }
+            return store1.getLocation().compareTo(store2.getLocation());
+        };
     }
 
     @Cacheable(cacheNames = CachingKey.STORES, key = "#id")
@@ -133,6 +138,11 @@ public class StoreServiceImpl implements StoreService {
         Store store = BeanUtil.copyProperties(storeRequest, Store.class);
         store.setOwnerId(authenticatedProvider.getUserIdValue());
         store.setCompany(company);
+
+        if (storeRequest.getStatus() == null) {
+            store.setStatus(StoreStatus.IN_PROGRESS.getValue());
+        }
+
         store.setStatistic(StoreStatistic.builder()
                 .numberOfComment(0L)
                 .numberOfFollower(0L)
@@ -199,6 +209,8 @@ public class StoreServiceImpl implements StoreService {
 
         if (storeFilter.getStatus() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), storeFilter.getStatus()));
+        } else {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), StoreStatus.ACTIVE.getValue()));
         }
 
         if (storeFilter.getOwnerId() != null) {

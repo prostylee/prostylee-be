@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
 import vn.prostylee.core.repository.query.NativeQueryResult;
+import vn.prostylee.location.dto.DistanceWrapper;
+import vn.prostylee.location.dto.LatLngDto;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.entity.Location;
@@ -35,6 +37,23 @@ public class LocationExtRepositoryImpl extends BaseRepositoryImpl<Location, Long
 
         NativeQueryResult<LocationResponse> nativeQueryResult = new NativeQueryResult<>(getEntityManager(), LocationResponse.class, stringBuilder);
         return nativeQueryResult.getResultList(buildQueryParams(nearestLocationFilter)).getContent();
+    }
+
+    @Override
+    public Double calculateDistance(LatLngDto from, LatLngDto to) {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append(" SELECT func_get_distance_from_lat_lng_in_km(:fromLat, :fromLng, :toLat, :toLng) AS distance");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("fromLat", from.getLatitude());
+        params.put("fromLng", from.getLongitude());
+        params.put("toLat", to.getLatitude());
+        params.put("toLng", to.getLongitude());
+
+        NativeQueryResult<DistanceWrapper> nativeQueryResult = new NativeQueryResult<>(getEntityManager(), DistanceWrapper.class, stringBuilder);
+        return nativeQueryResult.getSingleResult(params)
+                .map(DistanceWrapper::getDistance)
+                .orElse(0d);
     }
 
     private Map<String, Object> buildQueryParams(NearestLocationFilter nearestLocationFilter) {

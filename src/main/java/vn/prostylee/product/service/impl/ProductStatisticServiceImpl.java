@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.product.dto.response.ProductStatisticResponse;
-import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
 import vn.prostylee.product.service.ProductStatisticService;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -23,7 +21,13 @@ public class ProductStatisticServiceImpl implements ProductStatisticService {
 
     @Override
     public ProductStatisticResponse findById(Long id){
-        return BeanUtil.copyProperties(this.getById(id),ProductStatisticResponse.class);
+        return BeanUtil.copyProperties(this.getById(id), ProductStatisticResponse.class);
+    }
+
+    @Override
+    public Optional<ProductStatisticResponse> fetchById(Long id) {
+        return productStatisticRepository.findById(id)
+                .map(productStatistic -> BeanUtil.copyProperties(productStatistic, ProductStatisticResponse.class));
     }
 
     private ProductStatistic getById(Long id){
