@@ -1,9 +1,12 @@
 package vn.prostylee.product.service;
 
 import vn.prostylee.product.dto.response.ProductStatisticResponse;
-import vn.prostylee.product.entity.Product;
+
+import java.util.Optional;
 
 public interface ProductStatisticService{
 
     ProductStatisticResponse findById(Long id);
+
+    Optional<ProductStatisticResponse> fetchById(Long id);
 }

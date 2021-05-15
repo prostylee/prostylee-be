@@ -45,7 +45,7 @@ public class Order extends AuditEntity {
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToOne
-	@JoinColumn(name = "payment_type_id", nullable = false)
+	@JoinColumn(name = "payment_type_id")
 	private PaymentType paymentType;
 
 	@Column(name = "buyer_id")
@@ -63,14 +63,14 @@ public class Order extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@OneToOne
-	@JoinColumn(name = "shipping_address_id", nullable = false)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "shipping_address_id")
 	private ShippingAddress shippingAddress;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToOne
-	@JoinColumn(name = "shipping_provider_id", nullable = false)
+	@JoinColumn(name = "shipping_provider_id")
 	private ShippingProvider shippingProvider;
 
 	public OrderStatus getStatus() {

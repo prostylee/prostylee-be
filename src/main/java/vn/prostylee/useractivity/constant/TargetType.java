@@ -5,6 +5,7 @@ public enum TargetType {
     POST,
     STORY,
     STORE,
+    BRANCH,
     USER,
     COMMENT
 }

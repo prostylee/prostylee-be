@@ -54,7 +54,9 @@ public class SimpleResultTransformer extends AliasToBeanResultTransformer {
 				}
 
 				Object tupleValue = tuple[i];
-				if (tupleValue instanceof Timestamp) {
+				if (tupleValue == null) {
+					setters[i].set(result, null, null);
+				} else if (tupleValue instanceof Timestamp) {
 					convertTimestampToLocalDateSetter(setters[i], (Timestamp) tupleValue, result);
 				} else if (tupleValue instanceof BigInteger || shouldSetLongValue(setters[i])) {
 					setters[i].set(result, Long.valueOf(tupleValue.toString()), null);

@@ -1,20 +1,20 @@
-package vn.prostylee.shipping.dto.response;
+package vn.prostylee.shipping.dto.request;
 
 import lombok.Data;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
 
 @Data
-public class ShippingAddressResponse implements Serializable {
+public class ShippingAddressRequest {
 
-    private Long id;
-
+    @NotBlank
     private String fullName;
 
     private String email;
 
     private String phoneNumber;
 
+    @NotBlank
     private String address1;
 
     private String address2;

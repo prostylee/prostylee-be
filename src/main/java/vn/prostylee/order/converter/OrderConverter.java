@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.order.constants.OrderStatus;
-import vn.prostylee.order.dto.request.OrderDetailRequest;
-import vn.prostylee.order.dto.request.OrderDiscountRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
 import vn.prostylee.order.dto.response.OrderDiscountResponse;
@@ -20,10 +18,15 @@ import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingAddress;
 import vn.prostylee.shipping.entity.ShippingProvider;
+import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
+import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,50 +35,80 @@ import java.util.stream.Collectors;
 public class OrderConverter {
 
     public void toEntity(OrderRequest request, Order order) {
-        PaymentType paymentType = PaymentType.builder().id(request.getPaymentTypeId()).build();
-        order.setPaymentType(paymentType);
-        ShippingProvider sp = ShippingProvider.builder().id(request.getShippingProviderId()).build();
-        order.setShippingProvider(sp);
-        ShippingAddress sa = ShippingAddress.builder().id(request.getShippingAddressId()).build();
-        order.setShippingAddress(sa);
-        order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
+        Optional.ofNullable(request.getPaymentTypeId())
+                .ifPresent(paymentTypeId -> {
+                    PaymentType paymentType = PaymentType.builder().id(paymentTypeId).build();
+                    order.setPaymentType(paymentType);
+                });
 
+        Optional.ofNullable(request.getShippingProviderId())
+                .ifPresent(shippingProviderId -> {
+                    ShippingProvider sp = ShippingProvider.builder().id(shippingProviderId).build();
+                    order.setShippingProvider(sp);
+                });
+
+        Optional.ofNullable(request.getShippingAddress())
+                .ifPresent(shippingAddressRequest -> {
+                    ShippingAddress sa = BeanUtil.copyProperties(shippingAddressRequest, ShippingAddress.class);
+                    order.setShippingAddress(sa);
+                });
+
+        order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
         convertOrderDetails(request, order);
         convertOrderDiscounts(request, order);
     }
 
     private void convertOrderDetails(OrderRequest request, Order order) {
-        Set<OrderDetail> details = new HashSet<>();
-        for(OrderDetailRequest detailRq : request.getOrderDetails()) {
-            OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
-            detail.setOrder(order);
-            Product product = Product.builder().id(detailRq.getProductId()).build();
-            detail.setProduct(product);
-            Store store = Store.builder().id(detailRq.getStoreId()).build();
-            detail.setStore(store);
-            details.add(detail);
-        }
+        Set<OrderDetail> details = Optional.ofNullable(request.getOrderDetails())
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(detailRq -> {
+                    OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
+                    detail.setOrder(order);
+
+                    Product product = Product.builder().id(detailRq.getProductId()).build();
+                    detail.setProduct(product);
+
+                    Optional.ofNullable(detailRq.getStoreId()).ifPresent(storeId -> {
+                        Store store = Store.builder().id(storeId).build();
+                        detail.setStore(store);
+                    });
+
+                    Optional.ofNullable(detailRq.getBranchId()).ifPresent(branchId -> {
+                        Branch branch = Branch.builder().id(detailRq.getBranchId()).build();
+                        detail.setBranch(branch);
+                    });
+
+                    return detail;
+                })
+                .collect(Collectors.toSet());
+
         Set<OrderDetail> entityDetails = order.getOrderDetails();
         if (entityDetails == null) {
             order.setOrderDetails(details);
             return;
         }
-        entityDetails.clear();
-        entityDetails.addAll(details);
+        order.getOrderDetails().clear();
+        order.getOrderDetails().addAll(details);
     }
 
     private void convertOrderDiscounts(OrderRequest request, Order order) {
-        Set<OrderDiscount> discounts = new HashSet<>();
-        for (OrderDiscountRequest discountRq : request.getOrderDiscounts()) {
-            OrderDiscount discount = BeanUtil.copyProperties(discountRq, OrderDiscount.class);
-            discount.setOrder(order);
-            discounts.add(discount);
-        }
+        Set<OrderDiscount> discounts = Optional.ofNullable(request.getOrderDiscounts())
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(discountRq -> {
+                    OrderDiscount discount = BeanUtil.copyProperties(discountRq, OrderDiscount.class);
+                    discount.setOrder(order);
+                    return discount;
+                })
+                .collect(Collectors.toSet());
+
         Set<OrderDiscount> entityDiscounts = order.getOrderDiscounts();
         if (entityDiscounts == null) {
             order.setOrderDiscounts(discounts);
             return;
         }
+
         order.getOrderDiscounts().clear();
         order.getOrderDiscounts().addAll(discounts);
     }
@@ -85,26 +118,48 @@ public class OrderConverter {
         orderResponse.setOrderDetails(
                 Optional.ofNullable(order.getOrderDetails())
                         .orElseGet(HashSet::new)
-                        .stream().map(this::convertToOrderDetailResponse)
+                        .stream()
+                        .map(this::convertToOrderDetailResponse)
                         .collect(Collectors.toList())
         );
+
         orderResponse.setOrderDiscounts(
                 Optional.ofNullable(order.getOrderDiscounts())
                         .orElseGet(HashSet::new)
-                        .stream().map(discount -> BeanUtil.copyProperties(discount, OrderDiscountResponse.class))
+                        .stream()
+                        .map(discount -> BeanUtil.copyProperties(discount, OrderDiscountResponse.class))
                         .collect(Collectors.toList())
         );
-        orderResponse.setPaymentType(order.getPaymentType().getName());
+
+        orderResponse.setPaymentType(order.getPaymentType() == null ? null : order.getPaymentType().getName());
         orderResponse.setStatus(order.getStatus() == null ? null : order.getStatus().name());
-        orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
-        orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
+
+        if (order.getShippingAddress() != null) {
+            orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
+        }
+
+        if (order.getShippingProvider() != null) {
+            orderResponse.setShippingProvider(BeanUtil.copyProperties(order.getShippingProvider(), ShippingProviderResponse.class));
+        }
+
         return orderResponse;
     }
 
     private OrderDetailResponse convertToOrderDetailResponse(OrderDetail detail) {
         OrderDetailResponse detailResponse = BeanUtil.copyProperties(detail, OrderDetailResponse.class);
-        StoreResponseLite storeResponse = BeanUtil.copyProperties(detail.getStore(), StoreResponseLite.class);
-        detailResponse.setStore(storeResponse);
+
+        Optional.ofNullable(detail.getStore())
+                .ifPresent(store -> {
+                    StoreResponseLite storeResponse = BeanUtil.copyProperties(store, StoreResponseLite.class);
+                    detailResponse.setStore(storeResponse);
+                });
+
+        Optional.ofNullable(detail.getBranch())
+                .ifPresent(branch -> {
+                    BranchResponse branchResponse = BeanUtil.copyProperties(branch, BranchResponse.class);
+                    detailResponse.setBranch(branchResponse);
+                });
+
         return detailResponse;
     }
 }

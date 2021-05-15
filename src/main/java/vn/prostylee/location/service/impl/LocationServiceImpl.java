@@ -16,6 +16,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.location.dto.LatLngDto;
 import vn.prostylee.location.dto.filter.LocationFilter;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.request.LocationRequest;
@@ -112,5 +113,17 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public List<LocationResponse> getNearestLocations(NearestLocationFilter nearestLocationFilter) {
         return locationRepository.getNearestLocations(nearestLocationFilter);
+    }
+
+    @Override
+    public LocationResponse getLocationByIdWithDistanceCalculation(Long id, LatLngDto toLatLngDto) {
+        LocationResponse locationResponse = findById(id);
+        LatLngDto fromLatLngDto = LatLngDto.builder()
+                .latitude(locationResponse.getLatitude())
+                .longitude(locationResponse.getLongitude())
+                .build();
+        Double distance = locationRepository.calculateDistance(fromLatLngDto, toLatLngDto);
+        locationResponse.setDistance(distance);
+        return locationResponse;
     }
 }
