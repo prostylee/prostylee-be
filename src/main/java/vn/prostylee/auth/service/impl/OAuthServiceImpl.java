@@ -14,8 +14,8 @@ import vn.prostylee.auth.service.OAuthService;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.converter.GenderConverter;
 import vn.prostylee.core.dto.response.SimpleResponse;
-import vn.prostylee.notification.configure.event.EmailEvent;
-import vn.prostylee.notification.configure.event.EmailEventDto;
+import vn.prostylee.notification.event.email.EmailEvent;
+import vn.prostylee.notification.event.email.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
 import java.util.Optional;

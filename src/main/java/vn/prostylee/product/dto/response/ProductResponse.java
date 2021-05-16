@@ -40,4 +40,6 @@ public class ProductResponse implements Serializable {
     private LocationResponse location;
 
     private Boolean isAdvertising;
+
+    private ProductStatisticResponse productStatisticResponse;
 }

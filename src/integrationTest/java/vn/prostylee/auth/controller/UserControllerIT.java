@@ -170,7 +170,7 @@ class UserControllerIT {
                 .perform(delete(ENDPOINT + "/" + userId))
                 .andDo(print())
                 .andExpect(status().isNoContent())
-                .andExpect(jsonPath("$").value("true"))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 

@@ -5,9 +5,11 @@ import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.AppConstant;
+import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.media.configuration.AwsS3Properties;
@@ -54,6 +56,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         return getImageUrls(fileIds, 0, 0);
     }
 
+    @Cacheable(value = CachingKey.AWS_S3, key = "{ #id, #width, #height }")
     @Override
     public String getImageUrl(Long id, int width, int height) {
         return generateUrlByDimension(attachmentService.getById(id), width, height);
@@ -62,7 +65,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
     @Override
     public List<String> getImageUrls(List<Long> fileIds, int width, int height) {
         List<Attachment> attachments = attachmentService.getByIds(fileIds);
-        if(Collections.isEmpty(attachments)) {
+        if (Collections.isEmpty(attachments)) {
             throw new ResourceNotFoundException("Files are not existed by getting with ids: " + fileIds);
         }
         return generateUrlsByDimension(attachments, width, height);
@@ -75,16 +78,18 @@ public class AwsS3ServiceImpl implements FileUploadService {
     }
 
     private String generateUrlByDimension(Attachment attachment, int width, int height) {
-        return buildUrl(attachment,width, height);
+        return buildUrl(attachment, width, height);
     }
 
-    private String buildUrl(Attachment attachment, int width, int height){
+    private String buildUrl(Attachment attachment, int width, int height) {
         String prefix = cloudfrontUrl;
         if (width > 0 && height > 0) {
             prefix = String.format("%s%s%dx%d%s", cloudfrontUrl,
                     s3ResizePrefix, width, height, AppConstant.PATH_SEPARATOR);
         }
-        return prefix + attachment.getPath() + AppConstant.PATH_SEPARATOR + attachment.getName();
+        return prefix + attachment.getPath()
+                + (attachment.getPath().endsWith(AppConstant.PATH_SEPARATOR) ? "" : AppConstant.PATH_SEPARATOR)
+                + attachment.getName();
     }
 
     @Override
@@ -114,7 +119,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
                 Thread.sleep(AppConstant.WAIT_ASYNC_DONE_IN_MS);
             }
 
-            for(Future<AttachmentResponse> future : futures) {
+            for (Future<AttachmentResponse> future : futures) {
                 attachments.add(future.get());
             }
         } catch (AmazonClientException | InterruptedException | ExecutionException | IOException e) {
@@ -128,7 +133,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
         try {
             List<String> fileNames = new ArrayList<>();
             List<Attachment> attachments = attachmentService.getByIds(fileIds);
-            for(Attachment attachment : attachments) {
+            for (Attachment attachment : attachments) {
                 fileNames.add(attachment.getName());
             }
             attachmentService.deleteAttachmentsByIdIn(fileIds);

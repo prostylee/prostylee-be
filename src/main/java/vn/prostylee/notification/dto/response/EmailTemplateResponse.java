@@ -1,13 +1,14 @@
 package vn.prostylee.notification.dto.response;
 
-
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import vn.prostylee.core.dto.response.AuditResponse;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class EmailTemplateResponse implements Serializable {
+public class EmailTemplateResponse extends AuditResponse implements Serializable {
 
     private Long id;
 
@@ -20,9 +21,5 @@ public class EmailTemplateResponse implements Serializable {
     private String keyword;
 
     private Long originalId;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
 }

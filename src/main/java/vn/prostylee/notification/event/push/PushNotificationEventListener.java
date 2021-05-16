@@ -1,4 +1,4 @@
-package vn.prostylee.notification.configure.event;
+package vn.prostylee.notification.event.push;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import vn.prostylee.notification.service.EmailTemplateService;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EmailEventListener implements ApplicationListener<EmailEvent> {
+public class PushNotificationEventListener implements ApplicationListener<PushNotificationEvent> {
 
     private final EmailService emailService;
 
@@ -23,17 +23,17 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
 
     @Async
     @Override
-    public void onApplicationEvent(EmailEvent event) {
+    public void onApplicationEvent(PushNotificationEvent event) {
         log.info("Created instance: event={}", event.getSource());
-        if (!(event.getSource() instanceof EmailEventDto)) {
+        if (!(event.getSource() instanceof PushNotificationEventDto)) {
             log.warn("Can not handle email event with source type is {}", event.getSource());
             return;
         }
 
         try {
-            EmailEventDto<?> emailEventDto = (EmailEventDto<?>) event.getSource();
+            PushNotificationEventDto<?> pushNotificationEventDto = (PushNotificationEventDto<?>) event.getSource();
 
-            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(emailEventDto.getEmailTemplateType().name());
+            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(pushNotificationEventDto.getEmailTemplateType().name());
             MailTemplateConfig config = MailTemplateConfig.builder()
                     .mailContent(emailTemplateResponse.getContent())
                     .mailSubject(emailTemplateResponse.getTitle())
@@ -41,8 +41,8 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
                     .build();
 
             MailInfo mailInfo = new MailInfo();
-            mailInfo.addTo(emailEventDto.getEmail());
-            emailService.sendAsync(mailInfo, config, emailEventDto.getData());
+            mailInfo.addTo(pushNotificationEventDto.getEmail());
+            emailService.sendAsync(mailInfo, config, pushNotificationEventDto.getData());
         } catch(ResourceNotFoundException e) {
             log.warn("There is no email template for sending an email type {}", event.getSource(), e);
         }

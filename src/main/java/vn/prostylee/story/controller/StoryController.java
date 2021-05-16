@@ -17,7 +17,7 @@ import vn.prostylee.story.service.StoryService;
 @RequestMapping(ApiVersion.API_V1 + "/stories")
 public class StoryController extends CrudController<StoryRequest, UserStoryResponse, Long, StoryFilter> {
 
-    private StoryService service;
+    private final StoryService service;
 
     @Autowired
     public StoryController(StoryService service) {

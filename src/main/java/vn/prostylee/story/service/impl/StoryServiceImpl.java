@@ -38,11 +38,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 public class StoryServiceImpl implements StoryService {
+
     public static final int FIRST_INDEX = 0;
     private final StoryRepository storyRepository;
     private final BaseFilterSpecs<Story> baseFilterSpecs;
@@ -52,6 +52,7 @@ public class StoryServiceImpl implements StoryService {
     private final StoryImageService storyImageService;
     private final StoreService storeService;
     private final FileUploadService fileUploadService;
+
     @Override
     public Page<UserStoryResponse> findAll(BaseFilter baseFilter) {
         return null;
@@ -76,12 +77,15 @@ public class StoryServiceImpl implements StoryService {
         Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
 
-        responses.getContent().forEach(response -> {
-            response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
-            response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
-            response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
-        });
+        responses.getContent().forEach(this::buildAdditionalData);
         return responses;
+    }
+
+    private void buildAdditionalData(UserStoryResponse response) {
+        response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
+        response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
+        response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
+        response.setStoreResponseLite(Optional.ofNullable(response.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
     }
 
     private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
@@ -105,7 +109,7 @@ public class StoryServiceImpl implements StoryService {
         return fileUploadService.getImageUrls(attachmentIds, sizeType.getWidth(), sizeType.getHeight());
     }
 
-    private StoreForStoryResponse getStoreForStoryBy(Long id) {
+    private StoreForStoryResponse  getStoreForStoryBy(Long id) {
         StoreResponse storeResponse = storeService.findById(id);
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(storeResponse.getLogo()),
                 ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
@@ -137,23 +141,21 @@ public class StoryServiceImpl implements StoryService {
     public UserStoryResponse save(StoryRequest req) {
         Story entity = BeanUtil.copyProperties(req, Story.class);
         entity.setTargetId(authenticatedProvider.getUserIdValue());
-        if (CollectionUtils.isNotEmpty(req.getAttachmentIds()))
-            entity.setStoryImages(buildStoryImages(req.getAttachmentIds(), entity));
+        entity.setStoryImages(storyImageService.saveImages(req.getImages(), entity));
         Story savedEntity = storyRepository.save(entity);
-        return BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
+
+        UserStoryResponse userStoryResponse = BeanUtil.copyProperties(savedEntity, UserStoryResponse.class);
+        buildAdditionalData(userStoryResponse);
+        return userStoryResponse;
     }
 
     @Override
     public UserStoryResponse update(Long id, StoryRequest req) {
         Story entity = getById(id);
-        Optional<List<Long>> attachmentIds = Optional.ofNullable(req.getAttachmentIds());
-        if (attachmentIds.isPresent()) {
-            processHasAttachments(entity, attachmentIds.get());
-        } else {
-            entity.getStoryImages().clear();
-        }
-
         BeanUtil.mergeProperties(req, entity);
+
+        // TODO update images
+
         Story savedUser = storyRepository.save(entity);
         return BeanUtil.copyProperties(savedUser, UserStoryResponse.class);
     }
@@ -172,37 +174,4 @@ public class StoryServiceImpl implements StoryService {
         return storyRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Story is not found with id [" + id + "]"));
     }
-
-    private void processHasAttachments(Story entity, List<Long> attachmentIds) {
-        Set<StoryImage> keepSets = getStoryImagesNeedToKeep(entity, attachmentIds);
-        entity.getStoryImages().removeIf(ci -> !keepSets.contains(ci));
-        Set<StoryImage> requestSets = buildImagesNeedToStore(entity, attachmentIds, keepSets);
-        entity.getStoryImages().addAll(requestSets);
-    }
-
-    private Set<StoryImage> buildImagesNeedToStore(Story entity, List<Long> attachmentIds, Set<StoryImage> keepSets) {
-        List<Long> keepIds = keepSets.stream().map(StoryImage::getAttachmentId).collect(Collectors.toList());
-        return buildStoryImages(attachmentIds, entity).stream()
-                .filter(commentImage -> !keepIds.contains(commentImage.getAttachmentId()))
-                .collect(Collectors.toSet());
-    }
-
-    private Set<StoryImage> getStoryImagesNeedToKeep(Story entity, List<Long> attachmentIds) {
-        return entity.getStoryImages().stream()
-                .filter(commentImage -> attachmentIds.contains(commentImage.getAttachmentId()))
-                .collect(Collectors.toSet());
-    }
-
-    private Set<StoryImage> buildStoryImages(List<Long> attachIds, Story entity) {
-        return IntStream.range(0, attachIds.size())
-                .mapToObj(index -> buildStoryImage(entity, attachIds.get(index), index + 1))
-                .collect(Collectors.toSet());
-    }
-
-    private StoryImage buildStoryImage(Story entity, Long id, Integer index) {
-        return StoryImage.builder().attachmentId(id)
-                .story(entity).order(index)
-                .build();
-    }
-
 }

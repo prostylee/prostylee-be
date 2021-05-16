@@ -17,6 +17,8 @@ public class OrderDetailRequest {
     @NotNull
     private Long storeId;
 
+    private Long branchId;
+
     @NotNull
     private Long productId;
 

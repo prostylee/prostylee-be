@@ -31,6 +31,16 @@ public interface SchedulerService {
     SchedulerResponse getJob(String jobGroup, String jobName);
 
     /**
+     * Trigger a job now.
+     *
+     * @param jobGroup         the job group
+     * @param jobName          the job name
+     *
+     * @return the scheduler response bean
+     */
+    SchedulerResponse triggerJob(String jobGroup, String jobName);
+
+    /**
      * Update job scheduler response bean.
      *
      * @param jobGroup         the job group

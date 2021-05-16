@@ -1,0 +1,1 @@
+ALTER TABLE product_statistic ADD COLUMN number_of_review BIGINT;

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.core.service.CrudService;
 
 import javax.validation.Valid;
@@ -47,7 +48,7 @@ public class CrudController<T, R, ID, F extends BaseFilter> {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public Boolean delete(@PathVariable ID id) {
-        return crudService.deleteById(id);
+    public SimpleResponse delete(@PathVariable ID id) {
+        return SimpleResponse.builder().data(crudService.deleteById(id)).build();
     }
 }

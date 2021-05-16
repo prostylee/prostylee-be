@@ -15,7 +15,7 @@ public enum StoreStatus {
     @Getter
     private final int value;
 
-    public static final StoreStatus getByStatusValue(int value) {
+    public static StoreStatus getByStatusValue(int value) {
         return Stream.of(StoreStatus.values())
                 .filter(storeStatus -> storeStatus.getValue() == value)
                 .findFirst()

@@ -20,5 +20,5 @@ public class UserStoryResponse implements Serializable {
     private List<String> storyLargeImageUrls;
     private UserResponseLite userForStoryResponse;
     private Long storeId;
-    private StoreResponseLite storeResponseLite;
+    private StoreForStoryResponse storeResponseLite;
 }

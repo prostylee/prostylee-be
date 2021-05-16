@@ -228,7 +228,7 @@ class StoreControllerIT extends AuthSupporterIT {
                 .perform(delete(ENDPOINT + "/" + id))
                 .andDo(print())
                 .andExpect(status().isNoContent())
-                .andExpect(jsonPath("$").value("true"))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 
@@ -239,7 +239,7 @@ class StoreControllerIT extends AuthSupporterIT {
                 .perform(delete(ENDPOINT + "/" + id))
                 .andDo(print())
                 .andExpect(status().isNoContent())
-                .andExpect(jsonPath("$").value("false"))
+                .andExpect(jsonPath("$.data").value("false"))
                 .andReturn();
     }
 }

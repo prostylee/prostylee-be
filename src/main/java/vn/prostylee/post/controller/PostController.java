@@ -13,11 +13,8 @@ import vn.prostylee.post.service.PostService;
 @RequestMapping(value = ApiVersion.API_V1 + "/posts")
 public class PostController extends CrudController<PostRequest, PostResponse, Long, PostFilter> {
 
-    private  PostService postService;
-
     public PostController(PostService postService) {
         super(postService);
-        this.postService = postService;
     }
 
 }
