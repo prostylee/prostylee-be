@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration.monitor;
+package vn.prostylee.core.configuration.monitor.userbehavior;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class UserTrackingAspect {
     private final UserTrackingService userTrackingService;
     private final HttpServletRequest request;
 
-    @Before("@annotation(vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking)")
+    @Before("@annotation(vn.prostylee.core.configuration.monitor.userbehavior.UserBehaviorTracking)")
     public void trackingUserBehavior(JoinPoint joinPoint) {
         try {
             List<Object> args = Arrays.asList(joinPoint.getArgs());

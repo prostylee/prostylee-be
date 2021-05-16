@@ -2,7 +2,7 @@ package vn.prostylee.core.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
-import vn.prostylee.core.configuration.monitor.annotation.UserBehaviorTracking;
+import vn.prostylee.core.configuration.monitor.userbehavior.UserBehaviorTracking;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.service.CrudService;
 

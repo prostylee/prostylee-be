@@ -1,15 +1,18 @@
 package vn.prostylee.order.dto.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.core.dto.response.AuditResponse;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class OrderResponse implements Serializable {
+public class OrderResponse extends AuditResponse {
 
     private Long id;
 
@@ -22,6 +25,8 @@ public class OrderResponse implements Serializable {
     private Double totalMoney;
 
     private Long buyerId;
+
+    private UserResponse buyer;
 
     private List<OrderDetailResponse> orderDetails;
 

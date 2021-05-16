@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
         value="app.monitor.performance.enable",
         havingValue = "true",
         matchIfMissing = true)
-@Configuration
+@Component
 @Aspect
 @Slf4j
 public class MethodExecutionTimeLoggingAdvice {

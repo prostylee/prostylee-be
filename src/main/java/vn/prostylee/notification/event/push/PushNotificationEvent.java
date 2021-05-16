@@ -4,7 +4,6 @@ import org.springframework.context.ApplicationEvent;
 
 public class PushNotificationEvent extends ApplicationEvent {
 
-
     /**
      * Create a new {@code ApplicationEvent}.
      *

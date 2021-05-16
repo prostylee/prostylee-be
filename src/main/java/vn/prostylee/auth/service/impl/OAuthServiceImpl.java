@@ -18,6 +18,7 @@ import vn.prostylee.notification.event.email.EmailEvent;
 import vn.prostylee.notification.event.email.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Slf4j
@@ -86,7 +87,7 @@ public class OAuthServiceImpl implements OAuthService {
     private void sendEmailWelcome(String email, UserRequest userRequest) {
         EmailEventDto<?> eventDto = EmailEventDto.builder()
                 .emailTemplateType(EmailTemplateType.WELCOME)
-                .email(email)
+                .emails(Collections.singletonList(email))
                 .data(userRequest)
                 .build();
         eventPublisher.publishEvent(new EmailEvent(eventDto));

@@ -101,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
     private void sendEmailWelcome(String email, UserRequest userRequest) {
         EmailEventDto<?> eventDto = EmailEventDto.builder()
                 .emailTemplateType(EmailTemplateType.WELCOME)
-                .email(email)
+                .emails(Collections.singletonList(email))
                 .data(userRequest)
                 .build();
         eventPublisher.publishEvent(new EmailEvent(eventDto));

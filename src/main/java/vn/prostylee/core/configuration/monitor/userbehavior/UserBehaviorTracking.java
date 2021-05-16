@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration.monitor.annotation;
+package vn.prostylee.core.configuration.monitor.userbehavior;
 
 import java.lang.annotation.*;
 

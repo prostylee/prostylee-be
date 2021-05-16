@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vn.prostylee.notification.constant.EmailTemplateType;
+import vn.prostylee.notification.constant.PushNotificationTemplateType;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -12,10 +15,16 @@ import vn.prostylee.notification.constant.EmailTemplateType;
 @NoArgsConstructor
 public class PushNotificationEventDto<T> {
 
-    private EmailTemplateType emailTemplateType;
+    private PushNotificationTemplateType templateType;
 
-    private String email;
+    private String provider;
 
-    private T data;
+    private List<Long> userIds;
+
+    private List<Long> storeIds;
+
+    private T fillData;
+
+    private Map<String, Object> pushData;
 
 }

@@ -18,6 +18,8 @@ import vn.prostylee.notification.event.email.EmailEvent;
 import vn.prostylee.notification.event.email.EmailEventDto;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
+import java.util.Collections;
+
 @Service
 @RequiredArgsConstructor
 public class UserPasswordServiceImpl implements UserPasswordService {
@@ -44,7 +46,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     private void sendEmailForgotPassword(String email, UserTempResponse userTempResponse) {
         EmailEventDto<?> eventDto = EmailEventDto.builder()
                 .emailTemplateType(EmailTemplateType.FORGOT_PASSWORD)
-                .email(email)
+                .emails(Collections.singletonList(email))
                 .data(userTempResponse)
                 .build();
         eventPublisher.publishEvent(new EmailEvent(eventDto));

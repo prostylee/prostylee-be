@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import vn.prostylee.notification.constant.EmailTemplateType;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,7 +16,7 @@ public class EmailEventDto<T> {
 
     private EmailTemplateType emailTemplateType;
 
-    private String email;
+    private List<String> emails;
 
     private T data;
 
