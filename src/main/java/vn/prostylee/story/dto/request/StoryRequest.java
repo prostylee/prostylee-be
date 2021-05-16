@@ -12,7 +12,6 @@ public class StoryRequest {
     @NotNull
     private List<MediaRequest> images;
 
-    @NotNull
     private Long targetId;
 
     private String targetType;
