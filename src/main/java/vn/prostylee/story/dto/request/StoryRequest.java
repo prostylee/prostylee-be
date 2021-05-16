@@ -11,7 +11,6 @@ public class StoryRequest {
     @NotNull
     private List<Long> attachmentIds;
 
-    @NotNull
     private Long targetId;
 
     private String targetType;
