@@ -31,6 +31,16 @@ public interface PushNotificationTokenRepository extends BaseRepository<PushNoti
 
     @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.userId, t.token) " +
             "FROM PushNotificationToken t " +
+            "WHERE t.userId IN (:userIds) ")
+    List<UserToken> getTokensByUserIds(@Param("userIds") List<Long> userIds);
+
+    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.userId, t.token) " +
+            "FROM PushNotificationToken t " +
             "WHERE t.storeId = :storeId ")
     List<UserToken> getTokensByStoreId(@Param("storeId") Long storeId);
+
+    @Query("SELECT new vn.prostylee.auth.dto.UserToken(t.userId, t.token) " +
+            "FROM PushNotificationToken t " +
+            "WHERE t.storeId IN (:storeIds) ")
+    List<UserToken> getTokensByStoreIds(@Param("storeIds") List<Long> storeIds);
 }

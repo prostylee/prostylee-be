@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration.monitor.event;
+package vn.prostylee.core.configuration.monitor.entitycreation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;

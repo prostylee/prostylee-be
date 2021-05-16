@@ -11,5 +11,9 @@ public interface PushNotificationTokenService {
 
     List<UserToken> getTokensByUserId(Long userId);
 
+    List<UserToken> getTokensByUserIds(List<Long> userIds);
+
     List<UserToken> getTokensByStoreId(Long storeId);
+
+    List<UserToken> getTokensByStoreIds(List<Long>  storeIds);
 }

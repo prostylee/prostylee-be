@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.notification.dto.mail.MailInfo;
 import vn.prostylee.notification.dto.mail.MailTemplateConfig;
 import vn.prostylee.notification.dto.response.EmailTemplateResponse;
@@ -31,9 +30,9 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
         }
 
         try {
-            EmailEventDto<?> emailEventDto = (EmailEventDto<?>) event.getSource();
+            EmailEventDto<?> eventData = (EmailEventDto<?>) event.getSource();
 
-            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(emailEventDto.getEmailTemplateType().name());
+            EmailTemplateResponse emailTemplateResponse = emailTemplateService.findByType(eventData.getEmailTemplateType().name());
             MailTemplateConfig config = MailTemplateConfig.builder()
                     .mailContent(emailTemplateResponse.getContent())
                     .mailSubject(emailTemplateResponse.getTitle())
@@ -41,10 +40,10 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
                     .build();
 
             MailInfo mailInfo = new MailInfo();
-            mailInfo.addTo(emailEventDto.getEmail());
-            emailService.sendAsync(mailInfo, config, emailEventDto.getData());
-        } catch(ResourceNotFoundException e) {
-            log.warn("There is no email template for sending an email type {}", event.getSource(), e);
+            mailInfo.addTos(eventData.getEmails());
+            emailService.sendAsync(mailInfo, config, eventData.getData());
+        } catch(Exception e) {
+            log.warn("Could not send an email with eventData={}", event.getSource(), e);
         }
     }
 }

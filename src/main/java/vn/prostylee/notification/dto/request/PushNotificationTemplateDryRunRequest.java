@@ -13,7 +13,6 @@ public class PushNotificationTemplateDryRunRequest {
     private String token;
 
     @Schema(description = "One of FIREBASE, EXPO")
-    @NotBlank
     private String provider;
 
     private Map<String, Object> fillData;

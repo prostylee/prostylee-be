@@ -28,6 +28,10 @@ public class SimpleMailInfo {
         to.add(mail);
     }
 
+    public void addTos(List<String> mails) {
+        to.addAll(mails);
+    }
+
     public String[] getTo() {
         return to.toArray(new String[0]);
     }

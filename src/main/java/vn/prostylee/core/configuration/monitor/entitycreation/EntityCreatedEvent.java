@@ -1,4 +1,4 @@
-package vn.prostylee.core.configuration.monitor.event;
+package vn.prostylee.core.configuration.monitor.entitycreation;
 
 import org.springframework.context.ApplicationEvent;
 

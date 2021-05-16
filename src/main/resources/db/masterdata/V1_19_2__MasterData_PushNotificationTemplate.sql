@@ -1,0 +1,2 @@
+INSERT INTO push_notification_template (id, created_at, created_by, updated_at, updated_by, title, content, type)
+VALUES (nextval('push_notification_template_seq'), '2021-05-16 15:31:44.000000', 1, '2021-05-16 15:31:45.000000', 1, 'Đơn hàng mới [[${code}]]', 'Đơn hàng [[${code}]] với số tiền là [[${totalMoney}]] vừa được tạo lúc [[${createdAt}]]', 'STORE_NEW_ORDER');

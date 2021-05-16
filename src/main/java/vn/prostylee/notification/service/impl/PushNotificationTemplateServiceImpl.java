@@ -2,6 +2,7 @@ package vn.prostylee.notification.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +19,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.ThymeleafTemplateProcessor;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.notification.constant.NotificationProvider;
 import vn.prostylee.notification.dto.PushNotificationDto;
 import vn.prostylee.notification.dto.request.PushNotificationTemplateDryRunRequest;
 import vn.prostylee.notification.dto.request.PushNotificationTemplateRequest;
@@ -103,7 +105,7 @@ public class PushNotificationTemplateServiceImpl implements PushNotificationTemp
             PushNotificationDto pushNotificationRequest = PushNotificationDto.builder()
                     .title(templateProcessor.process(templateResponse.getTitle(), request.getFillData()))
                     .body(templateProcessor.process(templateResponse.getContent(), request.getFillData()))
-                    .provider(templateResponse.getType())
+                    .provider(StringUtils.defaultIfBlank(request.getProvider(), NotificationProvider.FIREBASE.name()))
                     .data(request.getPushData())
                     .userTokens(Collections.singletonList(UserToken.builder().token(request.getToken()).build()))
                     .build();

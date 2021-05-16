@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.configuration.monitor.workflow.MutationAction;
+import vn.prostylee.core.configuration.monitor.workflow.MutationEventListener;
+import vn.prostylee.core.configuration.monitor.workflow.MutationPhase;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -28,6 +31,7 @@ import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
+import vn.prostylee.order.handler.OrderMutationEventHandler;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
@@ -36,7 +40,7 @@ import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static vn.prostylee.order.constants.OrderStatus.*;
+import static vn.prostylee.order.constants.OrderStatus.AWAITING_CONFIRMATION;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -85,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
         return orderConverter.toDto(order);
     }
 
+    @MutationEventListener(handler = OrderMutationEventHandler.class, action = MutationAction.CREATE, phase = MutationPhase.AFTER)
     @Override
     public OrderResponse save(OrderRequest request) {
         Order order = BeanUtil.copyProperties(request, Order.class);
