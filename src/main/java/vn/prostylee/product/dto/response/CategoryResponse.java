@@ -20,4 +20,5 @@ public class CategoryResponse implements Serializable {
     private Boolean hotStatus;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<AttributeResponse> attributes;
+    private String banner;
 }
