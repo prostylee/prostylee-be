@@ -83,5 +83,7 @@ public class Category extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
 	private Set<Product> products;
 
+	@Column(name = "banner", length = 512)
+	private String banner;
 
 }

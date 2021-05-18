@@ -34,4 +34,6 @@ public class CategoryRequest {
     private Boolean hotStatus;
 
     private Set<Long> attributeIds;
+
+    private String banner;
 }
