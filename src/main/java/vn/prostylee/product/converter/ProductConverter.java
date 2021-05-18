@@ -19,6 +19,9 @@ import vn.prostylee.product.entity.ProductImage;
 import vn.prostylee.product.service.ProductImageService;
 import vn.prostylee.product.service.ProductStatisticService;
 import vn.prostylee.product.service.ProductStoreService;
+import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
+import vn.prostylee.useractivity.service.UserLikeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +40,7 @@ public class ProductConverter {
     private final ProductStoreService productStoreService;
     private final ProductStatisticService productStatisticService;
     private final ProductImageService productImageService;
+    private final UserLikeService userLikeService;
 
     public ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
@@ -45,6 +49,7 @@ public class ProductConverter {
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
         productResponse.setProductStatisticResponse(buildProductStatistic(product.getId()));
+        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId()));
         return productResponse;
     }
 
@@ -91,5 +96,17 @@ public class ProductConverter {
         return Optional.ofNullable(id)
                 .flatMap(productStatisticService::fetchById)
                 .orElse(null);
+    }
+
+    private Boolean getLikeStatusOfUserLogin(Long productId){
+        StatusLikeRequest request = StatusLikeRequest.builder()
+                .targetIds(Collections.singletonList(productId))
+                .targetType(TargetType.PRODUCT.name())
+                .build();
+        List<Long> result = userLikeService.loadStatusLikes(request);
+        if (result.stream().count() > 0){
+            return true;
+        }
+        return false;
     }
 }
