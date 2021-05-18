@@ -7,6 +7,14 @@ app:
   security:
     allowed-origins:
       - "*"
+  aws:
+    s3:
+      bucket: psmedia224241-staging
+    cognito:
+      clientId: 2cjbb1o65lh7upb6gppdb0ddp8
+      poolId: ap-southeast-1_dSSJM8sQe
+      endpoint: prostylee-staging.auth.ap-southeast-1.amazoncognito.com
+      identityPoolId: ap-southeast-1:04513a47-2cf0-47fe-a766-606510e6be33
 
 spring:
   flyway:
