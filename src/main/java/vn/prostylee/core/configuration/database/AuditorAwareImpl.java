@@ -1,7 +1,7 @@
 package vn.prostylee.core.configuration.database;
 
-import vn.prostylee.core.provider.AuthenticatedProvider;
 import org.springframework.data.domain.AuditorAware;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 
 import java.util.Optional;
 

@@ -10,13 +10,14 @@ import org.springframework.stereotype.Service;
 import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.dto.AuthUserDetails;
 import vn.prostylee.auth.entity.Feature;
+import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService, ExtUserDetailsService {
@@ -61,8 +62,11 @@ public class UserDetailsServiceImpl implements UserDetailsService, ExtUserDetail
 	}
 
 	private List<Feature> getFeatures(User user) {
-		List<Feature> features = new ArrayList<>();
-		user.getRoles().forEach(role -> features.addAll(role.getFeatures()));
-		return features;
+		return Optional.ofNullable(user.getRoles())
+				.orElseGet(Collections::emptySet)
+				.stream()
+				.map(Role::getFeatures)
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList());
 	}
 }

@@ -7,6 +7,7 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,6 +57,7 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
                     List<SimpleGrantedAuthority> grantedAuthorities = convertToGrantedAuthorities(groups);
 
                     UserCredential user = UserCredential.builder()
+                            .id(NumberUtils.toLong((String) claimsSet.getClaim("userId")))
                             .sub((String) claimsSet.getClaim("sub"))
                             .username((String) claimsSet.getClaim("username"))
                             .roles(groups)

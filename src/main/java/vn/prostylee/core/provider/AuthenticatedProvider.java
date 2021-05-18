@@ -6,10 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import vn.prostylee.auth.converter.UserCredentialConverter;
 import vn.prostylee.auth.dto.response.UserCredential;
-import vn.prostylee.auth.service.impl.ExtUserDetailsService;
-import vn.prostylee.core.exception.ResourceNotFoundException;
+import vn.prostylee.auth.entity.User;
+import vn.prostylee.auth.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -18,8 +17,7 @@ import java.util.Optional;
 @Component
 public class AuthenticatedProvider {
 
-    private final ExtUserDetailsService userDetailsService;
-    private final UserCredentialConverter userCredentialConverter;
+    private final UserRepository userRepository;
 
     public Optional<Long> getUserId() {
         return getUser().map(UserCredential::getId);
@@ -36,19 +34,14 @@ public class AuthenticatedProvider {
         }
         UserCredential userCredential = (UserCredential) authentication.getPrincipal();
         if (userCredential != null && (userCredential.getId() == null || userCredential.getId() <= 0)) {
-            return findUserBySub(userCredential.getSub());
+            findUserIdBySub(userCredential.getSub()).ifPresent(userCredential::setId);
         }
         return Optional.ofNullable(userCredential);
     }
 
-    private Optional<UserCredential> findUserBySub(String sub) {
+    private Optional<Long> findUserIdBySub(String sub) {
         if (StringUtils.isNotBlank(sub)) {
-            try {
-                return Optional.ofNullable(userDetailsService.loadUserBySub(sub))
-                        .map(userCredentialConverter::convert);
-            } catch (ResourceNotFoundException e) {
-                log.error("Can not get user credential by user sub={}", sub, e);
-            }
+            return userRepository.findActivatedUserBySub(sub).map(User::getId);
         }
         return Optional.empty();
     }
