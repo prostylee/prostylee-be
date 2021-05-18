@@ -7,6 +7,7 @@ import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.product.dto.request.ProductImageRequest;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.repository.ProductImageRepository;
 import vn.prostylee.product.service.ProductImageService;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.stream.IntStream;
 public class ProductImageServiceImpl implements ProductImageService {
 
     private final AttachmentService attachmentService;
+    private final ProductImageRepository productImageRepository;
 
     @Override
     public Set<ProductImage> handleProductImages(List<ProductImageRequest> productImageRequests, Product product) {
@@ -40,6 +42,10 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     private Attachment saveAttachment(ProductImageRequest productImageRequest){
         return attachmentService.saveAttachmentByNameAndPath(productImageRequest.getName(), productImageRequest.getPath());
+    }
+
+    public List<Long> getAttachmentIdByProductID(Long productId){
+        return productImageRepository.getAttachmentIdByProductId(productId);
     }
 
 }

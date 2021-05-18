@@ -16,6 +16,7 @@ import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.dto.response.ProductStatisticResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.service.ProductImageService;
 import vn.prostylee.product.service.ProductStatisticService;
 import vn.prostylee.product.service.ProductStoreService;
 
@@ -35,10 +36,11 @@ public class ProductConverter {
     private final UserService userService;
     private final ProductStoreService productStoreService;
     private final ProductStatisticService productStatisticService;
+    private final ProductImageService productImageService;
 
     public ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
-        productResponse.setImageUrls(buildImageUrls(product.getProductImages()));
+        productResponse.setImageUrls(buildImageUrls(product.getId()));
         productResponse.setLocation(buildLocation(productResponse.getLocationId()));
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
@@ -46,12 +48,10 @@ public class ProductConverter {
         return productResponse;
     }
 
-    private List<String> buildImageUrls(Set<ProductImage> productImages) {
-        List<Long> attachmentIds = Optional.ofNullable(productImages)
-                .orElseGet(Collections::emptySet)
-                .stream()
-                .map(ProductImage::getAttachmentId)
-                .collect(Collectors.toList());
+    private List<String> buildImageUrls(long productID) {
+        List<Long> attachmentIds = Optional.ofNullable(productID)
+                .map(productImageService::getAttachmentIdByProductID)
+                .orElse(null);
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             try {
                 return fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());

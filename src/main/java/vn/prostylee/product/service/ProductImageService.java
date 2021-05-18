@@ -10,4 +10,5 @@ import java.util.Set;
 
 public interface ProductImageService {
     Set<ProductImage> handleProductImages(List<ProductImageRequest> productImageRequests, Product product);
+    List<Long> getAttachmentIdByProductID(Long productId);
 }
