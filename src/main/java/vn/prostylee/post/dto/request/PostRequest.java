@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import vn.prostylee.media.dto.request.MediaRequest;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -15,7 +14,6 @@ public class PostRequest {
     @Size(max = 4096)
     private String description;
 
-    @NotNull
     private Long storeId;
 
     private List<MediaRequest> images;
