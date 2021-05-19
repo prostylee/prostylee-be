@@ -35,6 +35,11 @@ public class ProductRequest {
     @Size(max = 4096)
     private String description;
 
+    @NotNull
+    private Double price;
+
+    private Double priceSale;
+
     private LocationRequest locationRequest;
 
     @NotNull
