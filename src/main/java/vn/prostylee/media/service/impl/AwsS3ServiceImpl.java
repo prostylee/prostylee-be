@@ -82,6 +82,9 @@ public class AwsS3ServiceImpl implements FileUploadService {
     }
 
     private String buildUrl(Attachment attachment, int width, int height) {
+        if (attachment == null) {
+            return null;
+        }
         String prefix = cloudfrontUrl;
         if (width > 0 && height > 0) {
             prefix = String.format("%s%s%dx%d%s", cloudfrontUrl,

@@ -2,12 +2,13 @@ package vn.prostylee.auth.configure.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import vn.prostylee.auth.configure.properties.SecurityProperties;
+import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.response.UserCredential;
 import vn.prostylee.auth.token.extractor.TokenExtractor;
@@ -32,9 +33,10 @@ public class JwtAuthenticationFilter extends AuthOncePerRequestFilter {
 
     @Override
     boolean setAuthIfTokenValid(HttpServletRequest request) {
+        log.debug("Checking system Jwt");
         String jwt = tokenExtractor.extract(request);
 
-        if (StringUtils.hasText(jwt) && tokenVerifier.verify(jwt)) {
+        if (StringUtils.isBlank(request.getHeader(AuthConstants.OAUTH_KEY)) && StringUtils.isNotBlank(jwt) && tokenVerifier.verify(jwt)) {
             UserCredential user = tokenParser.getUserCredential(jwt, securityProperties.getJwt().getTokenSigningKey());
 
             // UsernamePasswordAuthenticationToken: A built-in object, used by spring to represent the current authenticated / being authenticated user.

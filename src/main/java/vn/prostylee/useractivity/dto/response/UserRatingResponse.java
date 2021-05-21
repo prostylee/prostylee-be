@@ -1,18 +1,27 @@
 package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import vn.prostylee.core.dto.response.AuditResponse;
+import vn.prostylee.story.dto.response.UserResponseLite;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserRatingResponse implements Serializable {
+public class UserRatingResponse extends AuditResponse {
+
     private Long id;
-    private Date createdAt;
-    private Long createdBy;
-    private Date updatedAt;
-    private Long updatedBy;
+
     private Long targetId;
+
     private String targetType;
+
     private Integer value;
+
+    private String content;
+
+    private List<UserRatingImageResponse> images;
+
+    private UserResponseLite user;
 }

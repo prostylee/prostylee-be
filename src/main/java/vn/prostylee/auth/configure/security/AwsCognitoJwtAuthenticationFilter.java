@@ -46,6 +46,7 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
 
     @Override
     boolean setAuthIfTokenValid(HttpServletRequest request) {
+        log.debug("Checking Aws Cognito Jwt");
         try {
             String jwt = tokenExtractor.extract(request);
             if (StringUtils.equals(AuthConstants.OAUTH_VALUE, request.getHeader(AuthConstants.OAUTH_KEY))
