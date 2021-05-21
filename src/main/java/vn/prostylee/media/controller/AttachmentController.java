@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.media.dto.request.MediaFileRequest;
+import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.media.service.AttachmentService;
 
 import javax.validation.constraints.NotEmpty;
@@ -25,7 +25,7 @@ public class AttachmentController {
     }
 
     @PostMapping(value = "/store-file")
-    public ResponseEntity<Integer> storeFile(@NotEmpty @RequestBody List<MediaFileRequest> mediaFileRequest) {
-        return ResponseEntity.ok(attachmentService.storeFiles(mediaFileRequest));
+    public ResponseEntity<Integer> storeFile(@NotEmpty @RequestBody List<MediaRequest> mediaRequest) {
+        return ResponseEntity.ok(attachmentService.storeFiles(mediaRequest));
     }
 }

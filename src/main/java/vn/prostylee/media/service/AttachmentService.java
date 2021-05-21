@@ -1,9 +1,7 @@
 package vn.prostylee.media.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.request.MediaRequest;
-import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 
 import java.net.URL;
@@ -29,10 +27,10 @@ public interface AttachmentService {
     /**
      * Store and generate the path to attachment table
      *
-     * @param mediaFileRequests The {@link MediaFileRequest}
+     * @param mediaRequests The {@link MediaRequest}
      * @return total size of saved entity
      */
-    int storeFiles(List<MediaFileRequest> mediaFileRequests);
+    int storeFiles(List<MediaRequest> mediaRequests);
 
     Attachment getById(Long id);
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.media.dto.request.MediaFileRequest;
 import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.repository.AttachmentRepository;
@@ -75,18 +74,18 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     /**
-     * Give the MediaFileRequest save to Attachment table
-     * @param mediaFileRequests The {@link MediaFileRequest}
+     * Give the MediaRequest save to Attachment table
+     * @param mediaRequests The {@link MediaRequest}
      * @return size of saved Entity.
      */
     @Override
-    public int storeFiles(List<MediaFileRequest> mediaFileRequests) {
+    public int storeFiles(List<MediaRequest> mediaRequests) {
         List<Attachment> entities = new ArrayList<>();
-        mediaFileRequests.forEach(mediaFileRequest -> {
-            String name =  mediaFileRequest.getName();
+        mediaRequests.forEach(mediaRequest -> {
+            String name =  mediaRequest.getName();
             entities.add(Attachment.builder()
                     .name(name).displayName(name)
-                    .path(mediaFileRequest.getPath())
+                    .path(mediaRequest.getPath())
                     .build());
         });
         return attachmentRepository.saveAll(entities).size();
@@ -96,7 +95,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Attachment getById(Long id) {
         return attachmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post is not found with id [" + id + "]"));
+                .orElseThrow(() -> new ResourceNotFoundException("Attachment is not found with id [" + id + "]"));
     }
 
     @Cacheable(value = CachingKey.ATTACHMENTS, key = "#ids")
