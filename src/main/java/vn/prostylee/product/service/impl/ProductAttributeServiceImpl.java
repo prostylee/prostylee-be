@@ -14,6 +14,8 @@ import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.product.service.ProductAttributeService;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -58,5 +60,13 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
     public ProductAttribute getProductAttributeById(Long id) {
         return productAttributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product attribute is not found with id [" + id + "]"));
+    }
+
+    public List<ProductAttribute> getProductAttributeByProductId(Long productId) {
+        return productAttributeRepository.getProductAttributeByProductId(productId);
+    }
+
+    public List<ProductAttribute> getProductAttributeByPriceId(Long priceId) {
+        return productAttributeRepository.getProductAttributeByPriceId(priceId);
     }
 }

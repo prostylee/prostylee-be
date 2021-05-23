@@ -43,4 +43,9 @@ public class ProductAttribute extends AuditEntity {
 	@Column(name = "attr_value", length = 512)
 	private String attrValue;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
 }

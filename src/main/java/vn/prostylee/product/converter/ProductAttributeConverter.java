@@ -23,5 +23,6 @@ public class ProductAttributeConverter {
         Attribute attribute = Attribute.builder().id(request.getAttributeId()).build();
         productAttribute.setAttribute(attribute);
         productAttribute.setProductPrice(productPrice);
+        productAttribute.setProduct(productPrice.getProduct());
     }
 }

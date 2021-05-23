@@ -1,0 +1,1 @@
+ALTER TABLE product_attribute ADD COLUMN product_id BIGINT NOT NULL CONSTRAINT "fk_product_attribute" REFERENCES product;

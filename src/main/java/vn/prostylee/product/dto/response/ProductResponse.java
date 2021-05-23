@@ -44,4 +44,12 @@ public class ProductResponse implements Serializable {
     private Boolean LikeStatusOfUserLogin;
 
     private ProductStatisticResponse productStatisticResponse;
+
+    private CategoryResponse categoryResponse;
+
+    private BrandResponse brandResponse;
+
+    private List<ProductAttributeOptionResponse> productAttributeOptionResponse;
+
+    private List<ProductPriceResponse> productPriceResponseList;
 }

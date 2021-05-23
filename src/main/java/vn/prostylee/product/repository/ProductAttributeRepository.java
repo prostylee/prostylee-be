@@ -16,4 +16,8 @@ import java.util.Map;
 @Repository
 public interface ProductAttributeRepository extends BaseRepository<ProductAttribute, Long> {
     List<Long> findCrossTabProductAttribute(Map<String, String> attributesRequest);
+
+    List<ProductAttribute> getProductAttributeByProductId(Long productId);
+
+    List<ProductAttribute> getProductAttributeByPriceId(Long priceId);
 }
