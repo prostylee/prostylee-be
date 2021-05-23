@@ -4,6 +4,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.impl.BaseRepositoryImpl;
+import vn.prostylee.core.repository.query.HibernateQueryResult;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.repository.ProductAttributeRepository;
 
@@ -41,6 +42,26 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
         return query.unwrap(NativeQuery.class).getResultList();
     }
 
+    public List<ProductAttribute> getProductAttributeByProductId(Long productId) {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append(" SELECT pa ")
+                .append(" FROM ProductAttribute pa ")
+                .append(" WHERE pa.product.id = :productId ")
+                .append(" ORDER BY pa.attribute.id ");
+        HibernateQueryResult<ProductAttribute> queryResult = new HibernateQueryResult<>(this.getEntityManager(),ProductAttribute.class,stringBuilder);
+        return queryResult.getResultList(buildQueryParamProductId(productId)).getContent();
+    }
+
+    public List<ProductAttribute> getProductAttributeByPriceId(Long priceId){
+        StringBuilder stringBuilder = new StringBuilder()
+                .append(" SELECT pa ")
+                .append(" FROM ProductAttribute pa ")
+                .append(" WHERE pa.productPrice.id = :priceId ")
+                .append(" ORDER BY pa.id ");
+        HibernateQueryResult<ProductAttribute> queryResult = new HibernateQueryResult<>(this.getEntityManager(),ProductAttribute.class,stringBuilder);
+        return queryResult.getResultList(buildQueryParamPriceId(priceId)).getContent();
+    }
+
     private Map<String, Object> buildQueryParams(Map<String, String> attributes) {
         Map<String, Object> params = new HashMap<>();
         for (Map.Entry attribute : attributes.entrySet()) {
@@ -51,5 +72,23 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
 
     private void setParameters(Query query, Map<String, Object> params) {
         params.forEach(query::setParameter);
+    }
+
+    private Map<String, Object> buildQueryParamProductId(Long productId) {
+        Map<String, Object> params = new HashMap<>();
+
+        if (productId != null) {
+            params.put("productId", productId);
+        }
+        return params;
+    }
+
+    private Map<String, Object> buildQueryParamPriceId(Long priceId) {
+        Map<String, Object> params = new HashMap<>();
+
+        if (priceId != null) {
+            params.put("priceId", priceId);
+        }
+        return params;
     }
 }
