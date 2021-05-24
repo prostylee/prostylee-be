@@ -136,7 +136,9 @@ app:
     max-age: 36000
     allowed-origins:
       - https://${CORS_DOMAIN}
+      - https://prostylee.vn
       - http://localhost:4200
+      - http://localhost:8080
     allowed-methods:
       - GET
       - POST
@@ -159,6 +161,7 @@ app:
       - X-Xsrf-Token
       - Cache-Control
       - Id-Token
+      - X-PS-Authorization-Type
     allowed-public-apis:
       - /ping/**
       - /v1/public/*
@@ -174,7 +177,7 @@ app:
       secretKey: SHj9/sQCPonteyL44UAq5vjaVslF+xLkd0POD9R2
     # AWS S3
     s3:
-      bucket: psmedia211437-dev
+      bucket: psmedia224241-staging
       region: ap-southeast-1
       bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
       cloudFrontId: d1fq4uh0wyvt14
@@ -183,10 +186,10 @@ app:
       s3MediaPublicFolder: public
     # AWS Cognito
     cognito:
-      clientId: 1cjpg4lfnim8m1p7iiokcvbrld
-      poolId: ap-southeast-1_c0EMF4obI
-      endpoint: prostylee-dev.auth.ap-southeast-1.amazoncognito.com
-      identityPoolId: ap-southeast-1:289b0d35-9dd6-4164-a2f8-073a72d88e84
+      clientId: 2cjbb1o65lh7upb6gppdb0ddp8
+      poolId: ap-southeast-1_dSSJM8sQe
+      endpoint: prostylee-staging.auth.ap-southeast-1.amazoncognito.com
+      identityPoolId: ap-southeast-1:04513a47-2cf0-47fe-a766-606510e6be33
       region: ap-southeast-1
       issuer: https://cognito-idp.${app.aws.cognito.region}.amazonaws.com/${app.aws.cognito.poolId}
       jwkUrl: ${app.aws.cognito.issuer}/.well-known/jwks.json
