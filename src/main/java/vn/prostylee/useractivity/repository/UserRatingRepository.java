@@ -18,7 +18,7 @@ import vn.prostylee.useractivity.entity.UserRating;
 @Repository
 public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
     @Query("SELECT avg(value) FROM UserRating WHERE targetId=:targetId AND targetType=:targetType")
-    double average(
+    Double average(
             @Param("targetId") Long targetId,
             @Param("targetType") String targetType
     );

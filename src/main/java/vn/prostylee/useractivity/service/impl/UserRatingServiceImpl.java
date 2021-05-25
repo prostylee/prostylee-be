@@ -55,8 +55,9 @@ public class UserRatingServiceImpl implements UserRatingService {
     }
 
     @Override
-    public double average(UserRatingFilter filter){
-        return userRatingRepository.average(filter.getTargetId(), filter.getTargetType());
+    public double average(UserRatingFilter filter) {
+        Double result = userRatingRepository.average(filter.getTargetId(), filter.getTargetType());
+        return result == null ? 0d : result;
     }
 
     @Override
