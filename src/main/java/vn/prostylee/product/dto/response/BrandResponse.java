@@ -9,4 +9,5 @@ public class BrandResponse implements Serializable {
     private Long id;
     private String description;
     private String name;
+    private String icon;
 }
