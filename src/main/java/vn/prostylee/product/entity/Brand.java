@@ -44,4 +44,6 @@ public class Brand extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "brand")
 	private Set<Product> products;
 
+	@Column(name = "icon", length = 512)
+	private String icon;
 }

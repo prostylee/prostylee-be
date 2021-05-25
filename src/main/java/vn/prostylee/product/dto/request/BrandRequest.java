@@ -14,4 +14,6 @@ public class BrandRequest {
     @NotEmpty
     @Size(max = 512)
     private String name;
+
+    private String icon;
 }

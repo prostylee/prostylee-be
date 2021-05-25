@@ -1,0 +1,1 @@
+ALTER TABLE brand ADD COLUMN icon varchar(512);
