@@ -10,4 +10,5 @@ public class BrandResponse implements Serializable {
     private String description;
     private String name;
     private String icon;
+    private Integer order;
 }
