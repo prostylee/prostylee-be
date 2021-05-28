@@ -32,15 +32,21 @@ public class Product extends AuditEntity {
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = Brand.class)
 	@JoinColumn(name = "brand_id", nullable = false)
 	private Brand brand;
 
+	@Column(name = "brand_id", insertable = false, updatable = false)
+	private Long brandId;
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, targetEntity = Category.class)
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
+
+	@Column(name = "category_id", insertable = false, updatable = false)
+	private Long categoryId;
 
 	@Column(name = "name", length = 512)
 	private String name;
