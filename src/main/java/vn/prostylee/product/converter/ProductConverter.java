@@ -54,8 +54,8 @@ public class ProductConverter {
         productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId()));
         productResponse.setProductAttributeOptionResponse(buildAttributeOption(product.getId()));
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
-        productResponse.setCategoryResponse(buildCategory(product.getCategory().getId()));
-        productResponse.setBrandResponse(buildBrand(product.getBrand().getId()));
+        productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
+        productResponse.setBrandResponse(buildBrand(product.getBrandId()));
         return productResponse;
     }
 
