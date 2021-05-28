@@ -46,4 +46,7 @@ public class Brand extends AuditEntity {
 
 	@Column(name = "icon", length = 512)
 	private String icon;
+
+	@Column(name = "order")
+	private Integer order;
 }

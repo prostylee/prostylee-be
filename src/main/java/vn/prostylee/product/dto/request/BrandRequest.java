@@ -16,4 +16,6 @@ public class BrandRequest {
     private String name;
 
     private String icon;
+
+    private Integer order;
 }
