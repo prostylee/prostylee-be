@@ -24,6 +24,7 @@ import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
+import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.store.constants.StoreStatus;
 import vn.prostylee.store.converter.StoreConverter;
 import vn.prostylee.store.dto.filter.MostActiveStoreFilter;
@@ -64,6 +65,8 @@ public class StoreServiceImpl implements StoreService {
     private final UserMostActiveService userMostActiveService;
 
     private final StoreConverter storeConverter;
+
+    private final AttachmentService attachmentService;
 
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
@@ -138,6 +141,10 @@ public class StoreServiceImpl implements StoreService {
         Store store = BeanUtil.copyProperties(storeRequest, Store.class);
         store.setOwnerId(authenticatedProvider.getUserIdValue());
         store.setCompany(company);
+        store.setLogo(Optional.ofNullable(attachmentService.save(storeRequest.getLogoImage()))
+                .map(e -> {
+                    return e.getId();
+                }).orElse(0L));
 
         if (storeRequest.getStatus() == null) {
             store.setStatus(StoreStatus.IN_PROGRESS.getValue());

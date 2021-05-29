@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.media.dto.request.MediaRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -33,5 +34,7 @@ public class StoreRequest {
     private Long locationId;
 
     private Integer status;
+
+    private MediaRequest logoImage;
 
 }
