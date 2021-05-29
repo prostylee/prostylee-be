@@ -129,7 +129,7 @@ public class PostServiceImpl implements PostService {
         List<Long> attachmentIds = postImages.stream().map(PostImage::getAttachmentId).collect(Collectors.toList());
 
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
-            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
+            List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.POST_SIZE.getWidth(), ImageSize.POST_SIZE.getHeight());
             postForListResponse.setImageUrls(imageUrls);
         }
 
@@ -157,7 +157,7 @@ public class PostServiceImpl implements PostService {
                 .orElseGet(Collections::emptyList)
                 .stream()
                 .sorted(Comparator.comparingInt(PostImageResponse::getOrder).thenComparing(PostImageResponse::getId))
-                .forEach(dto -> dto.setUrl(fileUploadService.getImageUrl(dto.getAttachmentId(), ImageSize.SMALL.getWidth(), ImageSize.SMALL.getHeight())));
+                .forEach(dto -> dto.setUrl(fileUploadService.getImageUrl(dto.getAttachmentId(), ImageSize.POST_SIZE.getWidth(), ImageSize.POST_SIZE.getHeight())));
 
         return response;
     }

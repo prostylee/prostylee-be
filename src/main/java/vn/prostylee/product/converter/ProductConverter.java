@@ -65,7 +65,7 @@ public class ProductConverter {
                 .orElse(null);
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             try {
-                return fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
+                return fileUploadService.getImageUrls(attachmentIds, ImageSize.PRODUCT_SIZE.getWidth(), ImageSize.PRODUCT_SIZE.getHeight());
             } catch (ResourceNotFoundException e) {
                 log.debug("Could not build image Urls from attachmentIds={}", attachmentIds, e);
             }
