@@ -38,12 +38,14 @@ public class StoreConverter {
 
     public StoreResponse convertToResponse(Store store) {
         StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
+        setStoreLogo(storeResponse, store.getLogo());
+        setStoreLocation(storeResponse, store.getLocationId());
         Optional.ofNullable(store.getCompany()).ifPresent(company -> storeResponse.setCompanyId(company.getId()));
         return storeResponse;
     }
 
     public StoreResponse convertToFullResponse(Store store, int numberOfProducts) {
-        StoreResponse storeResponse = convertToResponse(store);
+        StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
         return convertToFullResponse(store, storeResponse, numberOfProducts);
     }
 
