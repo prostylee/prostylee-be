@@ -42,4 +42,6 @@ public class StoreResponse implements Serializable {
 
     private Boolean isAdvertising;
 
+    private List<StoreBannerResponse> storeBannerResponses;
+
 }
