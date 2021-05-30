@@ -17,6 +17,7 @@ import vn.prostylee.store.dto.response.StoreMiniResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
+import vn.prostylee.store.service.StoreBannerService;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,11 +30,13 @@ public class StoreConverter {
     private final ProductService productService;
     private final FileUploadService fileUploadService;
     private final LocationService locationService;
+    private final StoreBannerService storeBannerService;
 
-    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService) {
+    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService) {
         this.productService = productService;
         this.fileUploadService = fileUploadService;
         this.locationService = locationService;
+        this.storeBannerService = storeBannerService;
     }
 
     public StoreResponse convertToResponse(Store store) {
@@ -56,7 +59,13 @@ public class StoreConverter {
         setStoreLocation(storeResponse, store.getLocationId());
         setStoreProducts(storeResponse, numberOfProducts);
         setStoreCompany(storeResponse, store.getCompany());
+        setStoreBanner(storeResponse,store.getId());
         return storeResponse;
+    }
+
+    private void setStoreBanner(StoreResponse storeResponse, Long storeId) {
+        Optional.ofNullable(storeId)
+                .ifPresent(com -> storeResponse.setStoreBannerResponses(storeBannerService.getListStoreBannerByStore(storeId)));
     }
 
     private void setStoreCompany(StoreResponse storeResponse, Company company) {

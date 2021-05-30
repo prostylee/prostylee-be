@@ -76,4 +76,9 @@ public class Store extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store")
 	private Set<Branch> branches;
 
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store")
+	private Set<StoreBanner> storeBanners;
+
 }
