@@ -14,6 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 import vn.prostylee.AuthSupporterIT;
 import vn.prostylee.IntegrationTest;
 import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.store.constants.StoreStatus;
 import vn.prostylee.store.dto.request.StoreRequest;
 
@@ -129,6 +130,7 @@ class StoreControllerIT extends AuthSupporterIT {
                 .ownerId(1L)
                 .locationId(1L)
                 .companyId(1L)
+                .logoImage(MediaRequest.builder().name("557e3db0-c889-488b-8afd-79a8c90f17d6.jpeg").path("public/ec72c651-d66a-4bfb-950c-f6b8e2132f30/").build())
                 .build();
 
         MvcResult mvcResult = this.mockMvc
@@ -148,6 +150,7 @@ class StoreControllerIT extends AuthSupporterIT {
                 .andExpect(jsonPath("$.ownerId").value(request.getOwnerId()))
                 .andExpect(jsonPath("$.locationId").value(request.getLocationId()))
                 .andExpect(jsonPath("$.status").value(request.getStatus()))
+                .andExpect(jsonPath("$.logoImage").value(request.getLogoImage()))
                 .andReturn();
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
     }
