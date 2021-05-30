@@ -26,10 +26,14 @@ public class UserWishListController {
     }
 
 
-    @PostMapping("/add")
+    @PostMapping
     public SimpleResponse addToWishList(@Valid @RequestBody UserWishListRequest request) {
         return SimpleResponse.builder().data(userWishListService.addToWishList(request)).build();
     }
 
+    @DeleteMapping("/{id}")
+    public SimpleResponse removeFromWishList(@PathVariable Long id) {
+        return SimpleResponse.builder().data(userWishListService.removeFromWishList(id)).build();
+    }
 
 }

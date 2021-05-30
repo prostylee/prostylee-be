@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -11,6 +12,12 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.dto.response.AttachmentResponse;
+import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.dto.response.ProductResponseLite;
+import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.service.ProductService;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserWishListFilter;
 import vn.prostylee.useractivity.dto.request.UserWishListRequest;
@@ -19,6 +26,7 @@ import vn.prostylee.useractivity.entity.UserWishList;
 import vn.prostylee.useractivity.repository.UserWishListRepository;
 import vn.prostylee.useractivity.service.UserWishListService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +37,7 @@ public class UserWishListServiceImpl implements UserWishListService {
     private final UserWishListRepository repository;
     private final BaseFilterSpecs<UserWishList> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
+    private final ProductService productService;
 
     @Override
     public boolean addToWishList(UserWishListRequest request) {
@@ -42,12 +51,23 @@ public class UserWishListServiceImpl implements UserWishListService {
     }
 
     @Override
+    public boolean removeFromWishList(Long id) {
+        try {
+            repository.softDelete(id);
+            return true;
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
     public Page<UserWishListResponse> findAll(UserWishListFilter filter) {
         Specification<UserWishList> searchable = getUserWishListSpecification(filter);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<UserWishList> page = repository.findAll(searchable, pageable);
         List<UserWishListResponse> responses = page.getContent()
-                .stream().map(UserWishListServiceImpl::convertToResponse).collect(Collectors.toList());
+                .stream().map(response -> convertToResponse(response))
+                .collect(Collectors.toList());
         return new PageImpl<>(responses,pageable,responses.size());
     }
 
@@ -58,8 +78,12 @@ public class UserWishListServiceImpl implements UserWishListService {
         return searchable.and(userIdParam);
     }
 
-    private static UserWishListResponse convertToResponse(UserWishList userWishList) {
-        UserWishListResponse userLikeResponse = BeanUtil.copyProperties(userWishList, UserWishListResponse.class);
-        return userLikeResponse;
+    private UserWishListResponse convertToResponse(UserWishList userWishList) {
+        UserWishListResponse userWishListResponse = BeanUtil.copyProperties(userWishList, UserWishListResponse.class);
+        ProductResponse productResponse = productService.findById(userWishList.getId());
+        ProductResponseLite productLite = BeanUtil.copyProperties(productResponse, ProductResponseLite.class);
+        productLite.setImageUrl(productResponse.getImageUrls().get(0));
+        userWishListResponse.setProductResponseLite(productLite);
+        return userWishListResponse;
     }
 }

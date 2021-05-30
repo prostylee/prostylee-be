@@ -7,6 +7,7 @@ create table user_wish_list
     created_by bigint,
     updated_at timestamp,
     updated_by bigint,
+    deleted_at timestamp,
     product_id bigint
 );
 create sequence if not exists user_wish_list_seq;
