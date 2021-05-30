@@ -150,7 +150,6 @@ class StoreControllerIT extends AuthSupporterIT {
                 .andExpect(jsonPath("$.ownerId").value(request.getOwnerId()))
                 .andExpect(jsonPath("$.locationId").value(request.getLocationId()))
                 .andExpect(jsonPath("$.status").value(request.getStatus()))
-                .andExpect(jsonPath("$.logoImage").value(request.getLogoImage()))
                 .andReturn();
         assertEquals(MediaType.APPLICATION_JSON_VALUE, mvcResult.getResponse().getContentType());
     }
