@@ -45,7 +45,7 @@ public class StoreConverter {
     }
 
     public StoreResponse convertToFullResponse(Store store, int numberOfProducts) {
-        StoreResponse storeResponse = convertToResponse(store);
+        StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
         return convertToFullResponse(store, storeResponse, numberOfProducts);
     }
 
