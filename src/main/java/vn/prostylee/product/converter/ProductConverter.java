@@ -86,7 +86,8 @@ public class ProductConverter {
     private ProductOwnerResponse buildProductOwner(Product product) {
         final ProductOwnerResponse[] productOwnerResponse = new ProductOwnerResponse[1];
         if (product.getStoreId() != null) {
-            productOwnerResponse[0] = productStoreService.getStoreOwner(product.getStoreId());
+            Long storeId = product.getStoreId();
+            productOwnerResponse[0] = productStoreService.getStoreOwner(storeId);
         } else {
             userService.fetchById(product.getCreatedBy()).ifPresent(user ->
                     productOwnerResponse[0] = ProductOwnerResponse.builder()
