@@ -11,4 +11,5 @@ import vn.prostylee.useractivity.entity.UserWishList;
  */
 @Repository
 public interface UserWishListRepository extends BaseRepository<UserWishList, Long>{
+    UserWishList findByProductIdAndCreatedBy(Long productId, Long createdBy);
 }

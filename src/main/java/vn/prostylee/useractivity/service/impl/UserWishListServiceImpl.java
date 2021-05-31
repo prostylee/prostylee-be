@@ -1,7 +1,7 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,11 +12,8 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.media.constant.ImageSize;
-import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.dto.response.ProductResponseLite;
-import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserWishListFilter;
@@ -26,7 +23,6 @@ import vn.prostylee.useractivity.entity.UserWishList;
 import vn.prostylee.useractivity.repository.UserWishListRepository;
 import vn.prostylee.useractivity.service.UserWishListService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +38,20 @@ public class UserWishListServiceImpl implements UserWishListService {
     @Override
     public boolean addToWishList(UserWishListRequest request) {
         try {
-            UserWishList entity = BeanUtil.copyProperties(request, UserWishList.class);
-            repository.save(entity);
+            Long productId = request.getProductId();
+            Long userIdValue = authenticatedProvider.getUserIdValue();
+            UserWishList entity = repository.findByProductIdAndCreatedBy(productId, userIdValue);
+
+            if(entity != null && entity.getDeletedAt() == null){
+                return false;
+            } else if(entity != null && entity.getDeletedAt() != null){
+                entity.setDeletedAt(null);
+                repository.save(entity);
+                return true;
+            }
+
+            UserWishList copyEntity = BeanUtil.copyProperties(request, UserWishList.class);
+            repository.save(copyEntity);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
