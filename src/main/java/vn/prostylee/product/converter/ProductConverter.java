@@ -54,8 +54,8 @@ public class ProductConverter {
         productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId()));
         productResponse.setProductAttributeOptionResponse(buildAttributeOption(product.getId()));
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
-        productResponse.setCategoryResponse(buildCategory(product.getCategory().getId()));
-        productResponse.setBrandResponse(buildBrand(product.getBrand().getId()));
+        productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
+        productResponse.setBrandResponse(buildBrand(product.getBrandId()));
         return productResponse;
     }
 
@@ -65,7 +65,7 @@ public class ProductConverter {
                 .orElse(null);
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             try {
-                return fileUploadService.getImageUrls(attachmentIds, ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
+                return fileUploadService.getImageUrls(attachmentIds, ImageSize.PRODUCT_SIZE.getWidth(), ImageSize.PRODUCT_SIZE.getHeight());
             } catch (ResourceNotFoundException e) {
                 log.debug("Could not build image Urls from attachmentIds={}", attachmentIds, e);
             }
@@ -86,7 +86,8 @@ public class ProductConverter {
     private ProductOwnerResponse buildProductOwner(Product product) {
         final ProductOwnerResponse[] productOwnerResponse = new ProductOwnerResponse[1];
         if (product.getStoreId() != null) {
-            productOwnerResponse[0] = productStoreService.getStoreOwner(product.getStoreId());
+            Long storeId = product.getStoreId();
+            productOwnerResponse[0] = productStoreService.getStoreOwner(storeId);
         } else {
             userService.fetchById(product.getCreatedBy()).ifPresent(user ->
                     productOwnerResponse[0] = ProductOwnerResponse.builder()

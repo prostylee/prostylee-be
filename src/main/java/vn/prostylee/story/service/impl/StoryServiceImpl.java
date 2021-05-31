@@ -82,8 +82,8 @@ public class StoryServiceImpl implements StoryService {
     }
 
     private void buildAdditionalData(UserStoryResponse response) {
-        response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
-        response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
+        response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.STORY_LARGE, response.getId()));
+        response.setStorySmallImageUrls(this.fetchUrls(ImageSize.STORY_SMALL, response.getId()));
         response.setUserForStoryResponse(this.getUserForStoryBy(response.getCreatedBy()));
         response.setStoreResponseLite(Optional.ofNullable(response.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
     }
@@ -96,8 +96,8 @@ public class StoryServiceImpl implements StoryService {
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
 
         responses.getContent().forEach(response -> {
-            response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.LARGE, response.getId()));
-            response.setStorySmallImageUrls(this.fetchUrls(ImageSize.SMALL, response.getId()));
+            response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.STORY_LARGE, response.getId()));
+            response.setStorySmallImageUrls(this.fetchUrls(ImageSize.STORY_SMALL, response.getId()));
             response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
         });
         return responses;
