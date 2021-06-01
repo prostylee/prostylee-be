@@ -10,7 +10,7 @@ import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.filter.ProductFilter;
-import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.dto.response.CompanyResponse;
 import vn.prostylee.store.dto.response.StoreMiniResponse;
@@ -95,17 +95,17 @@ public class StoreConverter {
 
     private void setStoreProducts(StoreResponse storeResponse, int numberOfProducts) {
         if (numberOfProducts > 0) {
-            List<ProductResponse> products = getLatestProducts(storeResponse.getId(), numberOfProducts);
+            List<ProductResponseLite> products = getLatestProducts(storeResponse.getId(), numberOfProducts);
             storeResponse.setProducts(products);
         }
     }
 
-    private List<ProductResponse> getLatestProducts(Long storeId, int numberOfProducts) {
+    private List<ProductResponseLite> getLatestProducts(Long storeId, int numberOfProducts) {
         ProductFilter productFilter = new ProductFilter();
         productFilter.setLimit(numberOfProducts);
         productFilter.setStoreId(storeId);
         productFilter.setSorts(new String[] {"-createdAt"});
-        return productService.findAll(productFilter).getContent();
+        return productService.getProductsForListStore(productFilter).getContent();
     }
 
     public StoreMiniResponse convertToMiniResponse(StoreResponse storeResponse) {

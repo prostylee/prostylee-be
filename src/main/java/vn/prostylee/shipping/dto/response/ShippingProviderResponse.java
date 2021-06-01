@@ -9,4 +9,5 @@ public class ShippingProviderResponse implements Serializable {
     private String name;
     private String description;
     private Double price;
+    private String deliveryTime;
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.MasterDataController;
 import vn.prostylee.core.dto.filter.MasterDataFilter;
+import vn.prostylee.shipping.dto.request.ShippingAddressRequest;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.service.ShippingProviderService;
 
@@ -25,6 +26,12 @@ public class ShippingProviderController extends MasterDataController<ShippingPro
 
     @GetMapping("/providers")
     public Page<ShippingProviderResponse> getAll(MasterDataFilter filter){
+        return super.getAll(filter);
+    }
+
+    @GetMapping("/providers-fee")
+    public Page<ShippingProviderResponse> getProfiderAndFee(ShippingAddressRequest shippingAddressRequest){
+        MasterDataFilter filter = new MasterDataFilter();
         return super.getAll(filter);
     }
 }

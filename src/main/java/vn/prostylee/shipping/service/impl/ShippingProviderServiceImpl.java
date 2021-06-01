@@ -11,6 +11,8 @@ import vn.prostylee.core.dto.filter.MasterDataFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.shipping.dto.request.ShippingAddressRequest;
+import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingProvider;
 import vn.prostylee.shipping.repository.ShippingProviderRepository;
@@ -29,7 +31,11 @@ public class ShippingProviderServiceImpl implements ShippingProviderService {
         Specification<ShippingProvider> searchable = baseFilterSpecs.search(filter);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<ShippingProvider> page = shippingProviderRepository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, ShippingProviderResponse.class));
+        return page.map(entity -> {
+            ShippingProviderResponse response = BeanUtil.copyProperties(entity, ShippingProviderResponse.class);
+            response.setDeliveryTime("Nhận hàng vào 29-12 đến 31-12");
+            return response;
+        });
     }
 
     @Cacheable(value = CachingKey.SHIPPING_PROVIDER, key = "#id")

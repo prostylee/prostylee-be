@@ -59,6 +59,13 @@ public class ProductConverter {
         return productResponse;
     }
 
+    public ProductResponseLite toResponseForListStore(Product product) {
+        ProductResponseLite productResponseLite = BeanUtil.copyProperties(product, ProductResponseLite.class);
+        List<String> imageUrls = buildImageUrls(product.getId());
+        productResponseLite.setImageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0));
+        return productResponseLite;
+    }
+
     private List<String> buildImageUrls(long productID) {
         List<Long> attachmentIds = Optional.ofNullable(productID)
                 .map(productImageService::getAttachmentIdByProductID)

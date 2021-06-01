@@ -19,6 +19,7 @@ import vn.prostylee.product.dto.filter.RecentViewProductFilter;
 import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.*;
 import vn.prostylee.product.repository.ProductExtRepository;
 import vn.prostylee.product.repository.ProductRepository;
@@ -165,6 +166,16 @@ public class ProductServiceImpl implements ProductService {
 
     private Long saveLocation(LocationRequest locationRequest) {
         return locationService.save(locationRequest).getId();
+    }
+
+    @Override
+    public Page<ProductResponseLite> getProductsForListStore(BaseFilter baseFilter) {
+        Page<Product> page = productExtRepository.findAll((ProductFilter) baseFilter);
+        List<ProductResponseLite> responses = page.getContent()
+                .stream()
+                .map(productConverter::toResponseForListStore)
+                .collect(Collectors.toList());
+        return new PageImpl<>(responses, page.getPageable(), page.getTotalElements());
     }
 
 }

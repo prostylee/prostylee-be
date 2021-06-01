@@ -68,6 +68,7 @@ public class StoreServiceImpl implements StoreService {
 
     private final AttachmentService attachmentService;
 
+    @Cacheable(value = CachingKey.STORES, key = "#baseFilter")
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
         StoreFilter storeFilter = (StoreFilter) baseFilter;
@@ -91,7 +92,7 @@ public class StoreServiceImpl implements StoreService {
         List<StoreResponse> responses = page.getContent()
                 .stream()
                 .map(store -> {
-                    StoreResponse response = storeConverter.convertToResponse(store);
+                    StoreResponse response = storeConverter.convertToFullResponse(store, storeFilter.getNumberOfProducts());
                     Optional.ofNullable(response.getLocationId())
                             .ifPresent(locationId -> response.setLocation(nearByLocations.getOrDefault(locationId, null)));
                     return storeConverter.convertToFullResponse(store, response, storeFilter.getNumberOfProducts());
