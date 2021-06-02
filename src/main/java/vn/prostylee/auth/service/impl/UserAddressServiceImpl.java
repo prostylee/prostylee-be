@@ -3,7 +3,9 @@ package vn.prostylee.auth.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.filter.UserAddressFilter;
 import vn.prostylee.auth.dto.request.UserAddressRequest;
@@ -19,10 +21,15 @@ import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.response.AddressResponse;
+import vn.prostylee.location.entity.Address;
 import vn.prostylee.location.service.AddressService;
+import vn.prostylee.product.dto.filter.CategoryFilter;
+import vn.prostylee.product.entity.Category;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -51,6 +58,13 @@ public class UserAddressServiceImpl implements UserAddressService {
         Pageable pageable = baseFilterSpecs.page(userAddressFilter);
         Page<UserAddress> page = this.userAddressRepository.findAll(pageable);
         return page.map(this::toResponse);
+    }
+
+    @Override
+    public Page<UserAddressResponse> findByUserLogin(){
+        List<UserAddress> userAddressList = userAddressRepository.findAddressByUserLogin(authenticatedProvider.getUserIdValue());
+        Page<UserAddress> userAddressPage = new PageImpl<>(userAddressList);
+        return userAddressPage.map(this::toResponse);
     }
 
     @Override
@@ -132,4 +146,5 @@ public class UserAddressServiceImpl implements UserAddressService {
     private UserAddressResponse toResponse(UserAddress userAddress) {
         return BeanUtil.copyProperties(userAddress, UserAddressResponse.class);
     }
+
 }

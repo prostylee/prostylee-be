@@ -2,6 +2,7 @@ package vn.prostylee.product.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,16 +15,21 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EntityUtils;
 import vn.prostylee.product.dto.filter.AttributeFilter;
 import vn.prostylee.product.dto.request.AttributeRequest;
+import vn.prostylee.product.dto.response.AttributeOptionResponse;
 import vn.prostylee.product.dto.response.AttributeResponse;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.AttributeOption;
 import vn.prostylee.product.entity.Category;
+import vn.prostylee.product.repository.AttributeOptionRepository;
 import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.service.AttributeService;
 
 import javax.persistence.criteria.Join;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +37,8 @@ import java.util.Set;
 public class AttributeServiceImpl implements AttributeService {
 
     private final AttributeRepository attributeRepository;
+
+    private final AttributeOptionRepository attributeOptionRepository;
 
     private final BaseFilterSpecs<Attribute> baseFilterSpecs;
 
@@ -95,7 +103,13 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     private AttributeResponse toResponse(Attribute attribute) {
-        return BeanUtil.copyProperties(attribute, AttributeResponse.class);
+        AttributeResponse response = BeanUtil.copyProperties(attribute, AttributeResponse.class);
+        List<AttributeOption> attributeOptions = attributeOptionRepository.getOptionByAttrId(attribute.getId());
+        List<AttributeOptionResponse> options = attributeOptions.stream().map(e -> {
+            return BeanUtil.copyProperties(e, AttributeOptionResponse.class);
+        }).collect(Collectors.toList());
+        response.setAttributeOptions(options);
+        return response;
     }
 
     private Attribute getById(Long id) {

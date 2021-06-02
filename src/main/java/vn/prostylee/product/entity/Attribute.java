@@ -55,6 +55,9 @@ public class Attribute extends AuditEntity {
 	@Column(name = "type")
 	private Integer type;
 
+	@Column(name = "allows_multiple_selection")
+	private Boolean allowsMultipleSelection;
+
 	@Generated(GenerationTime.INSERT)
 	@Column(name = "language_code")
 	private String languageCode;
