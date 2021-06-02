@@ -214,11 +214,11 @@ public class ProductSpecificationBuilder {
         return userFollowerService.getTopBeFollows(request);
     }
 
-    private boolean isAttributesAvailable(Map<String, String> attributes) {
+    private boolean isAttributesAvailable(Map<String, List<String>> attributes) {
         return MapUtils.isNotEmpty(attributes);
     }
 
-    private List<Long> findByAttributes(Map<String, String> attributesRequest) {
+    private List<Long> findByAttributes(Map<String, List<String>> attributesRequest) {
         return productAttributeRepository.findCrossTabProductAttribute(attributesRequest);
     }
 }
