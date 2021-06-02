@@ -10,9 +10,7 @@ import vn.prostylee.product.repository.ProductAttributeRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAttribute, Long> implements ProductAttributeRepository {
@@ -28,11 +26,11 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
                 .append(" FROM crosstab('Select product_price_id, attr_id, attr_value")
                 .append(" from product_attribute where attr_id=1 or attr_id=2 or attr_id=3 or attr_id=4 or attr_id=5 ')")
                 .append(" AS product_attribute(product_price_id bigint, color varchar, size varchar, status varchar, material varchar, style varchar)");
-        if(MapUtils.isNotEmpty(attributesRequest)) {
+        if (MapUtils.isNotEmpty(attributesRequest)) {
             stringBuilder.append(" WHERE ");
         }
         for (Map.Entry attribute : attributesRequest.entrySet()) {
-            stringBuilder.append(attribute.getKey() + "=:" + attribute.getKey() + " AND ");
+            stringBuilder.append("LOWER(" + attribute.getKey() + ") IN (:" + attribute.getKey() + ") AND ");
         }
         String sql = stringBuilder.toString().substring(0, stringBuilder.toString().lastIndexOf("AND"));
 
@@ -65,9 +63,19 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
     private Map<String, Object> buildQueryParams(Map<String, String> attributes) {
         Map<String, Object> params = new HashMap<>();
         for (Map.Entry attribute : attributes.entrySet()) {
-            params.put((String) attribute.getKey(), attribute.getValue());
+            List<String> attrValue = buildMultipleValueForParam((String)attribute.getValue());
+            params.put((String) attribute.getKey(), attrValue);
         }
         return params;
+    }
+
+    private List<String> buildMultipleValueForParam(String attributeValues) {
+        List<String> attrValue = new ArrayList<>();
+        String[] values = attributeValues.split(",");
+        for (String value : values) {
+            attrValue.add(value.toLowerCase());
+        }
+        return attrValue;
     }
 
     private void setParameters(Query query, Map<String, Object> params) {
