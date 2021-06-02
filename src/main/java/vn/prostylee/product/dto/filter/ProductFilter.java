@@ -22,7 +22,7 @@ public class ProductFilter extends BaseFilter {
     private Long categoryId;
     private Long storeId;
     private List<Long> storeIds;
-    private Map<String, String> attributes;
+    private Map<String, List<String>> attributes;
 
     private Boolean topFollowingStore;
     private Boolean paidStore;
