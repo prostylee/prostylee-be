@@ -1,5 +1,6 @@
 package vn.prostylee.product.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,9 @@ public class AttributeRequest {
 
     @NotNull
     private Integer type;
+
+    @NotNull
+    private Boolean allowsMultipleSelection;
 
     private String languageCode;
 

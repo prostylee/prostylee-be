@@ -1,0 +1,1 @@
+ALTER TABLE "attribute" ADD COLUMN allows_multiple_selection BOOLEAN DEFAULT FALSE;
