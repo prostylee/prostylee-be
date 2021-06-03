@@ -1,5 +1,6 @@
 package vn.prostylee.order.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
@@ -7,6 +8,7 @@ import vn.prostylee.order.dto.filter.OrderFilter;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
 import vn.prostylee.order.dto.response.OrderResponse;
+import vn.prostylee.order.dto.response.VoucherCheckResultResponse;
 import vn.prostylee.order.service.OrderService;
 
 import javax.validation.Valid;
@@ -31,5 +33,15 @@ public class OrderController extends CrudController<OrderRequest, OrderResponse,
     @PatchMapping("/reOder/{id}")
     public OrderResponse reOrder(@PathVariable Long id){
         return orderService.reOrder(id);
+    }
+
+    @PostMapping("/checkVoucher")
+    @ResponseStatus(code = HttpStatus.OK)
+    public VoucherCheckResultResponse checkVoucher(@Valid @RequestBody OrderRequest orderRequest){
+        VoucherCheckResultResponse response = new VoucherCheckResultResponse();
+        response.setVoucherId(orderRequest.getOrderDiscounts().get(0).getVoucherId());
+        response.setAmount(240000D);
+        response.setResult(true);
+        return response;
     }
 }
