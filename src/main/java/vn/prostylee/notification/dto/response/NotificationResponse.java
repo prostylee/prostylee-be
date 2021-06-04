@@ -1,9 +1,11 @@
 package vn.prostylee.notification.dto.response;
 
 import lombok.Data;
+import vn.prostylee.auth.dto.response.BasicUserResponse;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class NotificationResponse implements Serializable {
@@ -14,7 +16,11 @@ public class NotificationResponse implements Serializable {
 
     private String content;
 
-    private String sendFrom;
+    private Integer type;
+
+    private Map<String, Object> data;
+
+    private BasicUserResponse sendFrom;
 
     private Boolean markAsRead;
 

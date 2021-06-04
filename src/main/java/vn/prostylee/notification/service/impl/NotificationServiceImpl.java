@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.UserToken;
+import vn.prostylee.auth.dto.response.BasicUserResponse;
+import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
@@ -29,6 +31,7 @@ import vn.prostylee.notification.repository.NotificationRepository;
 import vn.prostylee.notification.service.NotificationService;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
 
     private final AuthenticatedProvider authenticatedProvider;
+    private final UserService userService;
 
     private final NotificationRepository notificationRepository;
 
@@ -50,17 +54,30 @@ public class NotificationServiceImpl implements NotificationService {
         searchable = searchable.and(additionalSpec);
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<Notification> page = notificationRepository.findAll(searchable, pageable);
-        return page.map(entity -> BeanUtil.copyProperties(entity, NotificationResponse.class));
+        return page.map(this::toResponse);
+    }
+
+    private NotificationResponse toResponse(Notification entity) {
+        NotificationResponse response = BeanUtil.copyProperties(entity, NotificationResponse.class);
+        if (StringUtils.isNotBlank(entity.getAdditionalData())) {
+            response.setData(JsonUtils.fromJson(entity.getAdditionalData(), HashMap.class));
+        }
+        if (entity.getCreatedBy() != null) {
+            BasicUserResponse user = userService.getBasicUserInfo(entity.getCreatedBy());
+            response.setSendFrom(user);
+        }
+        return response;
     }
 
     @Override
     public NotificationResponse findById(Long id) {
-        Notification tripCatalog = getById(id);
-        return BeanUtil.copyProperties(tripCatalog, NotificationResponse.class);
+        Notification notification = getById(id);
+        return toResponse(notification);
     }
 
     private Notification getById(Long id) {
-        return notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trip catalog is not found with id [" + id + "]"));
+        return notificationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip catalog is not found with id [" + id + "]"));
     }
 
     @Override
@@ -71,7 +88,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
         notification.setUserId(request.getUserId());
         Notification savedNotification = notificationRepository.save(notification);
-        return BeanUtil.copyProperties(savedNotification, NotificationResponse.class);
+        return toResponse(savedNotification);
     }
 
     @Override
@@ -82,7 +99,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
         BeanUtil.mergeProperties(request, notification);
         Notification savedNotification = notificationRepository.save(notification);
-        return BeanUtil.copyProperties(savedNotification, NotificationResponse.class);
+        return toResponse(savedNotification);
     }
 
     @Override
