@@ -212,10 +212,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public BasicUserResponse getBasicUserInfo(Long userId) {
+    public Optional<BasicUserResponse> getBasicUserInfo(Long userId) {
         return userRepository.findById(userId)
-                .map(user -> BeanUtil.copyProperties(user, BasicUserResponse.class))
-                .orElse(null);
+                .map(user -> BeanUtil.copyProperties(user, BasicUserResponse.class));
     }
 
 }

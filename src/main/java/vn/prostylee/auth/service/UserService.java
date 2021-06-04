@@ -23,5 +23,5 @@ public interface UserService extends CrudService<UserRequest, UserResponse, Long
 
     List<UserResponse> findUsersByIds(List<Long> userIds);
 
-    BasicUserResponse getBasicUserInfo(Long userId);
+    Optional<BasicUserResponse> getBasicUserInfo(Long userId);
 }
