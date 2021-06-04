@@ -1,6 +1,7 @@
 package vn.prostylee.auth.service;
 
 import vn.prostylee.auth.dto.request.UserRequest;
+import vn.prostylee.auth.dto.response.BasicUserResponse;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.service.CrudService;
@@ -21,4 +22,6 @@ public interface UserService extends CrudService<UserRequest, UserResponse, Long
     Optional<User> findBySub(String sub);
 
     List<UserResponse> findUsersByIds(List<Long> userIds);
+
+    BasicUserResponse getBasicUserInfo(Long userId);
 }

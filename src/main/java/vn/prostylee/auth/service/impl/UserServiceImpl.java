@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
+import vn.prostylee.auth.dto.response.BasicUserResponse;
 import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.entity.Role;
 import vn.prostylee.auth.entity.User;
@@ -208,6 +209,13 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(user -> BeanUtil.copyProperties(user, UserResponse.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BasicUserResponse getBasicUserInfo(Long userId) {
+        return userRepository.findById(userId)
+                .map(user -> BeanUtil.copyProperties(user, BasicUserResponse.class))
+                .orElse(null);
     }
 
 }
