@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.UserToken;
-import vn.prostylee.auth.dto.response.BasicUserResponse;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -24,7 +23,9 @@ import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
 import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
 import vn.prostylee.notification.dto.request.FcmSubscriptionRequest;
 import vn.prostylee.notification.dto.request.NotificationRequest;
+import vn.prostylee.notification.dto.response.NotificationDiscountResponse;
 import vn.prostylee.notification.dto.response.NotificationResponse;
+import vn.prostylee.notification.dto.response.NotificationSender;
 import vn.prostylee.notification.entity.Notification;
 import vn.prostylee.notification.factory.PushNotificationServiceFactory;
 import vn.prostylee.notification.repository.NotificationRepository;
@@ -49,9 +50,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Page<NotificationResponse> findAll(BaseFilter baseFilter) {
+        return findAll(authenticatedProvider.getUserIdValue(), baseFilter);
+    }
+
+    private Page<NotificationResponse> findAll(Long userId, BaseFilter baseFilter) {
         Specification<Notification> searchable = baseFilterSpecs.search(baseFilter);
-        Specification<Notification> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), authenticatedProvider.getUserIdValue());
-        searchable = searchable.and(additionalSpec);
+        if (userId != null) {
+            Specification<Notification> additionalSpec = (root, query, cb) -> cb.equal(root.get("userId"), userId);
+            searchable = searchable.and(additionalSpec);
+        }
         Pageable pageable = baseFilterSpecs.page(baseFilter);
         Page<Notification> page = notificationRepository.findAll(searchable, pageable);
         return page.map(this::toResponse);
@@ -63,8 +70,12 @@ public class NotificationServiceImpl implements NotificationService {
             response.setData(JsonUtils.fromJson(entity.getAdditionalData(), HashMap.class));
         }
         if (entity.getCreatedBy() != null) {
-            BasicUserResponse user = userService.getBasicUserInfo(entity.getCreatedBy());
-            response.setSendFrom(user);
+            userService.getBasicUserInfo(entity.getCreatedBy()).ifPresent(
+                    user -> response.setSender(NotificationSender.builder()
+                            .userId(user.getId())
+                            .avatar(user.getAvatar())
+                            .name(user.getFullName())
+                            .build()));
         }
         return response;
     }
@@ -156,9 +167,21 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.countUnreadNotification(userId);
     }
 
+    @Override
+    public Page<NotificationDiscountResponse> getNotificationDiscounts(BaseFilter filter) {
+        // TODO Get from voucher/discount table
+        // TODO Get special discounts by group user
+        Page<NotificationResponse> responses = findAll(null, filter);
+        return responses.map(notification -> BeanUtil.copyProperties(notification, NotificationDiscountResponse.class))
+                .map(notification -> {
+                    notification.setTitle("Ưu đãi toàn bộ sản phẩm");
+                    return notification;
+                });
+    }
+
     private void sendPushNotification(PushNotificationDto request) {
         NotificationProvider.findProvider(request.getProvider()).ifPresent(provider -> {
-            switch (provider){
+            switch (provider) {
                 case EXPO:
                     sendViaExpoPush(request, provider);
                     break;
@@ -172,7 +195,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendViaExpoPush(PushNotificationDto request, NotificationProvider provider) {
-        String[]tokens = request.getUserTokens().stream().map(UserToken::getToken).distinct().toArray(String[]::new);
+        String[] tokens = request.getUserTokens().stream().map(UserToken::getToken).distinct().toArray(String[]::new);
         ExpoPushNotificationRequest pushNotificationRequest = ExpoPushNotificationRequest.builder()
                 .to(tokens)
                 .title(request.getTitle())

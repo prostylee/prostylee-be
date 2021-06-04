@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.dto.response.SimpleResponse;
 import vn.prostylee.notification.dto.filter.NotificationFilter;
+import vn.prostylee.notification.dto.response.NotificationDiscountResponse;
 import vn.prostylee.notification.dto.response.NotificationResponse;
 import vn.prostylee.notification.service.NotificationService;
 
@@ -56,5 +57,10 @@ public class NotificationController {
     @GetMapping("/count")
     public SimpleResponse countUnreadNotification() {
         return SimpleResponse.builder().data(notificationService.countUnreadNotification()).build();
+    }
+
+    @GetMapping("/discounts")
+    public Page<NotificationDiscountResponse> getNotificationDiscounts(NotificationFilter baseFilter) {
+        return notificationService.getNotificationDiscounts(baseFilter);
     }
 }
