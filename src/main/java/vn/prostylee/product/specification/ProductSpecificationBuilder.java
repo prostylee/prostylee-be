@@ -11,6 +11,8 @@ import vn.prostylee.core.constant.ApiParamConstant;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.core.utils.DbUtil;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.entity.Attribute;
+import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
@@ -33,6 +35,8 @@ public class ProductSpecificationBuilder {
     private final UserFollowerService userFollowerService;
     private final StoreService storeService;
     private final ProductAttributeRepository productAttributeRepository;
+    private final AttributeRepository attributeRepository;
+    private static Map<Long,String> attributeTypes;
 
     public StringBuilder buildQuery(ProductFilter productFilter) {
         List<Long> storeIds = new ArrayList<>(Optional.ofNullable(productFilter.getStoreIds())
@@ -219,6 +223,11 @@ public class ProductSpecificationBuilder {
     }
 
     private List<Long> findByAttributes(Map<String, List<String>> attributesRequest) {
-        return productAttributeRepository.findCrossTabProductAttribute(attributesRequest);
+        if (MapUtils.isEmpty(attributeTypes)) {
+            attributeTypes = new HashMap<>();
+            List<Attribute> attrs = attributeRepository.findAll();
+            attrs.forEach(attr -> attributeTypes.put(attr.getId(), attr.getKey()));
+        }
+        return productAttributeRepository.findCrossTabProductAttribute(attributesRequest, attributeTypes);
     }
 }
