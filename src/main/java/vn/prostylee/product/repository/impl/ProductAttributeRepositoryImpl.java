@@ -21,19 +21,24 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
     }
 
     @Override
-    public List<Long> findCrossTabProductAttribute(Map<String, List<String>> attributesRequest) {
+    public List<Long> findCrossTabProductAttribute(Map<String, List<String>> attributesRequest,
+                                                   Map<Long, String> attributeTypes) {
         StringBuilder stringBuilder = new StringBuilder()
                 .append(" SELECT product_price_id")
                 .append(" FROM crosstab('Select product_price_id, attr_id, attr_value")
-                .append(" from product_attribute where attr_id=1 or attr_id=2 or attr_id=3 or attr_id=4 or attr_id=5 ')")
-                .append(" AS product_attribute(product_price_id bigint, color varchar, size varchar, status varchar, material varchar, style varchar)");
+                .append(" from product_attribute pa join attribute attr")
+                .append(" on pa.attr_id = attr.id order by 1',")
+                .append(" 'select id from attribute' )")
+                .append(" AS product_attribute(product_price_id bigint,");
         if (MapUtils.isNotEmpty(attributesRequest)) {
-            stringBuilder.append(" WHERE ");
+            attributeTypes.forEach((k,v) -> stringBuilder.append(v + " varchar,"));
+            stringBuilder.deleteCharAt(stringBuilder.toString().lastIndexOf(","));
+            stringBuilder.append(") WHERE ");
         }
         for (Map.Entry attribute : attributesRequest.entrySet()) {
             stringBuilder.append("LOWER(" + attribute.getKey() + ") IN (:" + attribute.getKey() + ") AND ");
         }
-        String sql = stringBuilder.toString().substring(0, stringBuilder.toString().lastIndexOf("AND"));
+        String sql = stringBuilder.substring(0, stringBuilder.toString().lastIndexOf("AND"));
 
         Query query = getEntityManager().createNativeQuery(sql);
         setParameters(query, buildQueryParams(attributesRequest));
