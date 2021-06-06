@@ -1,9 +1,9 @@
 package vn.prostylee.shipping.service;
 
-import vn.prostylee.core.service.MasterDataService;
+import vn.prostylee.core.service.CrudService;
+import vn.prostylee.shipping.dto.request.ShippingProviderRequest;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
-import vn.prostylee.shipping.entity.ShippingProvider;
 
-public interface ShippingProviderService extends MasterDataService<ShippingProviderResponse> {
-    ShippingProvider getShippingProviderById(Long id);
+public interface ShippingProviderService extends CrudService<ShippingProviderRequest, ShippingProviderResponse, Long> {
+
 }
