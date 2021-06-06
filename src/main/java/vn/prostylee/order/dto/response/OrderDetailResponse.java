@@ -1,6 +1,7 @@
 package vn.prostylee.order.dto.response;
 
 import lombok.Data;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 
@@ -27,6 +28,6 @@ public class OrderDetailResponse implements Serializable {
 
     private String productSize;
 
-    private String productData;
+    private ProductResponseLite productData;
 
 }

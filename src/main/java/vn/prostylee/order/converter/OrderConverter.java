@@ -2,8 +2,13 @@ package vn.prostylee.order.converter;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
@@ -13,7 +18,10 @@ import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.payment.entity.PaymentType;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.service.ProductService;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingAddress;
@@ -23,16 +31,16 @@ import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 @Slf4j
 public class OrderConverter {
+
+    private final FileUploadService fileUploadService;
+    private final ProductService productService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -66,8 +74,9 @@ public class OrderConverter {
                     OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
                     detail.setOrder(order);
 
-                    Product product = Product.builder().id(detailRq.getProductId()).build();
+                    Product product = productService.getProductById(detailRq.getProductId());
                     detail.setProduct(product);
+                    detail.setProductData(handleProductData(product));
 
                     Optional.ofNullable(detailRq.getStoreId()).ifPresent(storeId -> {
                         Store store = Store.builder().id(storeId).build();
@@ -90,6 +99,17 @@ public class OrderConverter {
         }
         order.getOrderDetails().clear();
         order.getOrderDetails().addAll(details);
+    }
+
+    private String handleProductData(Product product) {
+        ProductResponseLite productResponseLite = BeanUtil.copyProperties(product, ProductResponseLite.class);
+        if (CollectionUtils.isNotEmpty(product.getProductImages())) {
+            ProductImage productImage = product.getProductImages().iterator().next();
+            List<String> productImageUrls = fileUploadService.getImageUrls(Collections.singletonList(productImage.getAttachmentId()),
+                    ImageSize.PRODUCT_SIZE.getWidth(), ImageSize.PRODUCT_SIZE.getHeight());
+            productResponseLite.setImageUrl(productImageUrls.get(0));
+        }
+        return JsonUtils.toJson(productResponseLite);
     }
 
     private void convertOrderDiscounts(OrderRequest request, Order order) {
@@ -160,6 +180,10 @@ public class OrderConverter {
                     detailResponse.setBranch(branchResponse);
                 });
 
+       if (StringUtils.isNotBlank(detail.getProductData())) {
+           ProductResponseLite productData = JsonUtils.fromJson(detail.getProductData(), ProductResponseLite.class);
+           detailResponse.setProductData(productData);
+       }
         return detailResponse;
     }
 }

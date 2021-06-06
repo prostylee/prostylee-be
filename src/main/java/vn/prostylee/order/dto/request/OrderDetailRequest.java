@@ -36,6 +36,4 @@ public class OrderDetailRequest {
 
     private String productSize;
 
-    private String productData;
-
 }
