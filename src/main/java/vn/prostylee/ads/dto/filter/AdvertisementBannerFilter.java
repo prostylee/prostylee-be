@@ -9,6 +9,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class AdvertisementBannerFilter extends BaseFilter {
 
     private Long groupId;
+    private String position;
 
     @Override
     public String[] getSearchableFields() {

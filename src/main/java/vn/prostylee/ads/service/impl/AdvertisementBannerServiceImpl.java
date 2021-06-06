@@ -2,6 +2,7 @@ package vn.prostylee.ads.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -58,6 +59,14 @@ public class AdvertisementBannerServiceImpl implements AdvertisementBannerServic
             Specification<AdvertisementBanner> joinAdsGroupSpec = (root, query, cb) -> {
                 Join<AdvertisementBanner, AdvertisementGroup> group = root.join("group");
                 return cb.equal(group.get("id"), filter.getGroupId());
+            };
+            spec = spec.and(joinAdsGroupSpec);
+        }
+
+        if (StringUtils.isNotBlank(filter.getPosition())) {
+            Specification<AdvertisementBanner> joinAdsGroupSpec = (root, query, cb) -> {
+                Join<AdvertisementBanner, AdvertisementGroup> group = root.join("group");
+                return cb.equal(cb.upper(group.get("position")), StringUtils.upperCase(filter.getPosition()));
             };
             spec = spec.and(joinAdsGroupSpec);
         }
