@@ -170,6 +170,7 @@ app:
       - /v1/masters/**
       - /v1/supports/**
       - /v1/oauth/**
+      - /v1/profile/*/avatar
   aws:
     # AWS Credential -
     credential:
