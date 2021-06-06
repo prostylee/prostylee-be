@@ -1,13 +1,24 @@
 package vn.prostylee.auth.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.dto.request.UserProfileRequest;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.provider.AuthenticatedProvider;
+import vn.prostylee.core.utils.MimeTypeUtil;
 
 import java.util.ArrayList;
 
@@ -49,6 +60,26 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public UserResponse getProfileBy(Long id) {
         return userService.findById(id);
+    }
+
+    @SneakyThrows
+    @Override
+    public ResponseEntity<Resource> getAvatar(String sub) {
+        Resource resource;
+        String avatarUrl = userService.findBySub(sub).map(User::getAvatar).orElse(null);
+        if (StringUtils.isBlank(avatarUrl)) {
+            avatarUrl = "images/user-avatar.png";
+            resource = new ClassPathResource(avatarUrl);
+        } else {
+            resource = new UrlResource(avatarUrl);
+        }
+        String extension = FilenameUtils.getExtension(avatarUrl);
+        String contentType = MimeTypeUtil.getMimeType(extension);
+        String fileName = "avatar-" + System.currentTimeMillis() + "." + extension;
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(resource);
     }
 
     private Long getLoggedInUserId() {

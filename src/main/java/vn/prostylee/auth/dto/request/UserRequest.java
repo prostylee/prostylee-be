@@ -5,10 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import vn.prostylee.ads.dto.request.ImageRequest;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.validator.UniqueEntity;
 import vn.prostylee.core.validator.UniqueIdentifier;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -63,5 +65,8 @@ public class UserRequest implements UniqueIdentifier<Long> {
     private Boolean phoneNumberVerified;
 
     private String bio;
+
+    @Valid
+    private ImageRequest avatarImageInfo;
 
 }

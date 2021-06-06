@@ -3,15 +3,17 @@ package vn.prostylee.core.dto.filter;
 public class MasterDataFilter extends BaseFilter {
 
     public String[] getSearchableFields() {
-        return new String[] {
+        return new String[]{
                 "name"
         };
     }
 
     public String[] getSortableFields() {
-       return new String[]{
+        return new String[]{
                 "id",
-                "name"
-       };
+                "name",
+                "description",
+                "createdAt"
+        };
     }
 }
