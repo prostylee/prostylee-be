@@ -51,8 +51,8 @@ public class BrandServiceImpl implements BrandService {
     public BrandResponse update(Long id, BrandRequest request) {
         Brand entity = getById(id);
         BeanUtil.mergeProperties(request, entity);
-        Brand savedUser = brandRepository.save(entity);
-        return BeanUtil.copyProperties(savedUser, BrandResponse.class);
+        Brand savedEntity = brandRepository.save(entity);
+        return BeanUtil.copyProperties(savedEntity, BrandResponse.class);
     }
 
     @Override
