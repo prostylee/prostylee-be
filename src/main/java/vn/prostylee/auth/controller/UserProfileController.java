@@ -1,6 +1,8 @@
 package vn.prostylee.auth.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.auth.dto.request.UserProfileRequest;
 import vn.prostylee.auth.dto.response.UserResponse;
@@ -35,4 +37,8 @@ public class UserProfileController {
         return userProfileService.updateProfile(request);
     }
 
+    @GetMapping("/{sub}/avatar")
+    public ResponseEntity<Resource> getAvatar(@PathVariable String sub) {
+        return userProfileService.getAvatar(sub);
+    }
 }

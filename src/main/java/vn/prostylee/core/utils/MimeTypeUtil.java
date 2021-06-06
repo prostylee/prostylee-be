@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class MimeTypeUtil {
 
-	public static final String DEFAULT_MIME_TYPE = "text/html";
+	public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 
 	/**
 	 * Hash map that will be stored types in

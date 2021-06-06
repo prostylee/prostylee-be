@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.ads.dto.request.ImageRequest;
 import vn.prostylee.auth.dto.filter.UserFilter;
 import vn.prostylee.auth.dto.request.UserRequest;
 import vn.prostylee.auth.dto.response.BasicUserResponse;
@@ -23,6 +24,9 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.AttachmentService;
+import vn.prostylee.media.service.FileUploadService;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -35,10 +39,10 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
     private final RoleRepository roleRepository;
-
     private final BaseFilterSpecs<User> baseFilterSpecs;
+    private final AttachmentService attachmentService;
+    private final FileUploadService fileUploadService;
 
     @Override
     public Page<UserResponse> findAll(BaseFilter baseFilter) {
@@ -126,8 +130,17 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(userRequest.getPassword())) {
             user.setPassword(EncrytedPasswordUtils.encryptPassword(userRequest.getPassword()));
         }
+        if (userRequest.getAvatarImageInfo() != null) {
+            Long avatarId = saveImage(userRequest.getAvatarImageInfo());
+            String avatarUrl = fileUploadService.getImageUrl(avatarId, ImageSize.FULL.getWidth(), ImageSize.FULL.getHeight());
+            user.setAvatar(avatarUrl);
+        }
         User savedUser = userRepository.save(user);
         return convertToResponse(savedUser);
+    }
+
+    private Long saveImage(ImageRequest imageRequest) {
+        return attachmentService.saveAttachmentByNameAndPath(imageRequest.getName(), imageRequest.getPath()).getId();
     }
 
     @Override
