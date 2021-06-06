@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.exception.ResourceInUsedException;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
@@ -20,6 +21,8 @@ import vn.prostylee.shipping.dto.response.ShippingMethodResponse;
 import vn.prostylee.shipping.entity.ShippingMethod;
 import vn.prostylee.shipping.repository.ShippingMethodRepository;
 import vn.prostylee.shipping.service.ShippingMethodService;
+
+import java.text.MessageFormat;
 
 @Slf4j
 @Service
@@ -68,13 +71,21 @@ public class ShippingMethodServiceImpl implements ShippingMethodService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            shippingMethodRepository.deleteById(id);
-            log.info("ShippingMethod with id [{}] deleted successfully", id);
-            return true;
+            if (isInUsed(id)) {
+                throw new ResourceInUsedException(MessageFormat.format("ShippingMethod with id [{0}] is in used. Could not delete!", id));
+            } else {
+                shippingMethodRepository.deleteById(id);
+                log.info("ShippingMethod with id [{}] deleted successfully", id);
+                return true;
+            }
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("ShippingMethod id [{}] does not exists", id);
-            return false;
         }
+        return false;
+    }
+
+    private boolean isInUsed(Long shippingMethodId) {
+        return shippingMethodRepository.isInUsed(shippingMethodId);
     }
 
     private ShippingMethod getById(Long id) {

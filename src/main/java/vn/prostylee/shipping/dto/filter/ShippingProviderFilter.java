@@ -11,6 +11,7 @@ public class ShippingProviderFilter extends BaseFilter {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
+                "id",
                 "name",
                 "description"
         };
