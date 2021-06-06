@@ -17,7 +17,9 @@ import vn.prostylee.auth.constant.AuthConstants;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.dto.AwsCognitoJwtAuthentication;
 import vn.prostylee.auth.dto.response.UserCredential;
+import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.exception.AuthenticationException;
+import vn.prostylee.auth.repository.UserRepository;
 import vn.prostylee.auth.token.extractor.TokenExtractor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,10 +41,9 @@ import java.util.stream.Collectors;
 public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter {
 
     private final TokenExtractor tokenExtractor;
-
     private final ConfigurableJWTProcessor configurableJWTProcessor;
-
     private final AwsCognitoProperties awsCognitoProperties;
+    private final UserRepository userRepository;
 
     @Override
     boolean setAuthIfTokenValid(HttpServletRequest request) {
@@ -57,9 +58,14 @@ public class AwsCognitoJwtAuthenticationFilter extends AuthOncePerRequestFilter 
 
                     List<SimpleGrantedAuthority> grantedAuthorities = convertToGrantedAuthorities(groups);
 
+                    String sub = (String) claimsSet.getClaim("sub");
+                    Long userId = NumberUtils.toLong((String) claimsSet.getClaim("custom:userId"), 0);
+                    if (userId == 0) {
+                        userId = userRepository.findActivatedUserBySub(sub).map(User::getId).orElse(null);
+                    }
                     UserCredential user = UserCredential.builder()
-                            .id(NumberUtils.toLong((String) claimsSet.getClaim("userId")))
-                            .sub((String) claimsSet.getClaim("sub"))
+                            .id(userId)
+                            .sub(sub)
                             .username((String) claimsSet.getClaim("username"))
                             .roles(groups)
                             .features(Collections.emptyList())
