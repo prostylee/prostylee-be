@@ -9,6 +9,7 @@ import vn.prostylee.store.dto.request.StoreRequest;
 import vn.prostylee.store.dto.response.StoreMiniResponse;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
+import vn.prostylee.store.entity.Store;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface StoreService extends CrudService<StoreRequest, StoreResponse, L
     Page<StoreMiniResponse> getMiniStoreResponse(StoreProductFilter storeProductFilter);
 
     List<Long> getNewStoreIds(NewestStoreRequest request);
+
+    Store getById(Long id);
 }

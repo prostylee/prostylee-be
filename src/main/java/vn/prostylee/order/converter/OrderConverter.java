@@ -30,6 +30,8 @@ import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
+import vn.prostylee.store.service.BranchService;
+import vn.prostylee.store.service.StoreService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,6 +43,8 @@ public class OrderConverter {
 
     private final FileUploadService fileUploadService;
     private final ProductService productService;
+    private final StoreService storeService;
+    private final BranchService branchService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -74,19 +78,15 @@ public class OrderConverter {
                     OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
                     detail.setOrder(order);
 
-                    Product product = productService.getProductById(detailRq.getProductId());
-                    detail.setProduct(product);
+                    detail.setProductId(detail.getProductId());
+                    Product product = productService.getById(detailRq.getProductId());
                     detail.setProductData(handleProductData(product));
 
-                    Optional.ofNullable(detailRq.getStoreId()).ifPresent(storeId -> {
-                        Store store = Store.builder().id(storeId).build();
-                        detail.setStore(store);
-                    });
+                    Optional.ofNullable(detailRq.getStoreId())
+                            .ifPresent(detail::setStoreId);
 
-                    Optional.ofNullable(detailRq.getBranchId()).ifPresent(branchId -> {
-                        Branch branch = Branch.builder().id(detailRq.getBranchId()).build();
-                        detail.setBranch(branch);
-                    });
+                    Optional.ofNullable(detailRq.getBranchId())
+                            .ifPresent(detail::setBranchId);
 
                     return detail;
                 })
@@ -168,14 +168,16 @@ public class OrderConverter {
     private OrderDetailResponse convertToOrderDetailResponse(OrderDetail detail) {
         OrderDetailResponse detailResponse = BeanUtil.copyProperties(detail, OrderDetailResponse.class);
 
-        Optional.ofNullable(detail.getStore())
-                .ifPresent(store -> {
+        Optional.ofNullable(detail.getStoreId())
+                .ifPresent(storeId -> {
+                    Store store = storeService.getById(storeId);
                     StoreResponseLite storeResponse = BeanUtil.copyProperties(store, StoreResponseLite.class);
                     detailResponse.setStore(storeResponse);
                 });
 
-        Optional.ofNullable(detail.getBranch())
-                .ifPresent(branch -> {
+        Optional.ofNullable(detail.getBranchId())
+                .ifPresent(branchId -> {
+                    Branch branch = branchService.getById(branchId);
                     BranchResponse branchResponse = BeanUtil.copyProperties(branch, BranchResponse.class);
                     detailResponse.setBranch(branchResponse);
                 });
