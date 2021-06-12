@@ -4,7 +4,7 @@ import lombok.Data;
 import vn.prostylee.app.dto.AppConfiguration;
 
 @Data
-public class MasterDataResponse {
+public class AppMasterDataResponse {
 
     private AppConfiguration configuration;
 

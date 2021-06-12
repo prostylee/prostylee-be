@@ -3,14 +3,14 @@ package vn.prostylee.voucher.repository;
 
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
-import vn.prostylee.voucher.entity.Voucher;
+import vn.prostylee.voucher.entity.VoucherMasterData;
 
 /**
- * Repository for domain model class Voucher.
- * @see Voucher ;
+ * Repository for domain model class VoucherMasterData.
+ * @see VoucherMasterData ;
  * @author prostylee
  */
 @Repository
-public interface VoucherRepository extends BaseRepository<Voucher, Long> {
+public interface VoucherMasterDataRepository extends BaseRepository<VoucherMasterData, Long> {
 
 }

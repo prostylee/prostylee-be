@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 
 import java.io.InputStream;
 
-public class JsonUtils {
+public final class JsonUtils {
 
     private JsonUtils() {
         super();

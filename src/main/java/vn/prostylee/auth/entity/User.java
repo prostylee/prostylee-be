@@ -97,10 +97,10 @@ public class User extends AuditEntity {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
 	private Set<UserAddress> userAddresses;
 
-	@Column(name = "avatar")
+	@Column(name = "avatar", length = 2048)
 	private String avatar;
 
-	@Column(name = "bio", length = 512, nullable = true)
+	@Column(name = "bio", length = 512)
 	private String bio;
 
 	@Column(name = "allow_sale_notification")
