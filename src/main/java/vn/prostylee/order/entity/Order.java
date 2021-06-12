@@ -46,7 +46,7 @@ public class Order extends AuditEntity {
 	@ToString.Exclude
 	@OneToOne
 	@JoinColumn(name = "payment_type_id")
-	private PaymentType paymentType;
+	private PaymentType paymentType; // TODO remove relationship
 
 	@Column(name = "buyer_id")
 	private Long buyerId;
@@ -71,7 +71,7 @@ public class Order extends AuditEntity {
 	@ToString.Exclude
 	@OneToOne
 	@JoinColumn(name = "shipping_provider_id")
-	private ShippingProvider shippingProvider;
+	private ShippingProvider shippingProvider; // TODO remove relationship
 
 	public OrderStatus getStatus() {
 		return OrderStatus.parse(this.status);

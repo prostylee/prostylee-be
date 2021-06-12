@@ -18,6 +18,8 @@ public final class CachingKey {
     public static final String ADS_CAMPAIGN = "adsCampaign";
     public static final String PUSH_NOTIFICATION_TEMPLATES = "pushNotificationTemplate";
     public static final String EMAIL_TEMPLATES = "emailTemplate";
+    public static final String VOUCHER = "voucher";
+    public static final String VOUCHER_MASTER_DATA = "voucherMasterData";
 
     private CachingKey() {}
 }

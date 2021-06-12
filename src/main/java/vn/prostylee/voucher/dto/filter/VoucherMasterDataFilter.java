@@ -6,29 +6,27 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class VoucherFilter extends BaseFilter {
+public class VoucherMasterDataFilter extends BaseFilter {
 
-    private Long storeId;
+    private String group;
     private Boolean active;
-    private Integer type;
 
     @Override
     public String[] getSearchableFields() {
-        return new String[] {
+        return new String[]{
                 "name",
-                "code",
+                "description",
         };
     }
 
     @Override
     public String[] getSortableFields() {
-        return new String[] {
+        return new String[]{
                 "name",
+                "group",
                 "description",
-                "code",
-                "type",
-                "active",
                 "createdAt",
         };
     }
+
 }

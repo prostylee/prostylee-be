@@ -1,6 +1,7 @@
 package vn.prostylee.product.entity;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import javax.persistence.*;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@Table(name = "language")
 public class Language extends AuditEntity {
     private static final long serialVersionUID = 1L;
 
@@ -23,6 +25,6 @@ public class Language extends AuditEntity {
     @Column(name = "name", length = 512)
     private String name;
 
-    @Column(name = "status", length = 512)
+    @Column(name = "status")
     private boolean status;
 }

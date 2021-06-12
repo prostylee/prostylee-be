@@ -1,13 +1,12 @@
 package vn.prostylee.app.controller;
 
-import vn.prostylee.app.dto.filter.MasterDataFilter;
-import vn.prostylee.app.dto.response.MasterDataResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.app.dto.response.AppMasterDataResponse;
 import vn.prostylee.app.service.AppMetadataService;
+import vn.prostylee.core.constant.ApiVersion;
 
 @AllArgsConstructor
 @RestController
@@ -16,9 +15,9 @@ public class MasterDataController {
 
     private final AppMetadataService metadataService;
 
-    @GetMapping
-    public MasterDataResponse getAllMasterData(MasterDataFilter filter) {
-        MasterDataResponse response = new MasterDataResponse();
+    @GetMapping("/app")
+    public AppMasterDataResponse getAllMasterData() {
+        AppMasterDataResponse response = new AppMasterDataResponse();
         response.setConfiguration(metadataService.getConfiguration());
         return response;
     }

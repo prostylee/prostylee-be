@@ -34,17 +34,17 @@ public class OrderDetail extends AuditEntity {
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id", nullable = false)
-	private Store store;
+	private Store store; // TODO remove relationship
 
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id")
-	private Branch branch;
+	private Branch branch; // TODO remove relationship
 
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
-	private Product product;
+	private Product product; // TODO remove relationship
 
 	@Column(name = "product_price")
 	private Double productPrice;
