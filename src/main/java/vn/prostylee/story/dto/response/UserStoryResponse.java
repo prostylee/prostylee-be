@@ -1,7 +1,6 @@
 package vn.prostylee.story.dto.response;
 
 import lombok.Data;
-import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.io.Serializable;
 import java.util.Date;

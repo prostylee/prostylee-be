@@ -13,7 +13,7 @@ import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductExtRepository;
-import vn.prostylee.product.specification.ProductSpecificationBuilder;
+import vn.prostylee.product.repository.specification.ProductSpecificationBuilder;
 
 import javax.persistence.EntityManager;
 import java.util.HashMap;
