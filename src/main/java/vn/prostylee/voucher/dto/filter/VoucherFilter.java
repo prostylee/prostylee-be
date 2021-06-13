@@ -1,9 +1,11 @@
 package vn.prostylee.voucher.dto.filter;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
+@Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VoucherFilter extends BaseFilter {

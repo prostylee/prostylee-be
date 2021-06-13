@@ -74,13 +74,18 @@ public class StoreConverter {
     }
 
     private void setStoreLogo(StoreResponse storeResponse, Long logo) {
+        storeResponse.setLogoUrl(getLogoUrl(logo));
+    }
+
+    private String getLogoUrl(Long logo) {
         if (logo == null) {
-            return;
+            return null;
         }
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(logo), ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
         if (CollectionUtils.isNotEmpty(imageUrls)) {
-            storeResponse.setLogoUrl(imageUrls.get(0));
+            return imageUrls.get(0);
         }
+        return null;
     }
 
     private void setStoreLocation(StoreResponse storeResponse, Long locationId) {

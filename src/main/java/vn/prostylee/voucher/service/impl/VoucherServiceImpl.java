@@ -35,11 +35,7 @@ public class VoucherServiceImpl implements VoucherService {
         Specification<Voucher> searchable = buildSearchable((VoucherFilter) filter);
         Pageable pageable = baseFilterSpecs.page(filter);
         Page<Voucher> page = voucherRepository.findAllActive(searchable, pageable);
-        return page.map(entity -> {
-            VoucherResponse response = BeanUtil.copyProperties(entity, VoucherResponse.class);
-            response.setDeliveryTime("Nhận hàng vào 29-12 đến 31-12"); // TODO Remove
-            return response;
-        });
+        return page.map(entity -> BeanUtil.copyProperties(entity, VoucherResponse.class));
     }
 
     private Specification<Voucher> buildSearchable(VoucherFilter filter) {

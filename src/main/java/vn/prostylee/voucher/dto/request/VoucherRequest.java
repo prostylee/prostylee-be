@@ -16,6 +16,9 @@ import java.util.List;
 @Data
 public class VoucherRequest {
 
+    @NotNull
+    private Long storeId;
+
     @NotBlank
     private String name;
 

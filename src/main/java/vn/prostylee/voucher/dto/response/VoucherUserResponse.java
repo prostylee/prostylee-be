@@ -1,18 +1,15 @@
 package vn.prostylee.voucher.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import vn.prostylee.core.entity.AuditEntity;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class VoucherResponse extends AuditEntity {
+public class VoucherUserResponse {
 
     private Long id;
-
-    private Long storeId;
 
     private String name;
 
@@ -20,8 +17,7 @@ public class VoucherResponse extends AuditEntity {
 
     private String code;
 
-    private Boolean active;
-
+    @Schema(description = "type=1: Discount by fixed amount, type=2: Discount by percent.")
     private Integer type;
 
     private Double discountAmount;
@@ -74,5 +70,7 @@ public class VoucherResponse extends AuditEntity {
 
     private Boolean cndApplyMultipleCoupons;
 
-    private Date deletedAt;
+    private StoreResponseLite storeOwner;
+
+    private Long savedUserVoucherId;
 }
