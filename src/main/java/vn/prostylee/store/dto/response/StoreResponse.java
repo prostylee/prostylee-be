@@ -45,4 +45,6 @@ public class StoreResponse implements Serializable {
 
     private List<StoreBannerResponse> storeBannerResponses;
 
+    private Boolean followStatusOfUserLogin;
+
 }

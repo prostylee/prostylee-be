@@ -24,7 +24,6 @@ public class ProductRequest {
     @NotNull
     private Long categoryId;
 
-    @NotNull
     private Long storeId;
 
     @NotBlank

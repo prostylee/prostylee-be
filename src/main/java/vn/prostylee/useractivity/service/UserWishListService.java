@@ -12,4 +12,6 @@ public interface UserWishListService {
     boolean removeFromWishList(Long id);
 
     Page<UserWishListResponse> findAll(UserWishListFilter filter);
+
+    UserWishListResponse loadStatusFollows(Long productId);
 }
