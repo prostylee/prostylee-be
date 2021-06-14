@@ -52,4 +52,6 @@ public class ProductResponse implements Serializable {
     private List<ProductAttributeOptionResponse> productAttributeOptionResponse;
 
     private List<ProductPriceResponse> productPriceResponseList;
+
+    private Boolean saveStatusOfUserLogin;
 }

@@ -17,6 +17,7 @@ import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserWishListFilter;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.UserWishListRequest;
 import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.entity.UserWishList;
@@ -77,6 +78,15 @@ public class UserWishListServiceImpl implements UserWishListService {
                 .stream().map(response -> convertToResponse(response))
                 .collect(Collectors.toList());
         return new PageImpl<>(responses,pageable,responses.size());
+    }
+
+    @Override
+    public UserWishListResponse loadStatusFollows(Long productId) {
+        UserWishList userWishList = repository.findByProductIdAndCreatedBy(productId, authenticatedProvider.getUserIdValue());
+        if(userWishList != null && userWishList.getDeletedAt() == null){
+            return BeanUtil.copyProperties(userWishList, UserWishListResponse.class);
+        }
+        return null;
     }
 
     private Specification<UserWishList> getUserWishListSpecification(UserWishListFilter filter) {
