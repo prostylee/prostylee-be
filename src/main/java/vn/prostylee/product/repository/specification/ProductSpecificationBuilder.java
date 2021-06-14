@@ -1,4 +1,4 @@
-package vn.prostylee.product.specification;
+package vn.prostylee.product.repository.specification;
 
 import com.google.common.base.CaseFormat;
 import lombok.RequiredArgsConstructor;

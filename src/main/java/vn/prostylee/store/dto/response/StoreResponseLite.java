@@ -11,4 +11,5 @@ public class StoreResponseLite implements Serializable {
 
     private String name;
 
+    private String logoUrl;
 }
