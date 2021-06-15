@@ -9,7 +9,6 @@ import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.converter.ProductConverter;
 import vn.prostylee.product.dto.filter.PurchasedProductFilter;
 import vn.prostylee.product.dto.response.ProductResponse;
-import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.ProductOrderService;
 

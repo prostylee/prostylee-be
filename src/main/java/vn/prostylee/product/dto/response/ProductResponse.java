@@ -41,7 +41,7 @@ public class ProductResponse implements Serializable {
 
     private Boolean isAdvertising;
 
-    private Boolean LikeStatusOfUserLogin;
+    private Boolean likeStatusOfUserLogin;
 
     private ProductStatisticResponse productStatisticResponse;
 

@@ -1,10 +1,10 @@
 package vn.prostylee.voucher.dto.filter;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
