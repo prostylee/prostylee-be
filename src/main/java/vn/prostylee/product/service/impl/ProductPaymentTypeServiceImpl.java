@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductPaymentType;
-import vn.prostylee.product.repository.ProductPaymentTypeRepository;
 import vn.prostylee.product.service.ProductPaymentTypeService;
 
 import java.util.List;
