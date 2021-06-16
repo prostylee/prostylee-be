@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder
@@ -32,8 +33,6 @@ public class OrderDetailRequest {
 
     private String productImage;
 
-    private String productColor;
-
-    private String productSize;
+    private List<Long> productAttrIds;
 
 }

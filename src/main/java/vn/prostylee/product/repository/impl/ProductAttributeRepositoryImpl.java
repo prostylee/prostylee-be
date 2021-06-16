@@ -1,5 +1,6 @@
 package vn.prostylee.product.repository.impl;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,10 @@ import vn.prostylee.product.repository.ProductAttributeRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -68,6 +72,16 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
         return queryResult.getResultList(buildQueryParamPriceId(priceId)).getContent();
     }
 
+    @Override
+    public List<ProductAttribute> findByIdIn(List<Long> ids) {
+        StringBuilder stringBuilder = new StringBuilder()
+                .append(" SELECT pa ")
+                .append(" FROM ProductAttribute pa ")
+                .append(" WHERE pa.id in (:priceId) ");
+        HibernateQueryResult<ProductAttribute> queryResult = new HibernateQueryResult<>(this.getEntityManager(),ProductAttribute.class,stringBuilder);
+        return queryResult.getResultList(buildQueryParamProductIds(ids)).getContent();
+    }
+
     private Map<String, Object> buildQueryParams(Map<String, List<String>> attributes) {
         Map<String, Object> params = new HashMap<>();
         for (Map.Entry attribute : attributes.entrySet()) {
@@ -100,6 +114,15 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
 
         if (priceId != null) {
             params.put("priceId", priceId);
+        }
+        return params;
+    }
+
+    private Map<String, Object> buildQueryParamProductIds(List<Long> productIds) {
+        Map<String, Object> params = new HashMap<>();
+
+        if (CollectionUtils.isNotEmpty(productIds)) {
+            params.put("productId", productIds);
         }
         return params;
     }

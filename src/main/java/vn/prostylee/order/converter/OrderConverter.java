@@ -10,6 +10,7 @@ import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.order.constants.OrderStatus;
+import vn.prostylee.order.dto.request.OrderDetailAttributeRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
 import vn.prostylee.order.dto.response.OrderDiscountResponse;
@@ -17,10 +18,13 @@ import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
+import vn.prostylee.order.service.OrderDetailAttributeService;
 import vn.prostylee.payment.entity.PaymentType;
 import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.service.ProductAttributeService;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
@@ -45,6 +49,8 @@ public class OrderConverter {
     private final ProductService productService;
     private final StoreService storeService;
     private final BranchService branchService;
+    private final ProductAttributeService productAttributeService;
+    private final OrderDetailAttributeService orderDetailAttributeService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -88,6 +94,19 @@ public class OrderConverter {
                     Optional.ofNullable(detailRq.getBranchId())
                             .ifPresent(detail::setBranchId);
 
+                    if (CollectionUtils.isNotEmpty(detailRq.getProductAttrIds())) {
+                        List<ProductAttribute> productAttrs =
+                                productAttributeService.getProductAttributeByIds(
+                                        detailRq.getProductAttrIds());
+                        productAttrs.forEach(prodAttr ->
+                                orderDetailAttributeService.save(
+                                    OrderDetailAttributeRequest
+                                            .builder()
+                                            .attrKey(prodAttr.getAttribute().getKey())
+                                            .attrValue(prodAttr.getAttrValue())
+                                            .build()
+                        ));
+                    }
                     return detail;
                 })
                 .collect(Collectors.toSet());

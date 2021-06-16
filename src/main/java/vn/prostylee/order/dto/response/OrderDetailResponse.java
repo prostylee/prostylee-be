@@ -6,6 +6,7 @@ import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class OrderDetailResponse implements Serializable {
@@ -29,5 +30,7 @@ public class OrderDetailResponse implements Serializable {
     private String productSize;
 
     private ProductResponseLite productData;
+
+    private List<OrderDetailAttributeResponse> attributes;
 
 }
