@@ -3,6 +3,7 @@ package vn.prostylee.product.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -18,7 +19,10 @@ import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
 import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
+import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
+import vn.prostylee.useractivity.service.UserWishListService;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -28,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ProductConverter {
 
     private final LocationService locationService;
@@ -43,6 +46,35 @@ public class ProductConverter {
     private final ProductPriceService productPriceService;
     private final CategoryService categoryService;
     private final BrandService brandService;
+    private final UserWishListService userWishListService;
+
+    public ProductConverter(@Lazy UserWishListService userWishListService,
+                            LocationService locationService,
+                            FileUploadService fileUploadService,
+                            UserService userService,
+                            ProductStoreService productStoreService,
+                            ProductStatisticService productStatisticService,
+                            ProductImageService productImageService,
+                            UserLikeService userLikeService,
+                            ProductAttributeService productAttributeService,
+                            AttributeService attributeService,
+                            ProductPriceService productPriceService,
+                            CategoryService categoryService,
+                            BrandService brandService){
+        this.locationService = locationService;
+        this.fileUploadService = fileUploadService;
+        this.userService = userService;
+        this.productStoreService = productStoreService;
+        this.productStatisticService = productStatisticService;
+        this.productImageService = productImageService;
+        this.userLikeService = userLikeService;
+        this.productAttributeService = productAttributeService;
+        this.attributeService =attributeService;
+        this.productPriceService = productPriceService;
+        this.categoryService = categoryService;
+        this.brandService = brandService;
+        this.userWishListService = userWishListService;
+    }
 
     public ProductResponse toResponse(Product product) {
         ProductResponse productResponse = BeanUtil.copyProperties(product, ProductResponse.class);
@@ -56,6 +88,7 @@ public class ProductConverter {
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
         productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
         productResponse.setBrandResponse(buildBrand(product.getBrandId()));
+        productResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(product.getId()));
         return productResponse;
     }
 
@@ -118,6 +151,14 @@ public class ProductConverter {
                 .build();
         List<Long> result = userLikeService.loadStatusLikes(request);
         if (result.stream().count() > 0){
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean getSaveStatusOfUserLogin(Long productId){
+        UserWishListResponse result = userWishListService.loadStatusFollows(productId);
+        if (result != null){
             return true;
         }
         return false;

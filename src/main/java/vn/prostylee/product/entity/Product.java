@@ -37,7 +37,7 @@ public class Product extends AuditEntity {
 	private Brand brand;
 
 	@Column(name = "brand_id", insertable = false, updatable = false)
-	private Long brandId;
+	private Long brandId; // TODO ask @Dat to remove
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
@@ -46,7 +46,7 @@ public class Product extends AuditEntity {
 	private Category category;
 
 	@Column(name = "category_id", insertable = false, updatable = false)
-	private Long categoryId;
+	private Long categoryId; // TODO ask @Dat to remove
 
 	@Column(name = "name", length = 512)
 	private String name;

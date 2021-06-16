@@ -123,8 +123,10 @@ public class ProductServiceImpl implements ProductService {
 
     private Product saveProduct(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
-        Long locationId = saveLocation(productRequest.getLocationRequest());
-        productEntity.setLocationId(locationId);
+        if(productRequest.getStoreId() != null) {
+            Long locationId = saveLocation(productRequest.getLocationRequest());
+            productEntity.setLocationId(locationId);
+        }
         productEntity.setStatus(ProductStatus.PUBLISHED.getStatus());
         productEntity.setPublishedDate(new Date());
         productEntity.setBrand(new Brand(productRequest.getBrandId()));

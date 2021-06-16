@@ -6,8 +6,8 @@ import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.voucher.entity.Voucher;
 
 /**
- * Repository for domain model class ShippingAddress.
- * @see ShippingProvider ;
+ * Repository for domain model class Voucher.
+ * @see Voucher ;
  * @author prostylee
  */
 @Repository

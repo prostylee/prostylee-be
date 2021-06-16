@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductShippingProvider;
-import vn.prostylee.product.repository.ProductShippingProviderRepository;
 import vn.prostylee.product.service.ProductShippingProviderService;
 
 import java.util.List;

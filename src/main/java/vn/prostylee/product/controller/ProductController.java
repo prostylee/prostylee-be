@@ -15,12 +15,15 @@ import vn.prostylee.product.dto.filter.*;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
+import vn.prostylee.product.dto.response.ProductTabsServiceResponse;
 import vn.prostylee.product.service.ProductCollectionService;
 import vn.prostylee.product.service.ProductForStoryService;
 import vn.prostylee.product.service.ProductOrderService;
 import vn.prostylee.product.service.ProductService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiVersion.API_V1 + "/products")
@@ -90,5 +93,29 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     @GetMapping("/{userId}/purchased")
     public Page<ProductResponse> getPurchasedProductsByMe(@PathVariable(value = "userId") Long userId, @Valid PurchasedProductFilter purchasedProductFilter) {
         return productOrderService.getPurchasedProductsByUserId(userId, purchasedProductFilter);
+    }
+
+    @GetMapping("/allTabs")
+    public List<ProductTabsServiceResponse> getListAllService(){
+        List<ProductTabsServiceResponse> productTabsServiceResponses = new ArrayList<>();
+        ProductTabsServiceResponse tabAll = ProductTabsServiceResponse.builder()
+                .tabName("Tất cả")
+                .apiUrl(ApiVersion.API_V1 + "/products")
+                .apiMethod("Get").build();
+        productTabsServiceResponses.add(tabAll);
+
+        ProductTabsServiceResponse tabBestSeller = ProductTabsServiceResponse.builder()
+                .tabName("Best-seller")
+                .apiUrl(ApiVersion.API_V1 + "/products/best-seller")
+                .apiMethod("Get").build();
+        productTabsServiceResponses.add(tabBestSeller);
+
+        ProductTabsServiceResponse tabSuggestions = ProductTabsServiceResponse.builder()
+                .tabName("Đề xuất")
+                .apiUrl(ApiVersion.API_V1 + "/products/suggestions")
+                .apiMethod("Get").build();
+        productTabsServiceResponses.add(tabSuggestions);
+
+        return productTabsServiceResponses;
     }
 }

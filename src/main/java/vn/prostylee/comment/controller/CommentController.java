@@ -14,7 +14,7 @@ import vn.prostylee.core.controller.CrudController;
 @RequestMapping(value = ApiVersion.API_V1 + "/comments")
 public class CommentController extends CrudController<CommentRequest, CommentResponse, Long, CommentFilter> {
 
-    private CommentService service;
+    private final CommentService service;
 
     @Autowired
     public CommentController(CommentService service) {

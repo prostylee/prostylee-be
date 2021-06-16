@@ -18,6 +18,9 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.StoreBannerService;
+import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
+import vn.prostylee.useractivity.service.UserFollowerService;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,18 +34,22 @@ public class StoreConverter {
     private final FileUploadService fileUploadService;
     private final LocationService locationService;
     private final StoreBannerService storeBannerService;
+    private final UserFollowerService userFollowerService;
 
-    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService) {
+    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService,
+                          UserFollowerService userFollowerService) {
         this.productService = productService;
         this.fileUploadService = fileUploadService;
         this.locationService = locationService;
         this.storeBannerService = storeBannerService;
+        this.userFollowerService = userFollowerService;
     }
 
     public StoreResponse convertToResponse(Store store) {
         StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
         setStoreLogo(storeResponse, store.getLogo());
         setStoreLocation(storeResponse, store.getLocationId());
+        storeResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(store.getId()));
         Optional.ofNullable(store.getCompany()).ifPresent(company -> storeResponse.setCompanyId(company.getId()));
         return storeResponse;
     }
@@ -60,6 +67,7 @@ public class StoreConverter {
         setStoreProducts(storeResponse, numberOfProducts);
         setStoreCompany(storeResponse, store.getCompany());
         setStoreBanner(storeResponse,store.getId());
+        storeResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(store.getId()));
         return storeResponse;
     }
 
@@ -74,13 +82,18 @@ public class StoreConverter {
     }
 
     private void setStoreLogo(StoreResponse storeResponse, Long logo) {
+        storeResponse.setLogoUrl(getLogoUrl(logo));
+    }
+
+    private String getLogoUrl(Long logo) {
         if (logo == null) {
-            return;
+            return null;
         }
         List<String> imageUrls = fileUploadService.getImageUrls(Collections.singletonList(logo), ImageSize.EXTRA_SMALL.getWidth(), ImageSize.EXTRA_SMALL.getHeight());
         if (CollectionUtils.isNotEmpty(imageUrls)) {
-            storeResponse.setLogoUrl(imageUrls.get(0));
+            return imageUrls.get(0);
         }
+        return null;
     }
 
     private void setStoreLocation(StoreResponse storeResponse, Long locationId) {
@@ -116,5 +129,16 @@ public class StoreConverter {
         }
         storeMiniResponse.setLocationLite(locationService.getLocationResponseLite(storeResponse.getLocationId()));
         return storeMiniResponse;
+    }
+
+    private Boolean getFollowStatusOfUserLogin(Long storeId) {
+        StatusFollowRequest request = StatusFollowRequest.builder()
+                .targetIds(Collections.singletonList(storeId))
+                .targetType(TargetType.STORE.name()).build();
+        List<Long> result = userFollowerService.loadStatusFollows(request);
+        if (result.stream().count() > 0) {
+            return true;
+        }
+        return false;
     }
 }

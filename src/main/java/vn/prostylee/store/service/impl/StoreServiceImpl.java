@@ -24,6 +24,7 @@ import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.filter.NearestLocationFilter;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
+import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.store.constants.StoreStatus;
 import vn.prostylee.store.converter.StoreConverter;
@@ -68,7 +69,6 @@ public class StoreServiceImpl implements StoreService {
 
     private final AttachmentService attachmentService;
 
-    @Cacheable(value = CachingKey.STORES, key = "#baseFilter")
     @Override
     public Page<StoreResponse> findAll(BaseFilter baseFilter) {
         StoreFilter storeFilter = (StoreFilter) baseFilter;
@@ -143,9 +143,7 @@ public class StoreServiceImpl implements StoreService {
         store.setOwnerId(authenticatedProvider.getUserIdValue());
         store.setCompany(company);
         store.setLogo(Optional.ofNullable(attachmentService.save(storeRequest.getLogoImage()))
-                .map(e -> {
-                    return e.getId();
-                }).orElse(0L));
+                .map(Attachment::getId).orElse(0L));
 
         if (storeRequest.getStatus() == null) {
             store.setStatus(StoreStatus.IN_PROGRESS.getValue());
@@ -191,7 +189,6 @@ public class StoreServiceImpl implements StoreService {
         }
     }
 
-    @Cacheable(value = CachingKey.STORES, key = "#storeFilter")
     @Override
     public Page<StoreResponse> getTopProductsOfStores(MostActiveStoreFilter storeFilter) {
         MostActiveRequest request = MostActiveRequest.builder()

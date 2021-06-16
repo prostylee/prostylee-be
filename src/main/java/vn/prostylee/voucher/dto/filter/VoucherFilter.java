@@ -1,27 +1,36 @@
 package vn.prostylee.voucher.dto.filter;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import vn.prostylee.core.dto.filter.BaseFilter;
-import vn.prostylee.product.entity.Attribute;
 
-import java.util.List;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class VoucherFilter extends BaseFilter {
 
+    private Long storeId;
+    private Boolean active;
+    private Integer type;
+
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "name"
+                "name",
+                "code",
         };
     }
 
     @Override
     public String[] getSortableFields() {
         return new String[] {
-                "name"
+                "name",
+                "description",
+                "code",
+                "type",
+                "active",
+                "createdAt",
         };
     }
 }

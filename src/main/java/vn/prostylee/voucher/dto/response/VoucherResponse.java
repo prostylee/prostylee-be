@@ -1,21 +1,78 @@
 package vn.prostylee.voucher.dto.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import vn.prostylee.core.entity.AuditEntity;
 
-import java.io.Serializable;
+import java.util.Date;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class VoucherResponse implements Serializable {
+public class VoucherResponse extends AuditEntity {
 
     private Long id;
 
+    private Long storeId;
+
     private String name;
 
-    private String key;
+    private String description;
 
-    private String logo;
+    private String code;
 
-    private String voucherOwner;
+    private Boolean active;
 
-    private String expiryDate;
+    private Integer type;
+
+    private Double discountAmount;
+
+    private Double discountMaxAmount;
+
+    private Integer discountPercent;
+
+    private Integer cndProductType;
+
+    private String cndProductProdIds;
+
+    private String cndProductCatIds;
+
+    private Integer cndOrderAmountType;
+
+    private Double cndOrderAmountMinValue;
+
+    private Integer cndQuantityType;
+
+    private Integer cndQuantityMaxValue;
+
+    private Integer cndCustomerType;
+
+    private String cndCustomerUserIds;
+
+    private String cndCustomerLocationIds;
+
+    private Integer cndCouponQuantityType;
+
+    private Integer cndCouponQuantityMaxValue;
+
+    private Integer cndLimitedUseType;
+
+    private Integer cndLimitedUseMaxValue;
+
+    private Date cndValidFrom;
+
+    private Date cndValidTo;
+
+    private Integer cndShippingMethodType;
+
+    private Integer cndShippingProviderType;
+
+    private String cndShippingProviderIds;
+
+    private Integer cndPaymentType;
+
+    private Integer cndBuyType;
+
+    private Boolean cndApplyMultipleCoupons;
+
+    private Date deletedAt;
 }

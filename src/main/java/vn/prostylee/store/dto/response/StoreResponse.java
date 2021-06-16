@@ -2,7 +2,6 @@ package vn.prostylee.store.dto.response;
 
 import lombok.Data;
 import vn.prostylee.location.dto.response.LocationResponse;
-import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.dto.response.ProductResponseLite;
 
 import java.io.Serializable;
@@ -44,5 +43,7 @@ public class StoreResponse implements Serializable {
     private Boolean isAdvertising;
 
     private List<StoreBannerResponse> storeBannerResponses;
+
+    private Boolean followStatusOfUserLogin;
 
 }
