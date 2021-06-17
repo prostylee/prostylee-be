@@ -90,7 +90,7 @@ public class PostControllerIT extends AuthSupporterIT {
         images.add(MediaRequest.builder().name("prostylee1.jpg").path("abc/test1/").build());
         images.add(MediaRequest.builder().name("prostylee2.jpg").path("abc/test2/").build());
 
-        final long id = 1;
+        final long id = 1L;
         PostRequest request = PostRequest.builder()
                 .description("Updated store 10")
                 .storeId(1L)
