@@ -39,8 +39,8 @@ public class PostControllerIT extends AuthSupporterIT {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
     }
 
-    @Order(1)
     @Test
+    @Order(1)
     void create_Successfully() throws Exception {
         super.setAuth();
         List<MediaRequest> images = new ArrayList<>();
@@ -63,8 +63,8 @@ public class PostControllerIT extends AuthSupporterIT {
                 .andReturn();
     }
 
-    @Order(2)
     @Test
+    @Order(2)
     void update_Successfully() throws Exception {
         final long id = 1;
         PostRequest request = PostRequest.builder()
@@ -83,8 +83,8 @@ public class PostControllerIT extends AuthSupporterIT {
                 .andReturn();
     }
 
-    @Order(3)
     @Test
+    @Order(3)
     void update_AddNewPhotos_RemoveOne_Successfully() throws Exception {
         List<MediaRequest> images = new ArrayList<>();
         images.add(MediaRequest.builder().name("prostylee1.jpg").path("abc/test1/").build());
