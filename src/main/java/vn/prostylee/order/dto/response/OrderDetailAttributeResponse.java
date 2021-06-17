@@ -7,8 +7,10 @@ import java.io.Serializable;
 @Data
 public class OrderDetailAttributeResponse implements Serializable {
 
-    private String attrKey;
+    private String key;
 
-    private String attrValue;
+    private String label;
+
+    private String value;
 
 }

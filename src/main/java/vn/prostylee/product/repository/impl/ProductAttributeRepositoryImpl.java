@@ -76,8 +76,8 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
     public List<ProductAttribute> findByIdIn(List<Long> ids) {
         StringBuilder stringBuilder = new StringBuilder()
                 .append(" SELECT pa ")
-                .append(" FROM ProductAttribute pa ")
-                .append(" WHERE pa.id in (:priceId) ");
+                .append(" FROM ProductAttribute pa INNER JOIN fetch pa.attribute attr ")
+                .append(" WHERE pa.id in (:productAttrId) ");
         HibernateQueryResult<ProductAttribute> queryResult = new HibernateQueryResult<>(this.getEntityManager(),ProductAttribute.class,stringBuilder);
         return queryResult.getResultList(buildQueryParamProductIds(ids)).getContent();
     }
@@ -108,7 +108,6 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
         }
         return params;
     }
-
     private Map<String, Object> buildQueryParamPriceId(Long priceId) {
         Map<String, Object> params = new HashMap<>();
 
@@ -118,11 +117,11 @@ public class ProductAttributeRepositoryImpl extends BaseRepositoryImpl<ProductAt
         return params;
     }
 
-    private Map<String, Object> buildQueryParamProductIds(List<Long> productIds) {
+    private Map<String, Object> buildQueryParamProductIds(List<Long> productAttrIds) {
         Map<String, Object> params = new HashMap<>();
 
-        if (CollectionUtils.isNotEmpty(productIds)) {
-            params.put("productId", productIds);
+        if (CollectionUtils.isNotEmpty(productAttrIds)) {
+            params.put("productAttrId", productAttrIds);
         }
         return params;
     }

@@ -28,11 +28,14 @@ public class OrderDetailAttribute extends AuditEntity {
 	@Column(name = "id", unique = true, nullable = false)
 	private Long id;
 
-	@Column(name = "attr_key", length = 512)
-	private String attrKey;
+	@Column(name = "key", length = 512)
+	private String key;
 
-	@Column(name = "attr_value", length = 512)
-	private String attrValue;
+	@Column(name = "label", length = 512)
+	private String label;
+
+	@Column(name = "value", length = 512)
+	private String value;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

@@ -31,6 +31,6 @@ public class OrderDetailResponse implements Serializable {
 
     private ProductResponseLite productData;
 
-    private List<OrderDetailAttributeResponse> attributes;
+    private List<OrderDetailAttributeResponse> orderDetailAttributes;
 
 }

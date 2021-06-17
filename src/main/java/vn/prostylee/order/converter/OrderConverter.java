@@ -10,15 +10,16 @@ import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.order.constants.OrderStatus;
-import vn.prostylee.order.dto.request.OrderDetailAttributeRequest;
+import vn.prostylee.order.dto.request.OrderDetailRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
+import vn.prostylee.order.dto.response.OrderDetailAttributeResponse;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
 import vn.prostylee.order.dto.response.OrderDiscountResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
+import vn.prostylee.order.entity.OrderDetailAttribute;
 import vn.prostylee.order.entity.OrderDiscount;
-import vn.prostylee.order.service.OrderDetailAttributeService;
 import vn.prostylee.payment.entity.PaymentType;
 import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
@@ -50,7 +51,6 @@ public class OrderConverter {
     private final StoreService storeService;
     private final BranchService branchService;
     private final ProductAttributeService productAttributeService;
-    private final OrderDetailAttributeService orderDetailAttributeService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -95,17 +95,8 @@ public class OrderConverter {
                             .ifPresent(detail::setBranchId);
 
                     if (CollectionUtils.isNotEmpty(detailRq.getProductAttrIds())) {
-                        List<ProductAttribute> productAttrs =
-                                productAttributeService.getProductAttributeByIds(
-                                        detailRq.getProductAttrIds());
-                        productAttrs.forEach(prodAttr ->
-                                orderDetailAttributeService.save(
-                                    OrderDetailAttributeRequest
-                                            .builder()
-                                            .attrKey(prodAttr.getAttribute().getKey())
-                                            .attrValue(prodAttr.getAttrValue())
-                                            .build()
-                        ));
+                        List<OrderDetailAttribute> orderDetailAttributes = getOrderDetailAttributes(detailRq, detail);
+                        detail.setOrderDetailAttributes(orderDetailAttributes);
                     }
                     return detail;
                 })
@@ -118,6 +109,22 @@ public class OrderConverter {
         }
         order.getOrderDetails().clear();
         order.getOrderDetails().addAll(details);
+    }
+
+    private List<OrderDetailAttribute> getOrderDetailAttributes(OrderDetailRequest detailRq, OrderDetail detail) {
+        List<ProductAttribute> productAttrs =
+                productAttributeService.getProductAttributeByIds(
+                        detailRq.getProductAttrIds());
+        List<OrderDetailAttribute> orderDetailAttributes = new ArrayList<>();
+        productAttrs.forEach(prodAttr ->
+                orderDetailAttributes.add(OrderDetailAttribute.builder()
+                            .key(prodAttr.getAttribute().getKey())
+                            .label(prodAttr.getAttribute().getLabel())
+                            .value(prodAttr.getAttrValue())
+                            .orderDetail(detail)
+                            .build())
+        );
+        return orderDetailAttributes;
     }
 
     private String handleProductData(Product product) {
@@ -205,6 +212,13 @@ public class OrderConverter {
            ProductResponseLite productData = JsonUtils.fromJson(detail.getProductData(), ProductResponseLite.class);
            detailResponse.setProductData(productData);
        }
+
+       List<OrderDetailAttributeResponse> attrs = new ArrayList<>();
+       if (CollectionUtils.isNotEmpty(detail.getOrderDetailAttributes())) {
+           detail.getOrderDetailAttributes().forEach(orderDetailAttribute ->
+                   attrs.add(BeanUtil.copyProperties(orderDetailAttribute, OrderDetailAttributeResponse.class)));
+       }
+       detailResponse.setOrderDetailAttributes(attrs);
         return detailResponse;
     }
 }
