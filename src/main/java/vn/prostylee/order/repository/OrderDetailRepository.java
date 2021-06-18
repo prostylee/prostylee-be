@@ -16,24 +16,24 @@ import java.util.List;
 @Repository
 public interface OrderDetailRepository extends BaseRepository<OrderDetail, Long> {
 
-    @Query("SELECT e.product.id " +
+    @Query("SELECT e.productId " +
             " FROM #{#entityName} e " +
-            " WHERE (:storeId IS NULL OR e.store.id = :storeId) " +
+            " WHERE (:storeId IS NULL OR e.storeId = :storeId) " +
             "   AND e.createdAt >= :fromDate AND e.createdAt <= :toDate " +
             "   AND e.order.status <> 90" + // OrderStatus.CANCELLED.getStatus() +
-            " GROUP BY e.product.id " +
-            " ORDER BY count(e.product.id) DESC ")
+            " GROUP BY e.productId " +
+            " ORDER BY count(e.productId) DESC ")
     List<Long> getBestSellerProductIds(
             @Param("storeId") Long storeId,
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             Pageable pageable);
 
-    @Query("SELECT e.product.id AS productId, count(e.product.id) AS count " +
+    @Query("SELECT e.productId AS productId, count(e.productId) AS count " +
             " FROM #{#entityName} e " +
             " WHERE e.order.status <> 90" + // OrderStatus.CANCELLED.getStatus() +
-            " GROUP BY e.product.id " +
-            " ORDER BY count(e.product.id) DESC ")
+            " GROUP BY e.productId " +
+            " ORDER BY count(e.productId) DESC ")
     Page<ProductSoldCountResponse> countProductSold(Pageable pageable);
 
     @Query(value = "SELECT DISTINCT * " +

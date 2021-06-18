@@ -62,11 +62,18 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product attribute is not found with id [" + id + "]"));
     }
 
+    @Override
     public List<ProductAttribute> getProductAttributeByProductId(Long productId) {
         return productAttributeRepository.getProductAttributeByProductId(productId);
     }
 
+    @Override
     public List<ProductAttribute> getProductAttributeByPriceId(Long priceId) {
         return productAttributeRepository.getProductAttributeByPriceId(priceId);
+    }
+
+    @Override
+    public List<ProductAttribute> getProductAttributeByIds(List<Long> ids) {
+        return productAttributeRepository.findByIdIn(ids);
     }
 }

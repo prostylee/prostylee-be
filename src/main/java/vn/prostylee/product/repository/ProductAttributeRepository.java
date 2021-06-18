@@ -22,4 +22,5 @@ public interface ProductAttributeRepository extends BaseRepository<ProductAttrib
 
     List<ProductAttribute> getProductAttributeByPriceId(Long priceId);
 
+    List<ProductAttribute> findByIdIn(List<Long> ids);
 }
