@@ -12,4 +12,6 @@ public interface ProductAttributeService extends CrudService<ProductAttributeReq
     List<ProductAttribute> getProductAttributeByProductId(Long productId);
 
     List<ProductAttribute> getProductAttributeByPriceId(Long priceId);
+
+    List<ProductAttribute> getProductAttributeByIds(List<Long> productAttrs);
 }

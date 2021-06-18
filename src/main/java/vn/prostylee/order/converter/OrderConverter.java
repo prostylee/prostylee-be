@@ -2,18 +2,31 @@ package vn.prostylee.order.converter;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.media.constant.ImageSize;
+import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.order.constants.OrderStatus;
+import vn.prostylee.order.dto.request.OrderDetailRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
+import vn.prostylee.order.dto.response.OrderDetailAttributeResponse;
 import vn.prostylee.order.dto.response.OrderDetailResponse;
 import vn.prostylee.order.dto.response.OrderDiscountResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
+import vn.prostylee.order.entity.OrderDetailAttribute;
 import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.payment.entity.PaymentType;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
+import vn.prostylee.product.entity.ProductAttribute;
+import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.product.service.ProductAttributeService;
+import vn.prostylee.product.service.ProductService;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
 import vn.prostylee.shipping.dto.response.ShippingProviderResponse;
 import vn.prostylee.shipping.entity.ShippingAddress;
@@ -22,17 +35,22 @@ import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
+import vn.prostylee.store.service.BranchService;
+import vn.prostylee.store.service.StoreService;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 @Slf4j
 public class OrderConverter {
+
+    private final FileUploadService fileUploadService;
+    private final ProductService productService;
+    private final StoreService storeService;
+    private final BranchService branchService;
+    private final ProductAttributeService productAttributeService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -66,19 +84,20 @@ public class OrderConverter {
                     OrderDetail detail = BeanUtil.copyProperties(detailRq, OrderDetail.class);
                     detail.setOrder(order);
 
-                    Product product = Product.builder().id(detailRq.getProductId()).build();
-                    detail.setProduct(product);
+                    detail.setProductId(detail.getProductId());
+                    Product product = productService.getById(detailRq.getProductId());
+                    detail.setProductData(handleProductData(product));
 
-                    Optional.ofNullable(detailRq.getStoreId()).ifPresent(storeId -> {
-                        Store store = Store.builder().id(storeId).build();
-                        detail.setStore(store);
-                    });
+                    Optional.ofNullable(detailRq.getStoreId())
+                            .ifPresent(detail::setStoreId);
 
-                    Optional.ofNullable(detailRq.getBranchId()).ifPresent(branchId -> {
-                        Branch branch = Branch.builder().id(detailRq.getBranchId()).build();
-                        detail.setBranch(branch);
-                    });
+                    Optional.ofNullable(detailRq.getBranchId())
+                            .ifPresent(detail::setBranchId);
 
+                    if (CollectionUtils.isNotEmpty(detailRq.getProductAttrIds())) {
+                        List<OrderDetailAttribute> orderDetailAttributes = getOrderDetailAttributes(detailRq, detail);
+                        detail.setOrderDetailAttributes(orderDetailAttributes);
+                    }
                     return detail;
                 })
                 .collect(Collectors.toSet());
@@ -90,6 +109,33 @@ public class OrderConverter {
         }
         order.getOrderDetails().clear();
         order.getOrderDetails().addAll(details);
+    }
+
+    private List<OrderDetailAttribute> getOrderDetailAttributes(OrderDetailRequest detailRq, OrderDetail detail) {
+        List<ProductAttribute> productAttrs =
+                productAttributeService.getProductAttributeByIds(
+                        detailRq.getProductAttrIds());
+        List<OrderDetailAttribute> orderDetailAttributes = new ArrayList<>();
+        productAttrs.forEach(prodAttr ->
+                orderDetailAttributes.add(OrderDetailAttribute.builder()
+                            .key(prodAttr.getAttribute().getKey())
+                            .label(prodAttr.getAttribute().getLabel())
+                            .value(prodAttr.getAttrValue())
+                            .orderDetail(detail)
+                            .build())
+        );
+        return orderDetailAttributes;
+    }
+
+    private String handleProductData(Product product) {
+        ProductResponseLite productResponseLite = BeanUtil.copyProperties(product, ProductResponseLite.class);
+        if (CollectionUtils.isNotEmpty(product.getProductImages())) {
+            ProductImage productImage = product.getProductImages().iterator().next();
+            List<String> productImageUrls = fileUploadService.getImageUrls(Collections.singletonList(productImage.getAttachmentId()),
+                    ImageSize.PRODUCT_SIZE.getWidth(), ImageSize.PRODUCT_SIZE.getHeight());
+            productResponseLite.setImageUrl(productImageUrls.get(0));
+        }
+        return JsonUtils.toJson(productResponseLite);
     }
 
     private void convertOrderDiscounts(OrderRequest request, Order order) {
@@ -148,18 +194,31 @@ public class OrderConverter {
     private OrderDetailResponse convertToOrderDetailResponse(OrderDetail detail) {
         OrderDetailResponse detailResponse = BeanUtil.copyProperties(detail, OrderDetailResponse.class);
 
-        Optional.ofNullable(detail.getStore())
-                .ifPresent(store -> {
+        Optional.ofNullable(detail.getStoreId())
+                .ifPresent(storeId -> {
+                    Store store = storeService.getById(storeId);
                     StoreResponseLite storeResponse = BeanUtil.copyProperties(store, StoreResponseLite.class);
                     detailResponse.setStore(storeResponse);
                 });
 
-        Optional.ofNullable(detail.getBranch())
-                .ifPresent(branch -> {
+        Optional.ofNullable(detail.getBranchId())
+                .ifPresent(branchId -> {
+                    Branch branch = branchService.getById(branchId);
                     BranchResponse branchResponse = BeanUtil.copyProperties(branch, BranchResponse.class);
                     detailResponse.setBranch(branchResponse);
                 });
 
+       if (StringUtils.isNotBlank(detail.getProductData())) {
+           ProductResponseLite productData = JsonUtils.fromJson(detail.getProductData(), ProductResponseLite.class);
+           detailResponse.setProductData(productData);
+       }
+
+       List<OrderDetailAttributeResponse> attrs = new ArrayList<>();
+       if (CollectionUtils.isNotEmpty(detail.getOrderDetailAttributes())) {
+           detail.getOrderDetailAttributes().forEach(orderDetailAttribute ->
+                   attrs.add(BeanUtil.copyProperties(orderDetailAttribute, OrderDetailAttributeResponse.class)));
+       }
+       detailResponse.setOrderDetailAttributes(attrs);
         return detailResponse;
     }
 }

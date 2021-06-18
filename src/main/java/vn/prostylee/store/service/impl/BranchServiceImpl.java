@@ -164,7 +164,8 @@ public class BranchServiceImpl implements BranchService {
         }
     }
 
-    private Branch getById(Long id) {
+    @Override
+    public Branch getById(Long id) {
         return branchRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch is not found with id [" + id + "]"));
     }

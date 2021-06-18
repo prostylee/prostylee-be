@@ -69,7 +69,6 @@ public class Product extends AuditEntity {
 	@Column(name = "price_sale", precision = 22, scale = 0)
 	private Double priceSale;
 
-
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "published_date", length = 19)
 	private Date publishedDate;

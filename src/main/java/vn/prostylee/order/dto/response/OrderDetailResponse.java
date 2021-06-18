@@ -1,10 +1,12 @@
 package vn.prostylee.order.dto.response;
 
 import lombok.Data;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class OrderDetailResponse implements Serializable {
@@ -27,6 +29,8 @@ public class OrderDetailResponse implements Serializable {
 
     private String productSize;
 
-    private String productData;
+    private ProductResponseLite productData;
+
+    private List<OrderDetailAttributeResponse> orderDetailAttributes;
 
 }

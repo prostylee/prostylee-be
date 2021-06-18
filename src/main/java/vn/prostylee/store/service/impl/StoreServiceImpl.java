@@ -253,7 +253,8 @@ public class StoreServiceImpl implements StoreService {
         return locationService.getNearestLocations(locationFilter);
     }
 
-    private Store getById(Long id) {
+    @Override
+    public Store getById(Long id) {
         return storeRepository.findOneActive(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Store is not found with id [" + id + "]"));
     }
@@ -270,4 +271,5 @@ public class StoreServiceImpl implements StoreService {
                 .map(storeResponse -> BeanUtil.copyProperties(storeResponse, StoreResponseLite.class))
                 .orElse(null);
     }
+
 }
