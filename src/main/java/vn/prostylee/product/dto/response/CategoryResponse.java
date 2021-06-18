@@ -21,4 +21,5 @@ public class CategoryResponse implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<AttributeResponse> attributes;
     private String banner;
+    private String backgroundButton;
 }

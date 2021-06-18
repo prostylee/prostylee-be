@@ -86,4 +86,7 @@ public class Category extends AuditEntity {
 	@Column(name = "banner", length = 512)
 	private String banner;
 
+	@Column(name = "background_button", length = 512)
+	private String backgroundButton;
+
 }

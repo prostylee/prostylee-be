@@ -36,4 +36,6 @@ public class CategoryRequest {
     private Set<Long> attributeIds;
 
     private String banner;
+
+    private String backgroundButton;
 }
