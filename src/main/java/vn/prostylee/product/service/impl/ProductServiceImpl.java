@@ -143,20 +143,8 @@ public class ProductServiceImpl implements ProductService {
         Set<ProductShippingProvider> productShippingProviders = productShippingProviderService
                 .buildProductShippingProviders(productRequest.getShippingProviders(), productEntity);
         productEntity.setProductShippingProviders(productShippingProviders);
-        productEntity.setStatistic(buildProductStatistic(productEntity));
 
         return productRepository.save(productEntity);
-    }
-
-    private ProductStatistic buildProductStatistic(Product product) {
-        return ProductStatistic.builder()
-                .product(product)
-                .numberOfSold(0L)
-                .numberOfLike(0L)
-                .numberOfComment(0L)
-                .resultOfRating((double)0L)
-                .numberOfReview(0L)
-                .build();
     }
 
     private void saveProductPrice(Long productId, List<ProductPriceRequest> productPrices) {

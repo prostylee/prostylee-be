@@ -97,11 +97,6 @@ public class Product extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
 	private Set<ProductShippingProvider> productShippingProviders;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product", optional = false)
-	@EqualsAndHashCode.Exclude
-	@ToString.Exclude
-	private ProductStatistic statistic;
-
 	public Product(Long productId) {
 		this.id = productId;
 	}
