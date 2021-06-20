@@ -29,4 +29,10 @@ public class UserAddressRequest {
     @NotNull
     private Boolean priority;
 
+    @NotNull
+    private String contactName;
+
+    @NotNull
+    private String contactPhone;
+
 }
