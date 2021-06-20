@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.dto.response.SimpleResponse;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.voucher.dto.filter.VoucherUserFilter;
 import vn.prostylee.voucher.dto.request.VoucherCalculationRequest;
 import vn.prostylee.voucher.dto.response.VoucherCalculationResponse;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 public class VoucherUserController {
 
     private final VoucherUserService service;
+    private final AuthenticatedProvider authenticatedProvider;
 
     @GetMapping
     public Page<VoucherUserResponse> getVouchers(@Valid VoucherUserFilter filter) {
@@ -39,12 +41,16 @@ public class VoucherUserController {
     }
 
     @PostMapping("/{voucherId}/calculate")
-    public VoucherCalculationResponse calculateDiscount(@PathVariable Long voucherId, @Valid VoucherCalculationRequest request) {
+    public VoucherCalculationResponse calculateDiscount(@PathVariable Long voucherId, @Valid @RequestBody VoucherCalculationRequest request) {
         return service.calculateDiscount(voucherId, request);
     }
 
     @PostMapping("/{voucherId}/verify")
-    public SimpleResponse verifyVoucher(@PathVariable Long voucherId, @Valid VoucherCalculationRequest request) {
+    public SimpleResponse verifyVoucher(@PathVariable Long voucherId, @Valid @RequestBody VoucherCalculationRequest request) {
+        request.setVoucherId(voucherId);
+        if (request.getOrder().getBuyerId() == null) {
+            request.getOrder().setBuyerId(authenticatedProvider.getUserIdValue());
+        }
         return SimpleResponse.builder().data(service.verifyVoucher(voucherId, request)).build();
     }
 

@@ -180,4 +180,12 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(responses, page.getPageable(), page.getTotalElements());
     }
 
+    @Override
+    public List<ProductResponseLite> findByIds(List<Long> productIds) {
+        return productRepository.findProductsByIds(productIds)
+                .stream()
+                .map(productConverter::toResponseForListStore)
+                .collect(Collectors.toList());
+    }
+
 }

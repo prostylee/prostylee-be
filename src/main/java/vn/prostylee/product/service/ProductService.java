@@ -20,4 +20,6 @@ public interface ProductService extends CrudService<ProductRequest, ProductRespo
     List<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter);
 
     Page<ProductResponseLite> getProductsForListStore(BaseFilter baseFilter);
+
+    List<ProductResponseLite> findByIds(List<Long> productIds);
 }

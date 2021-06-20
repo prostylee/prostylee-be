@@ -44,7 +44,7 @@ public class VoucherUserResponse {
 
     private String cndCustomerUserIds;
 
-    private String cndCustomerLocationIds;
+    private String cndCustomerAddressIds;
 
     private Integer cndCouponQuantityType;
 
@@ -72,5 +72,5 @@ public class VoucherUserResponse {
 
     private StoreResponseLite storeOwner;
 
-    private Long savedUserVoucherId;
+    private Long savedUserVoucherId; // TODO get in case filter is savedByMe=true
 }

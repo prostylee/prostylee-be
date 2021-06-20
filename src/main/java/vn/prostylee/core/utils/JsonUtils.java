@@ -1,5 +1,6 @@
 package vn.prostylee.core.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -12,23 +13,30 @@ public final class JsonUtils {
         super();
     }
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
     @SneakyThrows
     public static String toJson(Object obj) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
+        return OBJECT_MAPPER.writeValueAsString(obj);
     }
 
     @SneakyThrows
     public static <T> T toObject(String file, Class<T> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(getResourceAsStream(file), clazz);
+        return OBJECT_MAPPER.readValue(getResourceAsStream(file), clazz);
     }
 
     @SneakyThrows
     public static <T> T fromJson(String json, Class<T> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper.readValue(json, clazz);
+        return OBJECT_MAPPER.readValue(json, clazz);
+    }
+
+    @SneakyThrows
+    public static <T> T fromJson(String json, TypeReference<T> valueTypeRef) {
+        return OBJECT_MAPPER.readValue(json, valueTypeRef);
     }
 
     private static InputStream getResourceAsStream(String file) {

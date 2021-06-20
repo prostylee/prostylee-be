@@ -1,5 +1,6 @@
 package vn.prostylee.core.converter;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import vn.prostylee.core.utils.JsonUtils;
@@ -25,7 +26,7 @@ public class JsonStringToListLongConverter implements AttributeConverter<List<Lo
         if (StringUtils.isBlank(json)) {
             return new ArrayList<>();
         }
-        return JsonUtils.fromJson(json, ArrayList.class);
+        return JsonUtils.fromJson(json, new TypeReference<ArrayList<Long>>() {});
     }
 
 }

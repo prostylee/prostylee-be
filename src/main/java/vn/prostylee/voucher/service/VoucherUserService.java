@@ -15,4 +15,8 @@ public interface VoucherUserService extends CrudService<VoucherUserRequest, Vouc
     VoucherCalculationResponse calculateDiscount(Long voucherId, VoucherCalculationRequest request);
 
     boolean verifyVoucher(Long voucherId, VoucherCalculationRequest request);
+
+    int countVoucherByUser(Long voucherId, Long userId);
+
+    int countAllVouchers(Long voucherId);
 }

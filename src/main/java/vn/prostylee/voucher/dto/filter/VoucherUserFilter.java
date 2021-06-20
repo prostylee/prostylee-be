@@ -18,7 +18,7 @@ public class VoucherUserFilter extends BaseFilter {
     public static final List<String> EXT_SORTS = List.of(SORT_BY_BEST_DISCOUNT, SORT_BY_EXPIRED_DATE, SORT_BY_MOST_USED);
 
     @Schema(description = "Null if find all stores, 0 if find by Prostylee, greater than 0 if find by store id")
-    private Long storeId;
+    private Long storeId; // TODO all store
 
     private Integer type;
 

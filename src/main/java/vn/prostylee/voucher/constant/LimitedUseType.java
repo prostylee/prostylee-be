@@ -3,12 +3,11 @@ package vn.prostylee.voucher.constant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public enum DiscountType {
+public enum LimitedUseType {
+    NONE(0),
+    LIMIT(1);
 
-    FIXED_AMOUNT(1),
-    PERCENT(2);
-
-    @Getter
     private final int type;
 }

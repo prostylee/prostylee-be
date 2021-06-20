@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public enum DiscountType {
+@Getter
+public enum PaymentType {
+    ALL(0),
+    ONLINE(1),
+    OFFLINE(2);
 
-    FIXED_AMOUNT(1),
-    PERCENT(2);
-
-    @Getter
     private final int type;
 }

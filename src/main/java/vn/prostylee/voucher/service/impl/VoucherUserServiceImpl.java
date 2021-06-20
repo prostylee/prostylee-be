@@ -10,29 +10,22 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceInUsedException;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
-import vn.prostylee.product.dto.response.ProductResponse;
-import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.voucher.constant.DiscountType;
 import vn.prostylee.voucher.dto.filter.VoucherUserFilter;
 import vn.prostylee.voucher.dto.request.VoucherCalculationRequest;
-import vn.prostylee.voucher.dto.request.VoucherOrderDetailRequest;
-import vn.prostylee.voucher.dto.request.VoucherOrderRequest;
 import vn.prostylee.voucher.dto.request.VoucherUserRequest;
 import vn.prostylee.voucher.dto.response.VoucherCalculationResponse;
-import vn.prostylee.voucher.dto.response.VoucherOrderDetailResponse;
-import vn.prostylee.voucher.dto.response.VoucherOrderResponse;
 import vn.prostylee.voucher.dto.response.VoucherUserResponse;
 import vn.prostylee.voucher.entity.Voucher;
 import vn.prostylee.voucher.entity.VoucherUser;
 import vn.prostylee.voucher.repository.VoucherExtRepository;
 import vn.prostylee.voucher.repository.VoucherRepository;
 import vn.prostylee.voucher.repository.VoucherUserRepository;
+import vn.prostylee.voucher.service.VoucherCalculatorService;
 import vn.prostylee.voucher.service.VoucherUserService;
+import vn.prostylee.voucher.verifier.VoucherConditionVerifier;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,23 +36,22 @@ public class VoucherUserServiceImpl implements VoucherUserService {
     private final VoucherUserRepository voucherUserRepository;
     private final VoucherExtRepository voucherExtRepository;
     private final StoreService storeService;
-    private final ProductService productService;
+    private final List<VoucherConditionVerifier> voucherConditionVerifiers;
+    private final VoucherCalculatorService voucherCalculatorService;
 
     @Override
     public Page<VoucherUserResponse> findAll(BaseFilter baseFilter) {
         VoucherUserFilter filter = (VoucherUserFilter) baseFilter;
-        Page<Voucher> page = voucherExtRepository.findAll(filter);
-        return page.map(this::toResponse);
-    }
-
-    private VoucherUserResponse toResponse(Voucher voucher) {
-        VoucherUserResponse response = BeanUtil.copyProperties(voucher, VoucherUserResponse.class);
-        response.setStoreOwner(storeService.getStoreResponseLite(voucher.getId()));
-        return response;
+        Page<VoucherUserResponse> page = voucherExtRepository.findAll(filter);
+        return page.map(response -> {
+            response.setStoreOwner(storeService.getStoreResponseLite(response.getId()));
+            return response;
+        });
     }
 
     private VoucherUserResponse toResponse(Voucher voucher, Long userVoucherId) {
-        VoucherUserResponse response = toResponse(voucher);
+        VoucherUserResponse response = BeanUtil.copyProperties(voucher, VoucherUserResponse.class);
+        response.setStoreOwner(storeService.getStoreResponseLite(voucher.getId()));
         response.setSavedUserVoucherId(userVoucherId);
         return response;
     }
@@ -148,67 +140,35 @@ public class VoucherUserServiceImpl implements VoucherUserService {
     public VoucherCalculationResponse calculateDiscount(Long voucherId, VoucherCalculationRequest request) {
         if (verifyVoucher(voucherId, request)) {
             Voucher voucher = findVoucherById(voucherId);
-            // TODO calculate based on voucher conditions
-            List<VoucherOrderDetailResponse> details = calculateOrderDetails(request.getOrderDetails(), voucher);
-            VoucherOrderResponse order = calculateOrder(request.getOrder(), details);
-            return VoucherCalculationResponse.builder()
-                    .voucherId(voucherId)
-                    .code(voucher.getCode())
-                    .expiredDate(voucher.getCndValidTo())
-                    .order(order)
-                    .orderDetails(details)
-                    .build();
+            return voucherCalculatorService.calculateDiscount(voucher, request);
         }
-        return null;
-    }
 
-    private VoucherOrderResponse calculateOrder(VoucherOrderRequest order, List<VoucherOrderDetailResponse> details) {
-        Double amount = details.stream().map(VoucherOrderDetailResponse::getAmount).reduce(0.0, Double::sum);
-        Double discountAmount = details.stream().map(VoucherOrderDetailResponse::getDiscountAmount).reduce(0.0, Double::sum);
-        Double balance = amount - discountAmount;
-        return VoucherOrderResponse.builder()
-                .amount(amount)
-                .discountAmount(discountAmount)
-                .balance(balance)
-                .buyerId(order.getBuyerId())
-                .paymentTypeId(order.getPaymentTypeId())
-                .shippingMethodId(order.getShippingMethodId())
-                .shippingProviderId(order.getShippingProviderId())
+        log.info("Voucher is invalid with voucherId={}, request={}", voucherId, request);
+        return VoucherCalculationResponse.builder()
+                .voucherId(voucherId)
+                .code(null)
                 .build();
-    }
-
-    private List<VoucherOrderDetailResponse> calculateOrderDetails(List<VoucherOrderDetailRequest> orderDetails, Voucher voucher) {
-        return orderDetails.stream()
-                .map(detail -> {
-                    ProductResponse product = productService.findById(detail.getProductId());
-                    Double price = Optional.ofNullable(product.getPriceSale()).orElse(product.getPrice());
-                    // TODO calculate based on voucher conditions
-                    Double total = detail.getQuantity() * price;
-                    Double discount = voucher.getDiscountAmount();
-                    if (DiscountType.PERCENT.getType().equals(voucher.getType())) {
-                        discount = total * (discount / 100);
-                    }
-                    if (voucher.getDiscountMaxAmount() != null && discount > voucher.getDiscountMaxAmount()) {
-                        discount = voucher.getDiscountMaxAmount();
-                    }
-                    Double balance = total - discount;
-                    return VoucherOrderDetailResponse.builder()
-                            .storeId(product.getStoreId())
-                            .categoryId(product.getCategoryId())
-                            .productId(detail.getProductId())
-                            .quantity(detail.getQuantity())
-                            .amount(total)
-                            .discountAmount(discount)
-                            .balance(balance)
-                            .build();
-                })
-                .collect(Collectors.toList());
     }
 
     @Override
     public boolean verifyVoucher(Long voucherId, VoucherCalculationRequest request) {
-        // TODO check voucher conditions
-        return BooleanUtils.isTrue(findVoucherById(voucherId).getActive());
+        try {
+            Voucher voucher = findVoucherById(voucherId);
+            return voucherConditionVerifiers.stream()
+                    .allMatch(verifier -> verifier.isSatisfyCondition(voucher, request));
+        } catch (ResourceNotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public int countVoucherByUser(Long voucherId, Long userId) {
+        return voucherUserRepository.countVoucher(voucherId, userId);
+    }
+
+    @Override
+    public int countAllVouchers(Long voucherId) {
+        return voucherUserRepository.countVoucher(voucherId, null);
     }
 
     private Voucher findVoucherById(Long voucherId) {

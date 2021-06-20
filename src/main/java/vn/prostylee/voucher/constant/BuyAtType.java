@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public enum DiscountType {
+@Getter
+public enum BuyAtType {
+    ALL(0),
+    STORE(1),
+    WEBSITE(2),
+    MOBILE_APP(2);
 
-    FIXED_AMOUNT(1),
-    PERCENT(2);
-
-    @Getter
     private final int type;
 }

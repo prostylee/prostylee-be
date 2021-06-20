@@ -2,9 +2,9 @@ package vn.prostylee.voucher.repository;
 
 import org.springframework.data.domain.Page;
 import vn.prostylee.voucher.dto.filter.VoucherUserFilter;
-import vn.prostylee.voucher.entity.Voucher;
+import vn.prostylee.voucher.dto.response.VoucherUserResponse;
 
 public interface VoucherExtRepository {
 
-    Page<Voucher> findAll(VoucherUserFilter filter);
+    Page<VoucherUserResponse> findAll(VoucherUserFilter filter);
 }

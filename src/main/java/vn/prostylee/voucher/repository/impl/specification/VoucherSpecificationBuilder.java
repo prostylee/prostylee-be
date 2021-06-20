@@ -15,6 +15,7 @@ import vn.prostylee.voucher.dto.filter.VoucherUserFilter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static vn.prostylee.store.constants.StoreConstant.PROSTYLEE_STORE;
 import static vn.prostylee.voucher.dto.filter.VoucherUserFilter.*;
 
 @Slf4j
@@ -25,17 +26,25 @@ public class VoucherSpecificationBuilder {
     private final AuthenticatedProvider authenticatedProvider;
 
     public StringBuilder buildQuery(VoucherUserFilter filter) {
-        return new StringBuilder("SELECT v.*")
+        return new StringBuilder(buildSelectClause(filter))
                 .append(buildFromClause(filter))
                 .append(buildWhereClause(filter))
                 .append(buildOrderClause(filter));
+    }
+
+    private StringBuilder buildSelectClause(VoucherUserFilter filter) {
+        final StringBuilder sbSelect = new StringBuilder("SELECT v.*");
+        if (BooleanUtils.isTrue(filter.getSavedByMe())) {
+            sbSelect.append(" , vc.id");
+        }
+        return sbSelect;
     }
 
     private StringBuilder buildFromClause(VoucherUserFilter filter) {
         final StringBuilder sbFrom = new StringBuilder(" FROM voucher v");
 
         if (BooleanUtils.isTrue(filter.getSavedByMe())) {
-            sbFrom.append(" INNER JOIN voucher_user vc ON vc.voucher_id = v.id");
+            sbFrom.append(" LEFT JOIN voucher_user vc ON vc.voucher_id = v.id");
         }
 
         return sbFrom;
@@ -49,7 +58,11 @@ public class VoucherSpecificationBuilder {
         }
 
         if (filter.getStoreId() != null) {
-            sbWhere.append(" AND v.store_id = :storeId");
+            if (filter.getStoreId() == PROSTYLEE_STORE.getStoreId()) {
+                sbWhere.append(" AND v.store_id = ").append(PROSTYLEE_STORE.getStoreId());
+            } else {
+                sbWhere.append(" AND v.store_id != ").append(PROSTYLEE_STORE.getStoreId());
+            }
         }
 
         if (filter.getType() != null) {
@@ -67,7 +80,6 @@ public class VoucherSpecificationBuilder {
         final StringBuilder sbOrder = new StringBuilder();
 
         final List<String> supportedSortFields = Arrays.asList(filter.getSortableFields());
-        log.debug(">>> supportedSortFields" + supportedSortFields);
         List<String> orderByColumns = Optional.ofNullable(filter.getSorts())
                 .map(Arrays::asList)
                 .filter(CollectionUtils::isNotEmpty)
@@ -92,7 +104,6 @@ public class VoucherSpecificationBuilder {
                 }).collect(Collectors.toList());
         String orderBySQL = String.join(", ", orderByColumns);
 
-        log.debug(">>> orderBySQL" + orderBySQL);
         if (orderBySQL.trim().length() > 0) {
             sbOrder.append(" ORDER BY").append(orderBySQL);
         } else {
@@ -128,10 +139,6 @@ public class VoucherSpecificationBuilder {
 
         if (BooleanUtils.isTrue(filter.getSavedByMe())) {
             params.put("createdBy", authenticatedProvider.getUserIdValue());
-        }
-
-        if (filter.getStoreId() != null) {
-            params.put("storeId", filter.getStoreId());
         }
 
         if (filter.getType() != null) {

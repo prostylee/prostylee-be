@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public enum DiscountType {
+@Getter
+public enum ShippingMethodType {
+    NONE(0),
+    ALL(1),
+    SPECIFIC(2);
 
-    FIXED_AMOUNT(1),
-    PERCENT(2);
-
-    @Getter
     private final int type;
 }

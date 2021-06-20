@@ -5,6 +5,8 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.location.dto.AddressDto;
 import vn.prostylee.location.dto.response.AddressResponse;
 
+import java.util.List;
+
 public interface AddressService {
 
     Page<AddressResponse> findAll(BaseFilter baseFilter);
@@ -14,4 +16,8 @@ public interface AddressService {
     AddressResponse findByCode(String code);
 
     AddressResponse findByCodeAndParentCode(String code, String parentCode);
+
+    boolean isBelongToCodes(String code, List<String> belongToCodes);
+
+    boolean isBelongToIds(String code, List<Long> belongToIds);
 }

@@ -13,6 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ProductResponseLite implements Serializable {
     private Long id;
+    private Long categoryId;
     private String imageUrl;
     private String name;
     private Double price;
