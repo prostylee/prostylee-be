@@ -42,9 +42,4 @@ public class ProductStatistic extends AuditEntity {
     @Column(name = "number_of_review")
     private Long numberOfReview;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id")
-    private Product product;
-
 }

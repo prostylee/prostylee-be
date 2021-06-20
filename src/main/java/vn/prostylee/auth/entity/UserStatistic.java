@@ -48,9 +48,4 @@ public class UserStatistic extends AuditEntity {
     @Column(name = "number_of_following")
     private Long numberOfFollowing;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id")
-    private User user;
-
 }

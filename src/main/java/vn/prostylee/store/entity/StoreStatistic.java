@@ -2,8 +2,6 @@ package vn.prostylee.store.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
 import lombok.*;
-import org.hibernate.annotations.LazyToOne;
-import org.hibernate.annotations.LazyToOneOption;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -43,10 +41,5 @@ public class StoreStatistic extends AuditEntity {
 
     @Column(name = "number_of_following")
     private Long numberOfFollowing;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id")
-    private Store store;
 
 }

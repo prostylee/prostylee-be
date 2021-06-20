@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.service.OrderService;
-import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
@@ -99,16 +98,15 @@ public class ProductStatisticJob extends QuartzJobBean {
         List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
 
         statistics.forEach(productStatistic -> {
-            productStatistic.setNumberOfSold(mapProductCount.getOrDefault(productStatistic.getProduct().getId(), 0L));
-            mapProductCount.remove(productStatistic.getProduct().getId());
+            productStatistic.setNumberOfSold(mapProductCount.getOrDefault(productStatistic.getId(), 0L));
+            mapProductCount.remove(productStatistic.getId());
         });
 
         List<ProductStatistic> adds = mapProductCount.keySet()
                 .stream()
                 .map(productId -> {
-                    Product product = new Product(productId);
                     return ProductStatistic.builder()
-                            .product(product)
+                            .id(productId)
                             .numberOfSold(mapProductCount.getOrDefault(productId, 0L))
                             .build();
                 })
@@ -126,16 +124,15 @@ public class ProductStatisticJob extends QuartzJobBean {
         List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
 
         statistics.forEach(productStatistic -> {
-            productStatistic.setResultOfRating(mapProductCount.getOrDefault(productStatistic.getProduct().getId(), (double) 0L));
-            mapProductCount.remove(productStatistic.getProduct().getId());
+            productStatistic.setResultOfRating(mapProductCount.getOrDefault(productStatistic.getId(), (double) 0L));
+            mapProductCount.remove(productStatistic.getId());
         });
 
         List<ProductStatistic> adds = mapProductCount.keySet()
                 .stream()
                 .map(productId -> {
-                    Product product = new Product(productId);
                     return ProductStatistic.builder()
-                            .product(product)
+                            .id(productId)
                             .resultOfRating(mapProductCount.getOrDefault(productId, (double) 0L))
                             .build();
                 })
@@ -153,16 +150,15 @@ public class ProductStatisticJob extends QuartzJobBean {
         List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
 
         statistics.forEach(productStatistic -> {
-            productStatistic.setNumberOfReview(mapProductCount.getOrDefault(productStatistic.getProduct().getId(), 0L));
-            mapProductCount.remove(productStatistic.getProduct().getId());
+            productStatistic.setNumberOfReview(mapProductCount.getOrDefault(productStatistic.getId(), 0L));
+            mapProductCount.remove(productStatistic.getId());
         });
 
         List<ProductStatistic> adds = mapProductCount.keySet()
                 .stream()
                 .map(productId -> {
-                    Product product = new Product(productId);
                     return ProductStatistic.builder()
-                            .product(product)
+                            .id(productId)
                             .numberOfReview(mapProductCount.getOrDefault(productId, 0L))
                             .build();
                 })

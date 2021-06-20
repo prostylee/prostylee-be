@@ -66,11 +66,6 @@ public class Store extends AuditEntity {
 	@Column(name = "logo")
 	private Long logo;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store", optional = false)
-	@EqualsAndHashCode.Exclude
-	@ToString.Exclude
-	private StoreStatistic statistic;
-
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store")

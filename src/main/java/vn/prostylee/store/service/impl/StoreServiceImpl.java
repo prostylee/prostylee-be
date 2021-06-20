@@ -38,7 +38,6 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
-import vn.prostylee.store.entity.StoreStatistic;
 import vn.prostylee.store.repository.StoreRepository;
 import vn.prostylee.store.service.StoreService;
 import vn.prostylee.useractivity.constant.TargetType;
@@ -148,15 +147,6 @@ public class StoreServiceImpl implements StoreService {
         if (storeRequest.getStatus() == null) {
             store.setStatus(StoreStatus.IN_PROGRESS.getValue());
         }
-
-        store.setStatistic(StoreStatistic.builder()
-                .numberOfComment(0L)
-                .numberOfFollower(0L)
-                .numberOfFollowing(0L)
-                .numberOfLike(0L)
-                .numberOfProduct(0L)
-                .store(store)
-                .build());
 
         Store savedStore = storeRepository.save(store);
 
