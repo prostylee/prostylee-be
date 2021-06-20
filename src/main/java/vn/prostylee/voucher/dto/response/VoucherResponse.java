@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import vn.prostylee.core.entity.AuditEntity;
 
 import java.util.Date;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -32,9 +33,9 @@ public class VoucherResponse extends AuditEntity {
 
     private Integer cndProductType;
 
-    private String cndProductProdIds;
+    private List<Long> cndProductProdIds;
 
-    private String cndProductCatIds;
+    private List<Long> cndProductCatIds;
 
     private Integer cndOrderAmountType;
 
@@ -46,9 +47,9 @@ public class VoucherResponse extends AuditEntity {
 
     private Integer cndCustomerType;
 
-    private String cndCustomerUserIds;
+    private List<Long> cndCustomerUserIds;
 
-    private String cndCustomerLocationIds;
+    private List<Long> cndCustomerAddressIds;
 
     private Integer cndCouponQuantityType;
 
@@ -64,9 +65,11 @@ public class VoucherResponse extends AuditEntity {
 
     private Integer cndShippingMethodType;
 
+    private List<Long> cndShippingMethodIds;
+
     private Integer cndShippingProviderType;
 
-    private String cndShippingProviderIds;
+    private List<Long> cndShippingProviderIds;
 
     private Integer cndPaymentType;
 

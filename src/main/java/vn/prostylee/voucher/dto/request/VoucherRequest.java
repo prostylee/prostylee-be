@@ -57,7 +57,7 @@ public class VoucherRequest {
 
     private List<Long> cndCustomerUserIds;
 
-    private List<Long> cndCustomerLocationIds;
+    private List<Long> cndCustomerAddressIds;
 
     private Integer cndCouponQuantityType;
 
@@ -72,6 +72,8 @@ public class VoucherRequest {
     private Date cndValidTo;
 
     private Integer cndShippingMethodType;
+
+    private List<Long> cndShippingMethodIds;
 
     private Integer cndShippingProviderType;
 

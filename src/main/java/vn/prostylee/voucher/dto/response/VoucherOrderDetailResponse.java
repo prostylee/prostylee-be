@@ -19,6 +19,8 @@ public class VoucherOrderDetailResponse {
 
     private Integer quantity;
 
+    private Double price;
+
     private Double amount;
 
     private Double discountAmount;

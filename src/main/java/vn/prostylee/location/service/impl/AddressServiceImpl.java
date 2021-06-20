@@ -3,6 +3,7 @@ package vn.prostylee.location.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +24,7 @@ import vn.prostylee.location.service.AddressService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -39,8 +41,8 @@ public class AddressServiceImpl implements AddressService {
     public Page<AddressResponse> findAll(BaseFilter baseFilter) {
         AddressFilter addressFilter = (AddressFilter) baseFilter;
         addressFilter.setLimit(ApiParamConstant.UNPAGED_LIMIT_VALUE);
-        Pageable pageable = this.baseFilterSpecs.page(baseFilter);
-        Page<Address> page = this.addressRepository.findAll(buildAddressSpecification(addressFilter), pageable);
+        Pageable pageable = baseFilterSpecs.page(baseFilter);
+        Page<Address> page = addressRepository.findAll(buildAddressSpecification(addressFilter), pageable);
         return page.map(this::toResponse);
     }
 
@@ -49,7 +51,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     private Specification<Address> buildAddressSpecification(AddressFilter addressFilter) {
-        Specification<Address> spec = this.baseFilterSpecs.search(addressFilter);
+        Specification<Address> spec = baseFilterSpecs.search(addressFilter);
         if (addressFilter.getParentCode() != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get(PARENT_CODE), addressFilter.getParentCode()));
         } else {
@@ -72,22 +74,62 @@ public class AddressServiceImpl implements AddressService {
                         .build();
                 addresses.add(address);
             });
-            this.addressRepository.saveAll(addresses);
+            addressRepository.saveAll(addresses);
         }
         return addressDto;
     }
 
     @Override
     public AddressResponse findByCode(String code) {
-        Address address =  this.addressRepository.findByCode(code)
+        Address address = addressRepository.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("The address is not found with code [" + code + "]"));
-        return this.toResponse(address);
+        return toResponse(address);
     }
 
     @Override
     public AddressResponse findByCodeAndParentCode(String code, String parentCode) {
-        Address address =  this.addressRepository.findByCodeAndParentCode(code, parentCode)
+        Address address = addressRepository.findByCodeAndParentCode(code, parentCode)
                 .orElseThrow(() -> new ResourceNotFoundException("The address is not found with code [" + code + "]"));
-        return this.toResponse(address);
+        return toResponse(address);
+    }
+
+    @Override
+    public boolean isBelongToCodes(String code, List<String> belongToCodes) {
+        if (StringUtils.isBlank(code) || CollectionUtils.isNotEmpty(belongToCodes)) {
+            return false;
+        }
+
+        if (belongToCodes.contains(code)) {
+            return true;
+        }
+
+        boolean isBelongTo = false;
+        final int maxAttempt = 10;
+        int attemptTimes = 0;
+        while (attemptTimes < maxAttempt) {
+            code = getParentCode(code);
+            if (StringUtils.isBlank(code) || belongToCodes.contains(code)) {
+                isBelongTo = StringUtils.isNotBlank(code);
+                break;
+            }
+            attemptTimes++;
+        }
+
+        return isBelongTo;
+    }
+
+    @Override
+    public boolean isBelongToIds(String code, List<Long> belongToIds) {
+        List<String> belongToCodes = addressRepository.findByIds(belongToIds)
+                .stream()
+                .map(Address::getCode)
+                .collect(Collectors.toList());
+        return isBelongToCodes(code, belongToCodes);
+    }
+
+    private String getParentCode(String code) {
+        return addressRepository.findByCode(code)
+                .map(Address::getParentCode)
+                .orElse(null);
     }
 }

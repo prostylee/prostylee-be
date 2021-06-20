@@ -1,6 +1,5 @@
 package vn.prostylee.product.converter;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
@@ -13,6 +12,7 @@ import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.response.*;
+import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
@@ -23,11 +23,10 @@ import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
 import vn.prostylee.useractivity.service.UserWishListService;
 
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -96,11 +95,12 @@ public class ProductConverter {
         ProductResponseLite productResponseLite = BeanUtil.copyProperties(product, ProductResponseLite.class);
         List<String> imageUrls = buildImageUrls(product.getId());
         productResponseLite.setImageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0));
+        productResponseLite.setCategoryId(Optional.ofNullable(product.getCategory()).map(Category::getId).orElse(null));
         return productResponseLite;
     }
 
-    private List<String> buildImageUrls(long productID) {
-        List<Long> attachmentIds = Optional.ofNullable(productID)
+    private List<String> buildImageUrls(long productId) {
+        List<Long> attachmentIds = Optional.ofNullable(productId)
                 .map(productImageService::getAttachmentIdByProductID)
                 .orElse(null);
         if (CollectionUtils.isNotEmpty(attachmentIds)) {

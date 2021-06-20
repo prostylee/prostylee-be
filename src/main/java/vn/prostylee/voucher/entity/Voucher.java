@@ -89,9 +89,9 @@ public class Voucher extends AuditEntity {
     @Convert(converter = JsonStringToListLongConverter.class)
     private List<Long> cndCustomerUserIds;
 
-    @Column(name = "cnd_customer_location_ids", length = 2048)
+    @Column(name = "cnd_customer_address_ids", length = 2048)
     @Convert(converter = JsonStringToListLongConverter.class)
-    private List<Long> cndCustomerLocationIds;
+    private List<Long> cndCustomerAddressIds;
 
     @Column(name = "cnd_coupon_quantity_type")
     private Integer cndCouponQuantityType;
@@ -113,6 +113,10 @@ public class Voucher extends AuditEntity {
 
     @Column(name = "cnd_shipping_method_type")
     private Integer cndShippingMethodType;
+
+    @Column(name = "cnd_shipping_method_ids", length = 2048)
+    @Convert(converter = JsonStringToListLongConverter.class)
+    private List<Long> cndShippingMethodIds;
 
     @Column(name = "cnd_shipping_provider_type")
     private Integer cndShippingProviderType;
