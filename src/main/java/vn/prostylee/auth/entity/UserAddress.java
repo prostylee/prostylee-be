@@ -45,4 +45,10 @@ public class UserAddress extends AuditEntity {
     @Column(name = "priority")
     private Boolean priority;
 
+    @Column(name = "contact_name", length = 128, nullable = false)
+    private String contactName;
+
+    @Column(name = "contact_phone", length = 32, nullable = false)
+    private String contactPhone;
+
 }

@@ -34,19 +34,13 @@ public class VoucherSpecificationBuilder {
 
     private StringBuilder buildSelectClause(VoucherUserFilter filter) {
         final StringBuilder sbSelect = new StringBuilder("SELECT v.*");
-        if (BooleanUtils.isTrue(filter.getSavedByMe())) {
-            sbSelect.append(" , vc.id");
-        }
+        sbSelect.append(" , vc.id AS savedUserVoucherId");
         return sbSelect;
     }
 
     private StringBuilder buildFromClause(VoucherUserFilter filter) {
         final StringBuilder sbFrom = new StringBuilder(" FROM voucher v");
-
-        if (BooleanUtils.isTrue(filter.getSavedByMe())) {
-            sbFrom.append(" LEFT JOIN voucher_user vc ON vc.voucher_id = v.id");
-        }
-
+        sbFrom.append(" LEFT JOIN voucher_user vc ON vc.voucher_id = v.id AND vc.created_by = :createdBy");
         return sbFrom;
     }
 
@@ -137,9 +131,7 @@ public class VoucherSpecificationBuilder {
     public Map<String, Object> buildParams(VoucherUserFilter filter) {
         Map<String, Object> params = new HashMap<>();
 
-        if (BooleanUtils.isTrue(filter.getSavedByMe())) {
-            params.put("createdBy", authenticatedProvider.getUserIdValue());
-        }
+        params.put("createdBy", authenticatedProvider.getUserIdValue());
 
         if (filter.getType() != null) {
             params.put("type", filter.getType());

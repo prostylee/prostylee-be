@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Builder
 @Data
 @NoArgsConstructor
@@ -24,5 +26,9 @@ public class UserAddressResponse {
     private String fullAddress;
 
     private Boolean priority;
+
+    private String contactName;
+
+    private String contactPhone;
 
 }
