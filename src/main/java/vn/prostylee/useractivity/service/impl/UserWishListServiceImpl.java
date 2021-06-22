@@ -98,7 +98,7 @@ public class UserWishListServiceImpl implements UserWishListService {
 
     private UserWishListResponse convertToResponse(UserWishList userWishList) {
         UserWishListResponse userWishListResponse = BeanUtil.copyProperties(userWishList, UserWishListResponse.class);
-        ProductResponse productResponse = productService.findById(userWishList.getId());
+        ProductResponse productResponse = productService.findById(userWishList.getProductId());
         ProductResponseLite productLite = BeanUtil.copyProperties(productResponse, ProductResponseLite.class);
         productLite.setImageUrl(productResponse.getImageUrls().get(0));
         userWishListResponse.setProductResponseLite(productLite);

@@ -41,4 +41,10 @@ public class UserResponse {
     private String avatar;
 
     private String bio;
+
+    private Integer date;
+
+    private Integer month;
+
+    private Integer year;
 }

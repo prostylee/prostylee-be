@@ -69,4 +69,10 @@ public class UserRequest implements UniqueIdentifier<Long> {
     @Valid
     private ImageRequest avatarImageInfo;
 
+    private Integer date;
+
+    private Integer month;
+
+    private Integer year;
+
 }
