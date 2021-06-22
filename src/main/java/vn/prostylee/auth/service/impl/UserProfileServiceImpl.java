@@ -18,6 +18,7 @@ import vn.prostylee.auth.entity.User;
 import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.provider.AuthenticatedProvider;
+import vn.prostylee.core.utils.EncrytedPasswordUtils;
 import vn.prostylee.core.utils.MimeTypeUtil;
 
 import java.util.ArrayList;
@@ -52,6 +53,9 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .allowSocialNotification(request.getAllowSocialNotification())
                 .allowStockNotification(request.getAllowStockNotification())
                 .bio(request.getBio())
+                .date(request.getDate())
+                .month(request.getMonth())
+                .year(request.getYear())
                 .build();
 
         return userService.update(userRequest.getId(), userRequest);

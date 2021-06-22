@@ -35,4 +35,12 @@ public class UserProfileRequest {
     private Boolean allowStockNotification;
 
     private String bio;
+
+    private Integer date;
+
+    private Integer month;
+
+    private Integer year;
+
+    private String password;
 }
