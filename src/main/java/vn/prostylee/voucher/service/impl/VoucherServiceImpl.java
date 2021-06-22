@@ -85,9 +85,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            voucherRepository.softDelete(id);
-            log.info("Voucher with id [{}] deleted successfully", id);
-            return true;
+            return voucherRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Voucher id [{}] does not exists", id);
             return false;
