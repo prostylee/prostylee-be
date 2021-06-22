@@ -83,9 +83,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            companyRepository.softDelete(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
+            return companyRepository.softDelete(id) > 0;
+        } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Delete a company without existing in database", e);
             return false;
         }

@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.Modifying;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -58,27 +57,23 @@ public interface SoftDeleteRepository<T, ID extends Serializable> {
      * Execute an update statement to set the deleted time at now() for the given entity id
      * @param id The id of entity will be updated, must not be {@literal null}.
      */
-    @Modifying
     int softDelete(ID id);
 
     /**
      * Execute an update statement to set the deleted time at now() for the given entity
      * @param entity The entity will be updated, must not be {@literal null}.
      */
-    @Modifying
     int softDelete(T entity);
 
     /**
      * Execute the update statements to set the deleted time at now() for the given entities
      * @param entities The entities will be updated, must not be {@literal null}.
      */
-    @Modifying
     int softDelete(Iterable<? extends T> entities);
 
     /**
      * Execute the update statements to set the deleted time at now() for all active entities in database
      */
-    @Modifying
     int softDeleteAll();
 
     /**
@@ -86,7 +81,6 @@ public interface SoftDeleteRepository<T, ID extends Serializable> {
      * @param id The id of entity will be updated, must not be {@literal null}.
      * @param dateTime The deleted time will be set
      */
-    @Modifying
     int scheduleSoftDelete(ID id, Date dateTime);
 
     /**
@@ -94,7 +88,6 @@ public interface SoftDeleteRepository<T, ID extends Serializable> {
      * @param entity The entity will be updated, must not be {@literal null}.
      * @param dateTime The deleted time will be set
      */
-    @Modifying
     int scheduleSoftDelete(T entity, Date dateTime);
 
     /**

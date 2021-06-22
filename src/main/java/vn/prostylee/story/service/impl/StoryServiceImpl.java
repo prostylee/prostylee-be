@@ -163,8 +163,7 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            storyRepository.softDelete(id);
-            return true;
+            return storyRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }

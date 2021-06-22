@@ -69,9 +69,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            this.productRepository.softDelete(id);
-            log.info("Product with id [{}] deleted successfully", id);
-            return true;
+            return this.productRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             throw new ResourceNotFoundException("Product is not found with id [" + id + "]");
         }

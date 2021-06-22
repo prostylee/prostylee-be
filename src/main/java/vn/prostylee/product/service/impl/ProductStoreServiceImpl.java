@@ -2,9 +2,7 @@ package vn.prostylee.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.response.ProductOwnerResponse;
@@ -21,7 +19,6 @@ public class ProductStoreServiceImpl implements ProductStoreService {
     private final StoreRepository storeRepository;
     private final FileUploadService fileUploadService;
 
-    @Cacheable(value = CachingKey.STORES, key = "#storeId")
     @Override
     public ProductOwnerResponse getStoreOwner(Long storeId) {
         return storeRepository.findById(storeId)

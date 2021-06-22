@@ -135,8 +135,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            userRepository.softDelete(id);
-            return true;
+            return userRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }

@@ -1,6 +1,5 @@
 package vn.prostylee.core.repository.impl;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -8,7 +7,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import vn.prostylee.core.repository.BaseRepository;
 
@@ -23,7 +21,6 @@ import java.util.*;
  * @param <T> The type of entity
  * @param <ID> The primary key of entity
  */
-@Transactional
 public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
 
     private static final String DELETED_FIELD = "deletedAt";
@@ -135,11 +132,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 
     private int softDelete(ID id, Date dateTime) {
         Assert.notNull(id, "The given id must not be null!");
-
-        T entity = findOneActive(id).orElseThrow(() -> new EmptyResultDataAccessException(
-                String.format("No %s entity with id %s exists!", entityInformation.getJavaType(), id), 1));
-
-        return softDelete(entity, dateTime);
+        return findOneActive(id).map(t -> softDelete(t, dateTime)).orElse(0);
     }
 
     private int softDelete(T entity, Date dateTime) {

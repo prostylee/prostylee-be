@@ -156,8 +156,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            branchRepository.softDelete(id);
-            return true;
+            return branchRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Delete a branch without existing in database", e);
             return false;

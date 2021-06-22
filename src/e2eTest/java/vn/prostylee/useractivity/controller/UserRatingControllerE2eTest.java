@@ -56,6 +56,7 @@ public class UserRatingControllerE2eTest extends BaseRestControllerE2eTest {
                 .targetId(Long.valueOf(1))
                 .targetType("product")
                 .value(5)
+                .content("Test")
                 .build();
     }
 }

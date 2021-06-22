@@ -88,8 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public boolean deleteById(Long id) {
         try {
-            this.categoryRepository.softDelete(id);
-            return true;
+            return this.categoryRepository.softDelete(id) > 0;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Category id {} does not exists", id);
             return false;
