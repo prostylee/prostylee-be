@@ -10,10 +10,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public enum OrderStatus {
 
-    AWAITING_CONFIRMATION(0),
-    IN_PROGRESS(50),
-    BUY_AT_STORE(70),
-    CANCELLED(90),
+    CREATE_ORDER(0),
+    RECEIVE_ORDER(10),
+    GOOD_ISSUE(20),
+    DELIVERY(30),
+    CANCEL_ORDER(90),
     COMPLETED(100);
 
     private final int status;
@@ -22,7 +23,7 @@ public enum OrderStatus {
         return Stream.of(OrderStatus.values())
                 .filter(storeStatus -> StringUtils.equalsIgnoreCase(storeStatus.name(), status))
                 .findFirst()
-                .orElse(AWAITING_CONFIRMATION);
+                .orElse(CREATE_ORDER);
     }
 
     public static OrderStatus parse(int statusValue) {

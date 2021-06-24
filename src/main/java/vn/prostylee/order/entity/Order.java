@@ -42,6 +42,9 @@ public class Order extends AuditEntity {
 	@Column(name = "status")
 	private int status;
 
+	@Column(name = "status_id")
+	private Long statusId;
+
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude
 	@OneToOne
@@ -60,6 +63,11 @@ public class Order extends AuditEntity {
 	@ToString.Exclude
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "order")
 	private Set<OrderDiscount> orderDiscounts;
+
+	@EqualsAndHashCode.Exclude
+	@ToString.Exclude
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "order")
+	private Set<OrderHistory> orderHistories;
 
 	@EqualsAndHashCode.Exclude
 	@ToString.Exclude

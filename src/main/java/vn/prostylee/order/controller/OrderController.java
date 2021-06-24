@@ -34,14 +34,4 @@ public class OrderController extends CrudController<OrderRequest, OrderResponse,
     public OrderResponse reOrder(@PathVariable Long id){
         return orderService.reOrder(id);
     }
-
-    @PostMapping("/checkVoucher")
-    @ResponseStatus(code = HttpStatus.OK)
-    public VoucherCheckResultResponse checkVoucher(@Valid @RequestBody OrderRequest orderRequest){
-        VoucherCheckResultResponse response = new VoucherCheckResultResponse();
-        response.setVoucherId(orderRequest.getOrderDiscounts().get(0).getVoucherId());
-        response.setAmount(240000D);
-        response.setResult(true);
-        return response;
-    }
 }

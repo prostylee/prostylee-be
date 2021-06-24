@@ -25,10 +25,6 @@ public class OrderDetailResponse implements Serializable {
 
     private String productImage;
 
-    private String productColor;
-
-    private String productSize;
-
     private ProductResponseLite productData;
 
     private List<OrderDetailAttributeResponse> orderDetailAttributes;

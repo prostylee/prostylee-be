@@ -22,6 +22,8 @@ public class OrderResponse extends AuditResponse {
 
     private String status;
 
+    private Long statusId;
+
     private Double totalMoney;
 
     private Long buyerId;
@@ -37,5 +39,7 @@ public class OrderResponse extends AuditResponse {
     private ShippingAddressResponse shippingAddress;
 
     private ShippingProviderResponse shippingProvider;
+
+    private List<OrderHistoryResponse> orderHistory;
 
 }

@@ -1,0 +1,5 @@
+INSERT INTO "public"."order_status" VALUES (1, '2021-06-24 01:50:22.764', 1, '2021-06-24 01:50:22.764', 1, 't', NULL, 'Chờ thanh toán', 'Chờ thanh toán', 0, 1, 'vi', '1');
+INSERT INTO "public"."order_status" VALUES (4, '2021-06-24 01:52:13.433', 1, '2021-06-24 01:52:13.433', 1, 't', NULL, 'Đã giao', 'Đã giao', 100, 4, 'vi', '1');
+INSERT INTO "public"."order_status" VALUES (5, '2021-06-24 01:52:44.316', 1, '2021-06-24 01:52:44.316', 1, 't', NULL, 'Đã huỷ', 'Đã huỷ', 90, 5, 'vi', '1');
+INSERT INTO "public"."order_status" VALUES (2, '2021-06-24 01:50:38.816', 1, '2021-06-24 01:50:38.816', 1, 't', NULL, 'Đang xử lý', 'Đang xử lý', 10, 2, 'vi', '1');
+INSERT INTO "public"."order_status" VALUES (3, '2021-06-24 01:50:54.875', 1, '2021-06-24 01:50:54.875', 1, 't', NULL, 'Đang vận chuyển', 'Đang vận chuyển', 30, 3, 'vi', '1');
