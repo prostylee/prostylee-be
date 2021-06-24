@@ -1,30 +1,24 @@
 package vn.prostylee.order.dto.filter;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class OrderFilter extends BaseFilter  {
-
-    private Long statusId;
-
-    @JsonIgnore
-    private Long loggedInUser;
-
+public class OrderStatusMstFilter extends BaseFilter {
     @Override
     public String[] getSearchableFields() {
         return new String[] {
-                "code"
+                "name",
+                "description"
         };
     }
 
     @Override
     public String[] getSortableFields() {
-        return new String[] {
-                "createdAt"
+        return new String[]{
+                "name"
         };
     }
 }

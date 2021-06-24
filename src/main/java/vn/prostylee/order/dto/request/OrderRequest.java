@@ -27,8 +27,11 @@ public class OrderRequest {
     private Double totalMoney;
 
     @NotNull
-    @Schema(allowableValues = {"AWAITING_CONFIRMATION", "IN_PROGRESS", "BUY_AT_STORE", "COMPLETE"})
+    @Schema(allowableValues = {"CREATE_ORDER", "RECEIVE_ORDER", "GOOD_ISSUE", "DELIVERY", "CANCEL_ORDER", "COMPLETE"})
     private String status;
+
+    @NotNull
+    private Long statusId;
 
     private Long paymentTypeId;
 

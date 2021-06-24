@@ -3,6 +3,7 @@ package vn.prostylee.order.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.specs.QueryBuilder;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.DateUtils;
+import vn.prostylee.order.constants.OrderHistoryStatus;
 import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.converter.OrderConverter;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
@@ -31,6 +33,7 @@ import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
+import vn.prostylee.order.entity.OrderHistory;
 import vn.prostylee.order.handler.OrderMutationEventHandler;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
@@ -40,7 +43,8 @@ import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static vn.prostylee.order.constants.OrderStatus.AWAITING_CONFIRMATION;
+import static vn.prostylee.order.constants.OrderStatus.CANCEL_ORDER;
+import static vn.prostylee.order.constants.OrderStatus.CREATE_ORDER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,11 +76,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void findByStatus(OrderFilter orderFilter, QueryBuilder<Order> queryBuilder) {
-        if(orderFilter.getStatus() == null) {
+        if(orderFilter.getStatusId() == null) {
             return;
         }
-        int statusId = OrderStatus.getByStatusValue(orderFilter.getStatus()).getStatus();
-        queryBuilder.equals("status", statusId);
+        Long statusId = orderFilter.getStatusId();
+        queryBuilder.equals("statusId", statusId);
     }
 
     private void findByLoggedInUser(OrderFilter orderFilter, QueryBuilder<Order> queryBuilder) {
@@ -120,7 +124,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse updateStatus(Long id, OrderStatusRequest statusRequest) {
         Order order = getOrderById(id);
-        order.setStatus(OrderStatus.getByStatusValue(statusRequest.getStatus()));
+        order.setStatus(OrderStatus.getByStatusValue(statusRequest.getAct()));
+        Set<OrderHistory> orderHistoryList = Optional.ofNullable(order.getOrderHistories()).orElseGet(HashSet::new)
+                .stream()
+                .map(object -> {
+                    if (order.getStatus().getStatus() == object.getActCode()){
+                        object.setCompletedStatus(OrderHistoryStatus.AWAITING_CONFIRMATION.getCompletedStatus());
+                        order.setStatusId(object.getStatusId());
+                    }
+                    OrderHistory response = BeanUtil.copyProperties(object,OrderHistory.class);
+                    return response;
+                }).collect(Collectors.toSet());
+        order.setOrderHistories(orderHistoryList);
         Order savedOrder = orderRepository.save(order);
         return orderConverter.toDto(savedOrder);
     }
@@ -135,13 +150,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse reOrder(Long id){
-        Order reOrderEntity = this.getOrderById(id);
-        if(reOrderEntity == null){
+        Order newOrder = this.getOrderById(id);
+        if(newOrder == null){
             return null;
         }
-        Order newOrder = BeanUtil.copyProperties(reOrderEntity,
-                Order.class);
-        newOrder.setStatus(AWAITING_CONFIRMATION);
         newOrder.setId(null);
         //Set orderdetail
         Set<OrderDetail> newOrderDetail = new HashSet<>();
@@ -165,8 +177,10 @@ public class OrderServiceImpl implements OrderService {
         }
         newOrder.getOrderDiscounts().clear();
         newOrder.setOrderDiscounts(newOrderDiscount);
-        Order savedOrder = orderRepository.save(newOrder);
-        return orderConverter.toDto(savedOrder);
+        newOrder.getOrderHistories().clear();
+        newOrder.setStatus(CREATE_ORDER);
+        newOrder.setStatusId(0L);
+        return orderConverter.toDto(newOrder);
     }
 
     @Override

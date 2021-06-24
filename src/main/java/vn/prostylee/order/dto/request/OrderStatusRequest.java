@@ -12,5 +12,8 @@ import javax.validation.constraints.NotNull;
 public class OrderStatusRequest {
 
     @NotNull
-    private String status;
+    private String act;
+
+    @NotNull
+    private Long statusId;
 }

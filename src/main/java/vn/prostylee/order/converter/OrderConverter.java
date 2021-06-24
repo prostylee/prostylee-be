@@ -9,22 +9,19 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.order.constants.OrderHistoryStatus;
 import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.dto.request.OrderDetailRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
-import vn.prostylee.order.dto.response.OrderDetailAttributeResponse;
-import vn.prostylee.order.dto.response.OrderDetailResponse;
-import vn.prostylee.order.dto.response.OrderDiscountResponse;
-import vn.prostylee.order.dto.response.OrderResponse;
-import vn.prostylee.order.entity.Order;
-import vn.prostylee.order.entity.OrderDetail;
-import vn.prostylee.order.entity.OrderDetailAttribute;
-import vn.prostylee.order.entity.OrderDiscount;
+import vn.prostylee.order.dto.response.*;
+import vn.prostylee.order.entity.*;
+import vn.prostylee.order.repository.OrderStatusMstRepository;
 import vn.prostylee.payment.entity.PaymentType;
 import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductImage;
+import vn.prostylee.order.entity.OrderStatusMst;
 import vn.prostylee.product.service.ProductAttributeService;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
@@ -51,6 +48,7 @@ public class OrderConverter {
     private final StoreService storeService;
     private final BranchService branchService;
     private final ProductAttributeService productAttributeService;
+    private final OrderStatusMstRepository orderStatusMstRepository;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -70,10 +68,10 @@ public class OrderConverter {
                     ShippingAddress sa = BeanUtil.copyProperties(shippingAddressRequest, ShippingAddress.class);
                     order.setShippingAddress(sa);
                 });
-
         order.setStatus(OrderStatus.getByStatusValue(request.getStatus()));
         convertOrderDetails(request, order);
         convertOrderDiscounts(request, order);
+        convertOrderHistory(order);
     }
 
     private void convertOrderDetails(OrderRequest request, Order order) {
@@ -177,8 +175,19 @@ public class OrderConverter {
                         .collect(Collectors.toList())
         );
 
+        orderResponse.setOrderHistory(
+                Optional.ofNullable(order.getOrderHistories())
+                        .orElseGet(HashSet::new)
+                        .stream()
+                        .filter(orderHistory -> Objects.nonNull(orderHistory.getCompletedStatus()))
+                        .sorted(Comparator.comparing(OrderHistory::getStep).reversed())
+                        .map(orderHistory -> BeanUtil.copyProperties(orderHistory, OrderHistoryResponse.class))
+                        .collect(Collectors.toList())
+        );
+
         orderResponse.setPaymentType(order.getPaymentType() == null ? null : order.getPaymentType().getName());
         orderResponse.setStatus(order.getStatus() == null ? null : order.getStatus().name());
+        orderResponse.setStatusId(order.getStatusId());
 
         if (order.getShippingAddress() != null) {
             orderResponse.setShippingAddress(BeanUtil.copyProperties(order.getShippingAddress(), ShippingAddressResponse.class));
@@ -220,5 +229,29 @@ public class OrderConverter {
        }
        detailResponse.setOrderDetailAttributes(attrs);
         return detailResponse;
+    }
+
+    private void convertOrderHistory(Order order) {
+        List<OrderStatusMst> orderStatusMstList = orderStatusMstRepository.findAll();
+        Set<OrderHistory> orderHistories = Optional.ofNullable(orderStatusMstList)
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(orderStatus -> {
+                    OrderHistory orderHistory = OrderHistory.builder()
+                            .statusId(orderStatus.getId())
+                            .statusName(orderStatus.getName())
+                            .step(orderStatus.getStep())
+                            .actCode(orderStatus.getActCode())
+                            .order(order)
+                            .build();
+                    if (orderStatus.getStep() == orderStatusMstList.stream().mapToInt(OrderStatusMst::getStep).min().getAsInt()){
+                        orderHistory.setCompletedStatus(OrderHistoryStatus.AWAITING_CONFIRMATION.getCompletedStatus());
+                        order.setStatusId(orderStatus.getId());
+                    }
+                    return orderHistory;
+                })
+                .collect(Collectors.toSet());
+
+        order.setOrderHistories(orderHistories);
     }
 }
