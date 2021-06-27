@@ -3,6 +3,7 @@ package vn.prostylee.product.service;
 import org.springframework.data.domain.Page;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.service.CrudService;
+import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.RecentViewProductFilter;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductResponse;
@@ -22,4 +23,6 @@ public interface ProductService extends CrudService<ProductRequest, ProductRespo
     Page<ProductResponseLite> getProductsForListStore(BaseFilter baseFilter);
 
     List<ProductResponseLite> findByIds(List<Long> productIds);
+
+    Page<ProductResponse> getNewFeeds(ProductFilter productFilter);
 }

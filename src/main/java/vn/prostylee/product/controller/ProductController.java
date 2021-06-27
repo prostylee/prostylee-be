@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
-import vn.prostylee.product.constant.NewFeedType;
 import vn.prostylee.product.dto.filter.*;
 import vn.prostylee.product.dto.request.ProductRequest;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
@@ -49,10 +48,7 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
 
     @GetMapping("/new-feeds")
     public Page<ProductResponse> getNewFeeds(@Valid ProductFilter productFilter) {
-        if (productFilter.getNewFeedType() == null) {
-            productFilter.setNewFeedType(NewFeedType.STORE);
-        }
-        return productService.findAll(productFilter);
+        return productService.getNewFeeds(productFilter);
     }
 
     @GetMapping("/product-for-story/{productId}")
