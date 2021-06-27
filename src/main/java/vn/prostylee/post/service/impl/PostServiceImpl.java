@@ -12,7 +12,6 @@ import vn.prostylee.auth.dto.response.UserResponse;
 import vn.prostylee.auth.service.UserProfileService;
 import vn.prostylee.core.dto.filter.BaseFilter;
 import vn.prostylee.core.exception.ResourceNotFoundException;
-import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.constant.ImageSize;
@@ -45,15 +44,16 @@ public class PostServiceImpl implements PostService {
     private final BaseFilterSpecs<Post> baseFilterSpecs;
     private final FileUploadService fileUploadService;
     private final StoreService storeService;
-    private final AuthenticatedProvider authenticatedProvider;
     private final UserProfileService userProfileService;
 
     @Override
     public Page<PostResponse> findAll(BaseFilter baseFilter) {
         PostFilter postFilter = (PostFilter) baseFilter;
-        final Long userId = Optional.ofNullable(postFilter.getUserId()).orElseGet(authenticatedProvider::getUserIdValue);
-        Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), userId);
-        Specification<Post> searchable = baseFilterSpecs.search(postFilter).and(additionalSpec);
+        Specification<Post> searchable = baseFilterSpecs.search(postFilter);
+        if (postFilter.getUserId() != null) {
+            Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), postFilter.getUserId());
+            searchable = searchable.and(additionalSpec);
+        }
         Pageable pageable = baseFilterSpecs.page(postFilter);
         Page<Post> page = postRepository.findAll(searchable, pageable);
         return page.map(this::toListResponse);
@@ -160,5 +160,10 @@ public class PostServiceImpl implements PostService {
                 .forEach(dto -> dto.setUrl(fileUploadService.getImageUrl(dto.getAttachmentId(), ImageSize.POST_SIZE.getWidth(), ImageSize.POST_SIZE.getHeight())));
 
         return response;
+    }
+
+    @Override
+    public Page<PostResponse> getNewFeeds(PostFilter postFilter) {
+        return findAll(postFilter); // TODO get new feeds
     }
 }

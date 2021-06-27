@@ -174,4 +174,9 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<ProductResponse> getNewFeeds(ProductFilter productFilter) {
+        return findAll(productFilter); // TODO get new feeds
+    }
+
 }
