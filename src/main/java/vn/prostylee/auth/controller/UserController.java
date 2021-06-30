@@ -38,4 +38,6 @@ public class UserController extends CrudController<UserRequest, UserResponse, Lo
         orderFilter.setLoggedInUser(authenticatedProvider.getUserIdValue());
         return orderService.findAll(orderFilter);
     }
+
+
 }

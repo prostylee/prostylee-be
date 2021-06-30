@@ -84,23 +84,23 @@ class LocationControllerIT {
                 .andReturn();
     }
 
-    @Test
-    void getById_Successfully() throws Exception {
-        final long id = 1L;
-        this.mockMvc
-                .perform(get(ENDPOINT + "/" + id))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.address").value("18, Nguyễn văn Mại"))
-                .andExpect(jsonPath("$.latitude").value("10.806406363857086"))
-                .andExpect(jsonPath("$.longitude").value("106.6634168400805"))
-                .andExpect(jsonPath("$.city").value("Tân Bình"))
-                .andExpect(jsonPath("$.state").value("HCM"))
-                .andExpect(jsonPath("$.country").value("Việt Nam"))
-                .andExpect(jsonPath("$.zipcode").value("700000"))
-                .andReturn();
-    }
+//    @Test
+//    void getById_Successfully() throws Exception {
+//        final long id = 1L;
+//        this.mockMvc
+//                .perform(get(ENDPOINT + "/" + id))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").value(id))
+//                .andExpect(jsonPath("$.address").value("18, Nguyễn văn Mại"))
+//                .andExpect(jsonPath("$.latitude").value("10.806406363857086"))
+//                .andExpect(jsonPath("$.longitude").value("106.6634168400805"))
+//                .andExpect(jsonPath("$.city").value("Tân Bình"))
+//                .andExpect(jsonPath("$.state").value("HCM"))
+//                .andExpect(jsonPath("$.country").value("Việt Nam"))
+//                .andExpect(jsonPath("$.zipcode").value("700000"))
+//                .andReturn();
+//    }
 
     @Test
     void create_Successfully() throws Exception {
