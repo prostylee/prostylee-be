@@ -5,5 +5,6 @@ import vn.prostylee.suggestion.dto.filter.NewFeedFilter;
 import vn.prostylee.suggestion.dto.response.NewFeedResponse;
 
 public interface NewFeedService {
+
     Page<NewFeedResponse> getNewFeed(NewFeedFilter newFeedFilter);
 }
