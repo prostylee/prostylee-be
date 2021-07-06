@@ -40,6 +40,7 @@ import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
 
 import javax.persistence.criteria.Predicate;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,6 +98,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponse save(OrderRequest request) {
         Order order = BeanUtil.copyProperties(request, Order.class);
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        order.setCode(sdf.format(cal.getTime()));
         orderConverter.toEntity(request, order);
         Order savedOrder = orderRepository.save(order);
         return orderConverter.toDto(savedOrder);
@@ -135,7 +139,8 @@ public class OrderServiceImpl implements OrderService {
                     OrderHistory response = BeanUtil.copyProperties(object,OrderHistory.class);
                     return response;
                 }).collect(Collectors.toSet());
-        order.setOrderHistories(orderHistoryList);
+        order.getOrderHistories().clear();
+        order.getOrderHistories().addAll(orderHistoryList);
         Order savedOrder = orderRepository.save(order);
         return orderConverter.toDto(savedOrder);
     }

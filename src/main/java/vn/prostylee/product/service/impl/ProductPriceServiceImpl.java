@@ -10,6 +10,7 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.product.converter.ProductPriceConverter;
 import vn.prostylee.product.dto.request.ProductPriceRequest;
+import vn.prostylee.product.dto.response.ProductPriceRangeResponse;
 import vn.prostylee.product.dto.response.ProductPriceResponse;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.repository.ProductPriceRepository;
@@ -72,5 +73,15 @@ public class ProductPriceServiceImpl implements ProductPriceService {
     @Override
     public List<ProductPrice> getProductPricesByProduct(Long productId) {
         return productPriceRepository.findAllByProductId(productId);
+    }
+
+    @Override
+    public ProductPriceRangeResponse getProductPriceRange(){
+        Double minPrice = productPriceRepository.getMinProductPrice();
+        Double maxPrice = productPriceRepository.getMaxProductPrice();
+        ProductPriceRangeResponse productPriceRangeResponse = new ProductPriceRangeResponse();
+        productPriceRangeResponse.setMinPrice(minPrice);
+        productPriceRangeResponse.setMaxPrice(maxPrice);
+        return productPriceRangeResponse;
     }
 }
