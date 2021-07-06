@@ -19,7 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderRequest {
 
-    @NotEmpty
     private String code;
 
     @NotNull
