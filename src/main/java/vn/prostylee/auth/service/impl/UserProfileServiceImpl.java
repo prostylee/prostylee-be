@@ -56,6 +56,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .date(request.getDate())
                 .month(request.getMonth())
                 .year(request.getYear())
+                .avatarImageInfo(request.getAvatarImageInfo())
                 .build();
 
         return userService.update(userRequest.getId(), userRequest);
