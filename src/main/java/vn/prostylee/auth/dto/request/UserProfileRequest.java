@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.ads.dto.request.ImageRequest;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
@@ -43,4 +45,7 @@ public class UserProfileRequest {
     private Integer year;
 
     private String password;
+
+    @Valid
+    private ImageRequest avatarImageInfo;
 }
