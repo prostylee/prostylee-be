@@ -96,6 +96,11 @@ public class UserServiceImpl implements UserService {
             user.setSub(UUID.randomUUID().toString());
         }
         user.setRoles(this.getRoles(userRequest.getRoles()));
+        if (userRequest.getAvatarImageInfo() != null) {
+            Long avatarId = saveImage(userRequest.getAvatarImageInfo());
+            String avatarUrl = fileUploadService.getImageUrl(avatarId, ImageSize.FULL.getWidth(), ImageSize.FULL.getHeight());
+            user.setAvatar(avatarUrl);
+        }
         User savedUser = this.save(user);
         UserResponse response = BeanUtil.copyProperties(savedUser, UserResponse.class);
         response.setRoles(user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()));
