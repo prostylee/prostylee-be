@@ -10,6 +10,8 @@ import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
 import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.entity.UserRating;
 
+import java.util.List;
+
 /**
  * Repository for domain model class User Rating.
  * @see UserRating ;
@@ -36,4 +38,11 @@ public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
             " GROUP BY ur.target_id" +
             " ORDER BY ur.target_id", nativeQuery = true)
     Page<ReviewCountResponse> countNumberReview(Pageable pageable,@Param("targetType") String targetType);
+
+    @Query("SELECT e FROM UserRating e WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:userId")
+    List<UserRating> getListRatingByUser(
+            @Param("targetId") Long targetId,
+            @Param("targetType") String targetType,
+            @Param("userId") Long userId
+    );
 }
