@@ -34,6 +34,9 @@ public class ProductFilter extends BaseFilter {
     private Double latitude;
     private Double longitude;
 
+    private Double minPrice;
+    private Double maxPrice;
+
     /**
      * The default number of days that will be count for considering as top following.
      */
