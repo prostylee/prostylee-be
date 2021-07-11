@@ -22,7 +22,7 @@ public class UserRatingRequestTest {
     @NotNull
     private Long targetId;
 
-    @NotBlank
+    @NotNull
     private TargetType targetType;
 
     @NotNull
