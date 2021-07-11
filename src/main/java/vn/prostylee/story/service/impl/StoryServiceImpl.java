@@ -17,7 +17,6 @@ import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
 import vn.prostylee.story.dto.response.StoreForStoryResponse;
@@ -29,6 +28,7 @@ import vn.prostylee.story.entity.StoryImage;
 import vn.prostylee.story.repository.StoryRepository;
 import vn.prostylee.story.service.StoryImageService;
 import vn.prostylee.story.service.StoryService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
@@ -61,13 +61,13 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getUserStoryResponses(filter, StoryDestinationType.USER.getType());
+        return getUserStoryResponses(filter, TargetType.USER.name());
     }
 
     @Override
     public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoreStoryResponses(filter, StoryDestinationType.STORE.getType());
+        return getStoreStoryResponses(filter, TargetType.STORE.name());
     }
 
     private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
@@ -125,7 +125,7 @@ public class StoryServiceImpl implements StoryService {
     }
 
     private List<Long> getFollowsBy(Long id, String typeName) {
-        UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(typeName).build();
+        UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(typeName.toLowerCase()).build();
         return userFollowerService.findAll(userFilter)
                 .map(UserFollowerResponse::getTargetId)
                 .stream().collect(Collectors.toList());

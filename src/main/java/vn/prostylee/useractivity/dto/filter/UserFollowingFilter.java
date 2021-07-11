@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.dto.filter;
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 
 import javax.validation.constraints.NotBlank;
 
@@ -12,5 +13,5 @@ import javax.validation.constraints.NotBlank;
 public class UserFollowingFilter extends UserFollowerPageable {
 
     @NotBlank
-    private String targetType;
+    private TargetType targetType;
 }

@@ -7,12 +7,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum StatisticsType {
-    STORE("store"),
-    USER("user");
+    STORE,
+    USER
 
-    private final String type;
-
-    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    /*@JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static StatisticsType fromType(String type){
         for(StatisticsType profileType : StatisticsType.values()){
             if(profileType.getType().equalsIgnoreCase(type)){
@@ -20,5 +18,5 @@ public enum StatisticsType {
             }
         }
         return STORE;
-    }
+    }*/
 }

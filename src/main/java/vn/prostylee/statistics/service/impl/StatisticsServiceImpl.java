@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.product.service.ProductService;
-import vn.prostylee.statistics.constant.StatisticsType;
 import vn.prostylee.statistics.dto.response.UserStatisticsResponse;
 import vn.prostylee.statistics.service.StatisticsService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -33,11 +33,11 @@ public class StatisticsServiceImpl implements StatisticsService {
     private UserStatisticsResponse getUserStatisticsResponse(Long userLoginId) {
         UserFollowerFilter followerFilter = UserFollowerFilter.builder()
                 .targetId(userLoginId)
-                .targetType(StatisticsType.USER.getType())
+                .targetType(TargetType.USER.name())
                 .build();
 
         UserFollowerFilter followingFilter = UserFollowerFilter.builder()
-                .targetType(StatisticsType.USER.getType())
+                .targetType(TargetType.USER.name())
                 .userId(userLoginId)
                 .build();
 

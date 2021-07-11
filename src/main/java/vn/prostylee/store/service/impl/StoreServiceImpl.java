@@ -36,7 +36,7 @@ import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.repository.StoreRepository;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserMostActiveService;
 

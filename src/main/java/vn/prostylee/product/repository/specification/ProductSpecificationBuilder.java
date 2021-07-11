@@ -17,7 +17,7 @@ import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 

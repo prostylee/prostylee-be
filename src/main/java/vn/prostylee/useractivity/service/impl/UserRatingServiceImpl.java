@@ -19,7 +19,7 @@ import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.story.dto.response.UserResponseLite;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;

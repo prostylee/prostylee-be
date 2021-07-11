@@ -16,7 +16,7 @@ import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.filter.UserFollowerPageable;
@@ -132,7 +132,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         userFollowerFilter.setKeyword(userFollowingFilter.getKeyword());
         userFollowerFilter.setLimit(userFollowingFilter.getLimit());
         userFollowerFilter.setPage(userFollowingFilter.getPage());
-        userFollowerFilter.setTargetType(userFollowingFilter.getTargetType());
+        userFollowerFilter.setTargetType(userFollowingFilter.getTargetType().name());
 
         Page<UserFollowerResponse> page = findAll(userFollowerFilter);
         List<Long> ids = page.getContent()
