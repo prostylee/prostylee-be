@@ -18,10 +18,13 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.LatLngDto;
+import vn.prostylee.location.dto.response.AddressResponse;
 import vn.prostylee.location.dto.response.LocationResponse;
+import vn.prostylee.location.service.AddressService;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.store.dto.filter.BranchFilter;
 import vn.prostylee.store.dto.request.BranchRequest;
+import vn.prostylee.store.dto.response.CitiesWithBranchesResponse;
 import vn.prostylee.store.dto.response.BranchResponse;
 import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
@@ -44,6 +47,8 @@ public class BranchServiceImpl implements BranchService {
     private final BaseFilterSpecs<Branch> baseFilterSpecs;
 
     private final LocationService locationService;
+
+    private final AddressService addressService;
 
     @Override
     public Page<BranchResponse> findAll(BaseFilter baseFilter) {
@@ -81,6 +86,20 @@ public class BranchServiceImpl implements BranchService {
         return new PageImpl<>(branches, pageable, page.getTotalElements());
     }
 
+    @Override
+    public List<CitiesWithBranchesResponse> getListCities(Long storeId){
+        List<String> cities = branchRepository.geCitiesByStoreId(storeId);
+        List<CitiesWithBranchesResponse> responses = cities.stream()
+                .map(city -> {
+                    CitiesWithBranchesResponse response = new CitiesWithBranchesResponse();
+                    response.setCityCode(city);
+                    AddressResponse cityObject = this.addressService.findByCode(city);
+                    response.setCityName(cityObject.getName());
+                    return response;
+                }).collect(Collectors.toList());
+        return responses;
+    }
+
     private Comparator<BranchResponse> branchResponseComparator() {
         return (branch1, branch2) -> {
             if (branch1.getLocation() == null) {
@@ -107,6 +126,10 @@ public class BranchServiceImpl implements BranchService {
             spec = spec.and(joinCompanySpec);
         }
 
+        if(branchFilter.getCityCode() != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("cityCode"), branchFilter.getCityCode()));
+        }
+
         return spec;
     }
 
@@ -126,8 +149,14 @@ public class BranchServiceImpl implements BranchService {
         Store store = new Store();
         store.setId(branchRequest.getStoreId());
 
+        AddressResponse city = this.addressService.findByCode(branchRequest.getCityCode());
+        AddressResponse district = this.addressService.findByCodeAndParentCode(branchRequest.getDistrictCode(), city.getCode());
+        AddressResponse ward = this.addressService.findByCodeAndParentCode(branchRequest.getWardCode(), district.getCode());
+        String fullAddress = String.format("%s, %s, %s", branchRequest.getAddress(), ward.getName(), district.getName());
+
         Branch branch = BeanUtil.copyProperties(branchRequest, Branch.class);
         branch.setStore(store);
+        branch.setFullAddress(fullAddress);
 
         if (branchRequest.getActive() == null) {
             branch.setActive(true);

@@ -110,6 +110,10 @@ public class ProductSpecificationBuilder {
             sbWhere.append(" AND :minPrice <= p.price_sale AND p.price_sale <= :maxPrice");
         }
 
+        if (productFilter.getBrandId() != null) {
+            sbWhere.append(" AND p.brand_id IN (:brandId)");
+        }
+
         return sbWhere;
     }
 
@@ -196,6 +200,10 @@ public class ProductSpecificationBuilder {
         if (productFilter.getMinPrice() != null && productFilter.getMaxPrice() != null) {
             params.put("minPrice", productFilter.getMinPrice());
             params.put("maxPrice", productFilter.getMaxPrice());
+        }
+
+        if (productFilter.getBrandId() != null) {
+            params.put("brandId", productFilter.getBrandId());
         }
 
         return params;

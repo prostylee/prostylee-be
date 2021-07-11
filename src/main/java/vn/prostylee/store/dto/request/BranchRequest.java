@@ -26,4 +26,16 @@ public class BranchRequest {
 
     private Boolean active;
 
+    @NotBlank
+    private String cityCode;
+
+    @NotBlank
+    private String districtCode;
+
+    @NotBlank
+    private String wardCode;
+
+    @NotBlank
+    private String address;
+
 }
