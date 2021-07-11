@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.JsonUtils;
 import vn.prostylee.media.constant.ImageSize;
@@ -34,6 +35,8 @@ import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.BranchService;
 import vn.prostylee.store.service.StoreService;
+import vn.prostylee.useractivity.entity.UserRating;
+import vn.prostylee.useractivity.service.UserRatingService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,6 +52,8 @@ public class OrderConverter {
     private final BranchService branchService;
     private final ProductAttributeService productAttributeService;
     private final OrderStatusMstRepository orderStatusMstRepository;
+    private final UserRatingService userRatingService;
+    private final AuthenticatedProvider authenticatedProvider;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -219,6 +224,7 @@ public class OrderConverter {
 
        if (StringUtils.isNotBlank(detail.getProductData())) {
            ProductResponseLite productData = JsonUtils.fromJson(detail.getProductData(), ProductResponseLite.class);
+           productData.setReviewedStatusOfUserLogin(this.getReviewedStatusOfUserLogin(detail.getProductId()));
            detailResponse.setProductData(productData);
        }
 
@@ -253,5 +259,13 @@ public class OrderConverter {
                 .collect(Collectors.toSet());
 
         order.setOrderHistories(orderHistories);
+    }
+
+    private Boolean getReviewedStatusOfUserLogin(Long productId){
+        List<UserRating> userRatings = userRatingService.getListRatingByUser(authenticatedProvider.getUserIdValue(), productId);
+        if (userRatings.stream().count()>0){
+            return true;
+        }
+        return false;
     }
 }

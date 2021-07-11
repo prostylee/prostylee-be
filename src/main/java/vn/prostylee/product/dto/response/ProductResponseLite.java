@@ -19,4 +19,5 @@ public class ProductResponseLite implements Serializable {
     private Double price;
     private Double priceSale;
     private Boolean likeStatusOfUserLogin;
+    private Boolean reviewedStatusOfUserLogin;
 }

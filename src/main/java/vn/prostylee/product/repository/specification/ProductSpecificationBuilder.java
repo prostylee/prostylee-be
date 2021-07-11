@@ -106,6 +106,10 @@ public class ProductSpecificationBuilder {
             sbWhere.append(" AND (LOWER(p.name) LIKE :keyword OR LOWER(c.name) LIKE :keyword)");
         }
 
+        if (productFilter.getMinPrice()!=null && productFilter.getMaxPrice()!=null) {
+            sbWhere.append(" AND :minPrice <= p.price_sale AND p.price_sale <= :maxPrice");
+        }
+
         return sbWhere;
     }
 
@@ -187,6 +191,11 @@ public class ProductSpecificationBuilder {
             params.put("pTargetType", TargetType.PRODUCT.name());
             params.put("pLimit", NUMBER_OF_RECORD_TO_BE_CALCULATED_DISTANCE);
             params.put("pOffset", 0);
+        }
+
+        if (productFilter.getMinPrice() != null && productFilter.getMaxPrice() != null) {
+            params.put("minPrice", productFilter.getMinPrice());
+            params.put("maxPrice", productFilter.getMaxPrice());
         }
 
         return params;

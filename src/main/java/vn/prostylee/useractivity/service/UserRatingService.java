@@ -8,6 +8,9 @@ import vn.prostylee.useractivity.dto.request.UserRatingRequest;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
 import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.dto.response.UserRatingResponse;
+import vn.prostylee.useractivity.entity.UserRating;
+
+import java.util.List;
 
 public interface UserRatingService extends CrudService<UserRatingRequest, UserRatingResponse, Long> {
     /**
@@ -27,4 +30,6 @@ public interface UserRatingService extends CrudService<UserRatingRequest, UserRa
     Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam);
 
     Page<ReviewCountResponse> countNumberReview(PagingParam pagingParam);
+
+    List<UserRating> getListRatingByUser(Long userId, Long productId);
 }

@@ -174,4 +174,9 @@ public class UserRatingServiceImpl implements UserRatingService {
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
         return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT.toString());
     }
+
+    @Override
+    public List<UserRating> getListRatingByUser(Long userId, Long productId){
+        return userRatingRepository.getListRatingByUser(productId, TargetType.PRODUCT.toString(), userId);
+    }
 }
