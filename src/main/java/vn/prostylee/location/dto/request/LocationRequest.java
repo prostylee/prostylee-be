@@ -2,6 +2,7 @@ package vn.prostylee.location.dto.request;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.location.dto.LatLngDto;
 
 @AllArgsConstructor
@@ -21,5 +22,5 @@ public class LocationRequest extends LatLngDto {
 
     private String zipcode;
 
-    private String targetType;
+    private TargetType targetType;
 }

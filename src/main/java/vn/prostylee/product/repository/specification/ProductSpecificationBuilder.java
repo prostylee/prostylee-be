@@ -220,7 +220,7 @@ public class ProductSpecificationBuilder {
 
     private List<Long> getTopFollowingStores(int numberOfStore, ProductFilter productFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.STORE.name()))
+                .targetTypes(Collections.singletonList(TargetType.STORE))
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
         request.setLimit(numberOfStore);

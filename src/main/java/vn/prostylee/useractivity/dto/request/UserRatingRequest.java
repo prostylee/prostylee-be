@@ -1,6 +1,8 @@
 package vn.prostylee.useractivity.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.media.dto.request.MediaRequest;
 
 import javax.validation.Valid;
@@ -16,8 +18,9 @@ public class UserRatingRequest {
     @NotNull
     private Long targetId;
 
-    @NotBlank
-    private String targetType;
+    @NotNull
+    @Schema(allowableValues = {"PRODUCT"})
+    private TargetType targetType;
 
     @NotNull
     @Max(5)

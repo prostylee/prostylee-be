@@ -174,7 +174,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public Page<StoreResponse> getTopProductsOfStores(MostActiveStoreFilter storeFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.STORE.name()))
+                .targetTypes(Collections.singletonList(TargetType.STORE))
                 .fromDate(DateUtils.getLastDaysBefore(storeFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
                 .build()
@@ -230,7 +230,7 @@ public class StoreServiceImpl implements StoreService {
         locationFilter.setLongitude(storeFilter.getLongitude());
         locationFilter.setLimit(storeFilter.getLimit());
         locationFilter.setPage(storeFilter.getPage());
-        locationFilter.setTargetType(TargetType.STORE.name());
+        locationFilter.setTargetType(TargetType.STORE);
 
         return locationService.getNearestLocations(locationFilter);
     }

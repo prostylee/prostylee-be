@@ -5,6 +5,7 @@ import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,7 +36,8 @@ public class UserFollower extends AuditEntity {
 	private Long targetId;
 
 	@Column(name = "target_type", length = 512)
-	private String targetType;
+	@Enumerated(EnumType.STRING)
+	private TargetType targetType;
 
 	@Column(name = "custom_field_id_1")
 	private Long customFieldId1;

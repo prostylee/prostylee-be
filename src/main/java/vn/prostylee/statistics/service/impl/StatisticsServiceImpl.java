@@ -33,11 +33,11 @@ public class StatisticsServiceImpl implements StatisticsService {
     private UserStatisticsResponse getUserStatisticsResponse(Long userLoginId) {
         UserFollowerFilter followerFilter = UserFollowerFilter.builder()
                 .targetId(userLoginId)
-                .targetType(TargetType.USER.name())
+                .targetType(TargetType.USER)
                 .build();
 
         UserFollowerFilter followingFilter = UserFollowerFilter.builder()
-                .targetType(TargetType.USER.name())
+                .targetType(TargetType.USER)
                 .userId(userLoginId)
                 .build();
 

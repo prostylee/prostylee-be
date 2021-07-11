@@ -17,7 +17,6 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.post.service.PostService;
 import vn.prostylee.product.service.ProductService;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
@@ -69,7 +68,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     public boolean like(UserLikeRequest request) {
         try {
             UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
-            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
+            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType().name()))
                 repository.save(entity);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
@@ -80,7 +79,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     @Override
     public boolean unlike(UserLikeRequest request) {
         try {
-            repository.unlike(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue());
+            repository.unlike(request.getTargetId(), request.getTargetType().name(), authenticatedProvider.getUserIdValue());
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
@@ -89,7 +88,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Override
     public List<Long> loadStatusLikes(StatusLikeRequest request) {
-        return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
+        return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType().name(), authenticatedProvider.getUserIdValue());
     }
 
     @Override
@@ -125,8 +124,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     private UserLikeResponse convertToResponse(UserLike userLike) {
         UserLikeResponse userLikeResponse = BeanUtil.copyProperties(userLike, UserLikeResponse.class);
-        TargetType targetType = TargetType.valueOf(userLike.getTargetType());
-        switch (targetType){
+        switch (userLike.getTargetType()){
             case PRODUCT:
                 Optional.ofNullable(userLikeResponse.getTargetId())
                         .ifPresent(targetID -> userLikeResponse.setProduct(productService.findById(targetID)));
@@ -138,9 +136,7 @@ public class UserLikeServiceImpl implements UserLikeService {
             default:
                 break;
         }
-        if (userLike.getTargetType() == TargetType.PRODUCT.toString()){
 
-        }
         return userLikeResponse;
     }
 

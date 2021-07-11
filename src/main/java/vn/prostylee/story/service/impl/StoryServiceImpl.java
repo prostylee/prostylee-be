@@ -61,20 +61,20 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getUserStoryResponses(filter, TargetType.USER.name());
+        return getUserStoryResponses(filter, TargetType.USER);
     }
 
     @Override
     public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoreStoryResponses(filter, TargetType.STORE.name());
+        return getStoreStoryResponses(filter, TargetType.STORE);
     }
 
-    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
+    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
 
-        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
 
         responses.getContent().forEach(this::buildAdditionalData);
@@ -88,11 +88,11 @@ public class StoryServiceImpl implements StoryService {
         response.setStoreResponseLite(Optional.ofNullable(response.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
     }
 
-    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
+    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
 
-        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
 
         responses.getContent().forEach(response -> {
@@ -124,8 +124,8 @@ public class StoryServiceImpl implements StoryService {
         return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
     }
 
-    private List<Long> getFollowsBy(Long id, String typeName) {
-        UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(typeName.toLowerCase()).build();
+    private List<Long> getFollowsBy(Long id, TargetType typeName) {
+        UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(typeName).build();
         return userFollowerService.findAll(userFilter)
                 .map(UserFollowerResponse::getTargetId)
                 .stream().collect(Collectors.toList());

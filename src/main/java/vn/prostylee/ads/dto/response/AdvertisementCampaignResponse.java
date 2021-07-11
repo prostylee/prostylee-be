@@ -1,6 +1,7 @@
 package vn.prostylee.ads.dto.response;
 
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class AdvertisementCampaignResponse implements Serializable {
 
     private Long targetId;
 
-    private String targetType;
+    private TargetType targetType;
 
     private Integer targetFromAge;
 

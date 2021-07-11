@@ -134,7 +134,7 @@ public class StoreConverter {
     private Boolean getFollowStatusOfUserLogin(Long storeId) {
         StatusFollowRequest request = StatusFollowRequest.builder()
                 .targetIds(Collections.singletonList(storeId))
-                .targetType(TargetType.STORE.name()).build();
+                .targetType(TargetType.STORE).build();
         List<Long> result = userFollowerService.loadStatusFollows(request);
         if (result.stream().count() > 0) {
             return true;

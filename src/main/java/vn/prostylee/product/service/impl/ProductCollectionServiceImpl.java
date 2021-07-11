@@ -66,7 +66,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
 
     private List<Long> getRelatedProductIdsByMostActive(Product product, RelatedProductFilter relatedProductFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.PRODUCT.name()))
+                .targetTypes(Collections.singletonList(TargetType.PRODUCT))
                 .customFieldId1(product.getCategory().getId())
                 .fromDate(DateUtils.getLastDaysBefore(MostActiveUserFilter.DEFAULT_TIME_RANGE_IN_DAYS))
                 .toDate(Calendar.getInstance().getTime())

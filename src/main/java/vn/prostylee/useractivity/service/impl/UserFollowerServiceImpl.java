@@ -109,7 +109,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         userFollowerFilter.setKeyword(userFollowerPageable.getKeyword());
         userFollowerFilter.setLimit(userFollowerPageable.getLimit());
         userFollowerFilter.setPage(userFollowerPageable.getPage());
-        userFollowerFilter.setTargetType(TargetType.USER.name());
+        userFollowerFilter.setTargetType(TargetType.USER);
 
         Page<UserFollowerResponse> page = findAll(userFollowerFilter);
         List<Long> ids = page.getContent()
@@ -132,7 +132,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         userFollowerFilter.setKeyword(userFollowingFilter.getKeyword());
         userFollowerFilter.setLimit(userFollowingFilter.getLimit());
         userFollowerFilter.setPage(userFollowingFilter.getPage());
-        userFollowerFilter.setTargetType(userFollowingFilter.getTargetType().name());
+        userFollowerFilter.setTargetType(userFollowingFilter.getTargetType());
 
         Page<UserFollowerResponse> page = findAll(userFollowerFilter);
         List<Long> ids = page.getContent()
@@ -164,8 +164,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     private UserFollowerResponse convertToResponse(UserFollower userFollower){
         UserFollowerResponse userFollowerResponse = BeanUtil.copyProperties(userFollower,UserFollowerResponse.class);
-        TargetType targetType = TargetType.valueOf(userFollower.getTargetType().toUpperCase());
-        switch (targetType){
+        switch (userFollower.getTargetType()){
             case STORE:
                 Optional.ofNullable(userFollowerResponse.getTargetId())
                         .ifPresent(targetId -> userFollowerResponse.setStore(storeService.findById(targetId)));

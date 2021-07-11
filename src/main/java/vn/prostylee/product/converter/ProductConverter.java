@@ -147,7 +147,7 @@ public class ProductConverter {
     private Boolean getLikeStatusOfUserLogin(Long productId){
         StatusLikeRequest request = StatusLikeRequest.builder()
                 .targetIds(Collections.singletonList(productId))
-                .targetType(TargetType.PRODUCT.name())
+                .targetType(TargetType.PRODUCT)
                 .build();
         List<Long> result = userLikeService.loadStatusLikes(request);
         if (result.stream().count() > 0){

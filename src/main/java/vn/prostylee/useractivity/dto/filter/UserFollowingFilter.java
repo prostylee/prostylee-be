@@ -3,7 +3,7 @@ package vn.prostylee.useractivity.dto.filter;
 import lombok.*;
 import vn.prostylee.core.constant.TargetType;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -12,6 +12,6 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class UserFollowingFilter extends UserFollowerPageable {
 
-    @NotBlank
+    @NotNull
     private TargetType targetType;
 }

@@ -37,7 +37,7 @@ public class UserActivityServiceImpl implements UserActivityService {
     @Override
     public Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.USER.name()))
+                .targetTypes(Collections.singletonList(TargetType.USER))
                 .fromDate(DateUtils.getLastDaysBefore(filter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
                 .build()

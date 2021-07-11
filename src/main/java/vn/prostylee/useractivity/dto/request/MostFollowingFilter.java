@@ -3,6 +3,7 @@ package vn.prostylee.useractivity.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 
 @Builder
@@ -17,7 +18,7 @@ public class MostFollowingFilter extends PagingParam {
      */
     public static final int DEFAULT_TIME_RANGE_IN_DAYS = 90;
 
-    private Long targetType;
+    private TargetType targetType;
 
     @Builder.Default
     @Schema(name = "timeRangeInDays", example = "365", description = "The number of days that will be count for considering as as top following.")

@@ -1,6 +1,7 @@
 package vn.prostylee.story.entity;
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -31,7 +32,8 @@ public class Story extends AuditEntity{
     private Long targetId;
 
     @Column(name = "target_type", nullable = false)
-    private String targetType;
+    @Enumerated(EnumType.STRING)
+    private TargetType targetType;
 
     @Column(name = "product_id")
     private Long productId;

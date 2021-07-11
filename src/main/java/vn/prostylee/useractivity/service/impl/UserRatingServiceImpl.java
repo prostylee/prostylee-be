@@ -166,17 +166,17 @@ public class UserRatingServiceImpl implements UserRatingService {
     @Override
     public Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam) {
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
-        return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT.toString());
+        return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT);
     }
 
     @Override
     public Page<ReviewCountResponse> countNumberReview(PagingParam pagingParam){
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
-        return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT.toString());
+        return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT);
     }
 
     @Override
     public List<UserRating> getListRatingByUser(Long userId, Long productId){
-        return userRatingRepository.getListRatingByUser(productId, TargetType.PRODUCT.toString(), userId);
+        return userRatingRepository.getListRatingByUser(productId, TargetType.PRODUCT, userId);
     }
 }

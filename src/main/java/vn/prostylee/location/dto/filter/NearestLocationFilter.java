@@ -2,6 +2,7 @@ package vn.prostylee.location.dto.filter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 import javax.validation.constraints.NotBlank;
@@ -17,8 +18,8 @@ public class NearestLocationFilter extends BaseFilter {
     @NotNull
     private double longitude;
 
-    @NotBlank
-    private String targetType;
+    @NotNull
+    private TargetType targetType;
 
     @Override
     public String[] getSearchableFields() {
