@@ -2,6 +2,7 @@ package vn.prostylee.story.dto.request;
 
 import lombok.Data;
 import vn.prostylee.media.dto.request.MediaRequest;
+import vn.prostylee.core.constant.TargetType;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -14,7 +15,7 @@ public class StoryRequest {
 
     private Long targetId;
 
-    private String targetType;
+    private TargetType targetType;
 
     private Long productId;
 

@@ -19,7 +19,7 @@ import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.story.dto.response.UserResponseLite;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserRatingFilter;
 import vn.prostylee.useractivity.dto.request.UserRatingRequest;
@@ -166,17 +166,17 @@ public class UserRatingServiceImpl implements UserRatingService {
     @Override
     public Page<RatingResultCountResponse> countRatingResult(PagingParam pagingParam) {
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
-        return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT.toString());
+        return userRatingRepository.countRatingResult(pageSpecification, TargetType.PRODUCT);
     }
 
     @Override
     public Page<ReviewCountResponse> countNumberReview(PagingParam pagingParam){
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
-        return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT.toString());
+        return userRatingRepository.countNumberReview(pageSpecification, TargetType.PRODUCT);
     }
 
     @Override
     public List<UserRating> getListRatingByUser(Long userId, Long productId){
-        return userRatingRepository.getListRatingByUser(productId, TargetType.PRODUCT.toString(), userId);
+        return userRatingRepository.getListRatingByUser(productId, TargetType.PRODUCT, userId);
     }
 }

@@ -2,6 +2,7 @@ package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.response.AuditResponse;
 import vn.prostylee.story.dto.response.UserResponseLite;
 
@@ -15,7 +16,7 @@ public class UserRatingResponse extends AuditResponse {
 
     private Long targetId;
 
-    private String targetType;
+    private TargetType targetType;
 
     private Integer value;
 

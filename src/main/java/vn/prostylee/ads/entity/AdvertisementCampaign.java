@@ -1,6 +1,7 @@
 package vn.prostylee.ads.entity;
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -54,7 +55,8 @@ public class AdvertisementCampaign extends AuditEntity {
     private Long targetId;
 
     @Column(name = "target_type", length = 512)
-    private String targetType;
+    @Enumerated(EnumType.STRING)
+    private TargetType targetType;
 
     @Column(name = "target_from_age")
     private Integer targetFromAge;

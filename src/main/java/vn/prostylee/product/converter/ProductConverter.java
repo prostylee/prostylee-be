@@ -17,7 +17,7 @@ import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
@@ -147,7 +147,7 @@ public class ProductConverter {
     private Boolean getLikeStatusOfUserLogin(Long productId){
         StatusLikeRequest request = StatusLikeRequest.builder()
                 .targetIds(Collections.singletonList(productId))
-                .targetType(TargetType.PRODUCT.name())
+                .targetType(TargetType.PRODUCT)
                 .build();
         List<Long> result = userLikeService.loadStatusLikes(request);
         if (result.stream().count() > 0){

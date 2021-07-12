@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.dto.filter;
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -9,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserFollowerFilter extends UserFollowerPageable {
 
-    private String targetType;
+    private TargetType targetType;
     private Long targetId;
     private Long userId;
 }

@@ -17,6 +17,7 @@ import vn.prostylee.comment.constant.CommentDestinationType;
 import vn.prostylee.comment.dto.response.CommentResponse;
 import vn.prostylee.comment.entity.CommentImage;
 import vn.prostylee.comment.service.impl.CommentServiceImpl;
+import vn.prostylee.core.constant.TargetType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,7 +76,7 @@ public class CommentControllerTest {
         CommentResponse response = new CommentResponse();
         response.setId(id);
         response.setContent("This is content");
-        response.setTargetType(CommentDestinationType.STORE.getType());
+        response.setTargetType(TargetType.STORE);
         response.setCommentImages(mockResponseCommentImage());
         return  response;
     }

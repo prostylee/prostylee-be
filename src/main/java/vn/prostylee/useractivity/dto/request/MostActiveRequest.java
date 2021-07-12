@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.dto.request;
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.product.constant.PagingConstant;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class MostActiveRequest extends PagingParam {
 
-    private List<String> targetTypes;
+    private List<TargetType> targetTypes;
 
     private Long customFieldId1;
 

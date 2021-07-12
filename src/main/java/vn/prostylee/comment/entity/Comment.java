@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -44,7 +45,8 @@ public class Comment extends AuditEntity {
 	private long targetId;
 
 	@Column(name = "target_type", length = 512)
-	private String targetType;
+	@Enumerated(EnumType.STRING)
+	private TargetType targetType;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "deleted_at")

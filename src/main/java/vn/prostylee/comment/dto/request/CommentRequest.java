@@ -1,8 +1,8 @@
 package vn.prostylee.comment.dto.request;
 
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,5 +19,5 @@ public class CommentRequest {
     @NotNull
     private Long targetId;
 
-    private String targetType;
+    private TargetType targetType;
 }

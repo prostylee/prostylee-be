@@ -12,7 +12,7 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.MostActiveUserFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.response.UserActivityResponse;
@@ -37,7 +37,7 @@ public class UserActivityServiceImpl implements UserActivityService {
     @Override
     public Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.USER.name()))
+                .targetTypes(Collections.singletonList(TargetType.USER))
                 .fromDate(DateUtils.getLastDaysBefore(filter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime())
                 .build()

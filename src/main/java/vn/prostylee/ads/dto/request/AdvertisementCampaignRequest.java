@@ -1,6 +1,7 @@
 package vn.prostylee.ads.dto.request;
 
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.location.dto.request.LocationRequest;
 
 import javax.validation.Valid;
@@ -37,7 +38,7 @@ public class AdvertisementCampaignRequest {
     private Long targetId;
 
     @Size(max = 512)
-    private String targetType;
+    private TargetType targetType;
 
     private Integer targetFromAge;
 

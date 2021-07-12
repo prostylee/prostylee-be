@@ -17,7 +17,7 @@ import vn.prostylee.product.repository.ProductAttributeRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -228,7 +228,7 @@ public class ProductSpecificationBuilder {
 
     private List<Long> getTopFollowingStores(int numberOfStore, ProductFilter productFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.STORE.name()))
+                .targetTypes(Collections.singletonList(TargetType.STORE))
                 .fromDate(DateUtils.getLastDaysBefore(productFilter.getTimeRangeInDays()))
                 .toDate(Calendar.getInstance().getTime()).build();
         request.setLimit(numberOfStore);

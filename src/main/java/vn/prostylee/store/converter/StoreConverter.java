@@ -18,7 +18,7 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.StoreBannerService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -134,7 +134,7 @@ public class StoreConverter {
     private Boolean getFollowStatusOfUserLogin(Long storeId) {
         StatusFollowRequest request = StatusFollowRequest.builder()
                 .targetIds(Collections.singletonList(storeId))
-                .targetType(TargetType.STORE.name()).build();
+                .targetType(TargetType.STORE).build();
         List<Long> result = userFollowerService.loadStatusFollows(request);
         if (result.stream().count() > 0) {
             return true;

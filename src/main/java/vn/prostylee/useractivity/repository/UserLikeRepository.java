@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.entity.UserLike;
 
@@ -45,7 +46,7 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
             "GROUP BY e.targetId " +
             "ORDER BY count(e.targetId) DESC ")
     List<Long> getTopBeLikes(
-            @Param("targetTypes") List<String> targetTypes,
+            @Param("targetTypes") List<TargetType> targetTypes,
             @Param("customFieldId1") Long customFieldId1,
             @Param("customFieldId2") Long customFieldId2,
             @Param("customFieldId3") Long customFieldId3,
