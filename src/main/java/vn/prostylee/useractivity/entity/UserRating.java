@@ -2,6 +2,7 @@ package vn.prostylee.useractivity.entity;
 // Generated Nov 28, 2020, 9:45:59 PM by Hibernate Tools 5.2.12.Final
 
 import lombok.*;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -31,7 +32,8 @@ public class UserRating extends AuditEntity {
 	private Long targetId;
 
 	@Column(name = "target_type", length = 512)
-	private String targetType;
+	@Enumerated(EnumType.STRING)
+	private TargetType targetType;
 
 	@Column(name = "value")
 	private Integer value;

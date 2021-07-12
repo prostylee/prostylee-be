@@ -2,6 +2,7 @@ package vn.prostylee.useractivity.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ public class StatusLikeRequest {
     @NotNull
     private List<Long> targetIds;
 
-    @NotBlank
-    private String targetType;
+    @NotNull
+    private TargetType targetType;
 
 }

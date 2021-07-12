@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.media.dto.request.MediaRequest;
 
 import javax.validation.Valid;
@@ -21,8 +22,8 @@ public class UserRatingRequestTest {
     @NotNull
     private Long targetId;
 
-    @NotBlank
-    private String targetType;
+    @NotNull
+    private TargetType targetType;
 
     @NotNull
     @Max(5)

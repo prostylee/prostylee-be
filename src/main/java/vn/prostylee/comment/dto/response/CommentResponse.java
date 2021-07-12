@@ -3,6 +3,7 @@ package vn.prostylee.comment.dto.response;
 import lombok.Data;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.comment.entity.CommentImage;
+import vn.prostylee.core.constant.TargetType;
 
 import java.util.Date;
 import java.util.Set;
@@ -14,7 +15,7 @@ public class CommentResponse {
     private String content;
     private Long parentId;
     private Long targetId;
-    private String targetType;
+    private TargetType targetType;
     private Date deletedAt;
     private Date createdAt;
     private Long createdBy;

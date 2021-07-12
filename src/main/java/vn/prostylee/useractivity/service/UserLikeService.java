@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.service;
 
 import org.springframework.data.domain.Page;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
@@ -26,5 +27,5 @@ public interface UserLikeService {
 
     List<Long> getTopBeLikes(MostActiveRequest request);
 
-    Page<LikeCountResponse> countNumberLike(PagingParam pagingParam, String targetType);
+    Page<LikeCountResponse> countNumberLike(PagingParam pagingParam, TargetType targetType);
 }

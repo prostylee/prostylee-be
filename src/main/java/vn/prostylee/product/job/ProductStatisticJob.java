@@ -7,14 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.service.OrderService;
-import vn.prostylee.post.entity.PostStatistic;
-import vn.prostylee.product.dto.response.ProductStatisticResponse;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
-import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.dto.response.LikeCountResponse;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
 import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
@@ -69,12 +67,12 @@ public class ProductStatisticJob extends QuartzJobBean {
 
     private void countNumberOfLike() {
         int page = 0;
-        Page<LikeCountResponse> likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT.toString());
+        Page<LikeCountResponse> likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT);
         log.debug("totalPages={}, totalElements={}, postLikeSize={}", likeCountResponsePage.getTotalPages(), likeCountResponsePage.getTotalElements(), likeCountResponsePage.getNumberOfElements());
         while (likeCountResponsePage.getNumberOfElements() > 0) {
             upsertLikeStatistic(likeCountResponsePage.getContent());
             page++;
-            likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT.toString());
+            likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT);
             log.debug("totalPages={}, totalElements={}, postLikeSize={}", likeCountResponsePage.getTotalPages(), likeCountResponsePage.getTotalElements(), likeCountResponsePage.getNumberOfElements());
         }
     }

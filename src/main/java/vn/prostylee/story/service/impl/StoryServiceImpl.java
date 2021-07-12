@@ -17,7 +17,6 @@ import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.story.constant.StoryDestinationType;
 import vn.prostylee.story.dto.filter.StoryFilter;
 import vn.prostylee.story.dto.request.StoryRequest;
 import vn.prostylee.story.dto.response.StoreForStoryResponse;
@@ -29,6 +28,7 @@ import vn.prostylee.story.entity.StoryImage;
 import vn.prostylee.story.repository.StoryRepository;
 import vn.prostylee.story.service.StoryImageService;
 import vn.prostylee.story.service.StoryService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
@@ -61,20 +61,20 @@ public class StoryServiceImpl implements StoryService {
     @Override
     public Page<UserStoryResponse> getUserStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getUserStoryResponses(filter, StoryDestinationType.USER.getType());
+        return getUserStoryResponses(filter, TargetType.USER);
     }
 
     @Override
     public Page<StoreStoryResponse> getStoreStoriesByUserId(BaseFilter baseFilter) {
         StoryFilter filter = (StoryFilter) baseFilter;
-        return getStoreStoryResponses(filter, StoryDestinationType.STORE.getType());
+        return getStoreStoryResponses(filter, TargetType.STORE);
     }
 
-    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, String type) {
+    private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
 
-        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+        Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
 
         responses.getContent().forEach(this::buildAdditionalData);
@@ -88,11 +88,11 @@ public class StoryServiceImpl implements StoryService {
         response.setStoreResponseLite(Optional.ofNullable(response.getStoreId()).map(this::getStoreForStoryBy).orElse(null));
     }
 
-    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, String type) {
+    private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
 
-        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type, pageable)
+        Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
 
         responses.getContent().forEach(response -> {
@@ -124,7 +124,7 @@ public class StoryServiceImpl implements StoryService {
         return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
     }
 
-    private List<Long> getFollowsBy(Long id, String typeName) {
+    private List<Long> getFollowsBy(Long id, TargetType typeName) {
         UserFollowerFilter userFilter = UserFollowerFilter.builder().userId(id).targetType(typeName).build();
         return userFollowerService.findAll(userFilter)
                 .map(UserFollowerResponse::getTargetId)

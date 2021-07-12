@@ -69,7 +69,7 @@ public class AdvertisementCampaignServiceImpl implements AdvertisementCampaignSe
             spec = spec.and((root, query, cb) -> cb.equal(root.get("position"), filter.getPosition()));
         }
 
-        if (StringUtils.isNotBlank(filter.getTargetType())) {
+        if (null != filter.getTargetType()) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("targetType"), filter.getTargetType()));
         }
 

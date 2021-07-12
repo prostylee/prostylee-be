@@ -1,14 +1,9 @@
 package vn.prostylee.product.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import vn.prostylee.location.dto.response.LocationResponse;
+import lombok.*;
 import vn.prostylee.post.dto.response.PostStatisticResponse;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 @Data

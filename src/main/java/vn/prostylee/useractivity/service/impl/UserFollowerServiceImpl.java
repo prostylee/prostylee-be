@@ -16,7 +16,7 @@ import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.filter.UserFollowerPageable;
@@ -109,7 +109,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
         userFollowerFilter.setKeyword(userFollowerPageable.getKeyword());
         userFollowerFilter.setLimit(userFollowerPageable.getLimit());
         userFollowerFilter.setPage(userFollowerPageable.getPage());
-        userFollowerFilter.setTargetType(TargetType.USER.name());
+        userFollowerFilter.setTargetType(TargetType.USER);
 
         Page<UserFollowerResponse> page = findAll(userFollowerFilter);
         List<Long> ids = page.getContent()
@@ -164,8 +164,7 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     private UserFollowerResponse convertToResponse(UserFollower userFollower){
         UserFollowerResponse userFollowerResponse = BeanUtil.copyProperties(userFollower,UserFollowerResponse.class);
-        TargetType targetType = TargetType.valueOf(userFollower.getTargetType().toUpperCase());
-        switch (targetType){
+        switch (userFollower.getTargetType()){
             case STORE:
                 Optional.ofNullable(userFollowerResponse.getTargetId())
                         .ifPresent(targetId -> userFollowerResponse.setStore(storeService.findById(targetId)));

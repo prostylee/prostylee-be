@@ -2,6 +2,7 @@ package vn.prostylee.useractivity.dto.filter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 @Data
@@ -9,7 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class UserLikeFilter extends BaseFilter {
 
     private Long targetId;
-    private String targetType;
+    private TargetType targetType;
     private String userId;
 
     @Override

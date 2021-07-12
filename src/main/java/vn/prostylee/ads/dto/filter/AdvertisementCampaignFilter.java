@@ -2,6 +2,7 @@ package vn.prostylee.ads.dto.filter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 @EqualsAndHashCode(callSuper = true)
@@ -9,7 +10,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class AdvertisementCampaignFilter extends BaseFilter {
 
     private Long groupId;
-    private String targetType;
+    private TargetType targetType;
     private String position;
     private Boolean active;
 

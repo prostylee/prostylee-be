@@ -46,4 +46,19 @@ public class Branch extends AuditEntity {
 	@Column(name = "deleted_at", length = 19)
 	private Date deletedAt;
 
+	@Column(name = "city_code", length = 20, nullable = false)
+	private String cityCode;
+
+	@Column(name = "district_code", length = 20, nullable = false)
+	private String districtCode;
+
+	@Column(name = "ward_code", length = 20, nullable = false)
+	private String wardCode;
+
+	@Column(name = "address", length = 512, nullable = false)
+	private String address;
+
+	@Column(name = "full_address", length = 512, nullable = false)
+	private String fullAddress;
+
 }

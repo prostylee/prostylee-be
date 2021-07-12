@@ -20,7 +20,7 @@ import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
@@ -91,7 +91,7 @@ public class ProductConverter {
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
         productResponse.setProductStatisticResponse(buildProductStatistic(product.getId()));
-        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId(),TargetType.PRODUCT.name()));
+        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId(),TargetType.PRODUCT));
         productResponse.setProductAttributeOptionResponse(buildAttributeOption(product.getId()));
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
         productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
@@ -108,16 +108,16 @@ public class ProductConverter {
         return productResponseLite;
     }
 
-    public NewFeedResponse toResponseForNewFeed(NewFeedResponse newFeedResponse, String targetType){
+    public NewFeedResponse toResponseForNewFeed(NewFeedResponse newFeedResponse, TargetType targetType){
         if(TargetType.valueOf(newFeedResponse.getType()) == TargetType.PRODUCT){
             newFeedResponse.setImageUrls(buildImageUrls(newFeedResponse.getId()));
-            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT.name()));
+            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT));
             newFeedResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(newFeedResponse.getId()));
             newFeedResponse.setProductStatisticResponse(buildProductStatistic(newFeedResponse.getId()));
         }
         if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST){
             newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
-            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST.name()));
+            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
             newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
         }
         newFeedResponse.setNewFeedOwnerResponse(buildNewFeedOwner(newFeedResponse.getOwnerId(), targetType));
@@ -190,7 +190,7 @@ public class ProductConverter {
                 .orElse(null);
     }
 
-    private Boolean getLikeStatusOfUserLogin(Long id, String targetType){
+    private Boolean getLikeStatusOfUserLogin(Long id, TargetType targetType){
         StatusLikeRequest request = StatusLikeRequest.builder()
                 .targetIds(Collections.singletonList(id))
                 .targetType(targetType)
@@ -265,9 +265,9 @@ public class ProductConverter {
         return t -> uniqueMap.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    private ProductOwnerResponse buildNewFeedOwner(Long id, String targetType) {
+    private ProductOwnerResponse buildNewFeedOwner(Long id, TargetType targetType) {
         final ProductOwnerResponse[] productOwnerResponse = new ProductOwnerResponse[1];
-        if (TargetType.valueOf(targetType) == TargetType.STORE) {
+        if (targetType == TargetType.STORE) {
             productOwnerResponse[0] = productStoreService.getStoreOwner(id);
         } else {
             userService.fetchById(id).ifPresent(user ->

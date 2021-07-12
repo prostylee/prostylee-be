@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import vn.prostylee.location.dto.response.LocationResponse;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,5 +33,7 @@ public class BranchResponse implements Serializable {
     private Date updatedAt;
 
     private Long createdBy;
+
+    private String fullAddress;
 
 }

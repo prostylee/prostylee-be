@@ -22,7 +22,7 @@ import vn.prostylee.product.repository.ProductExtRepository;
 import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.CategoryRelationshipService;
 import vn.prostylee.product.service.ProductCollectionService;
-import vn.prostylee.useractivity.constant.TargetType;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.MostActiveUserFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserMostActiveService;
@@ -66,7 +66,7 @@ public class ProductCollectionServiceImpl implements ProductCollectionService {
 
     private List<Long> getRelatedProductIdsByMostActive(Product product, RelatedProductFilter relatedProductFilter) {
         MostActiveRequest request = MostActiveRequest.builder()
-                .targetTypes(Collections.singletonList(TargetType.PRODUCT.name()))
+                .targetTypes(Collections.singletonList(TargetType.PRODUCT))
                 .customFieldId1(product.getCategory().getId())
                 .fromDate(DateUtils.getLastDaysBefore(MostActiveUserFilter.DEFAULT_TIME_RANGE_IN_DAYS))
                 .toDate(Calendar.getInstance().getTime())

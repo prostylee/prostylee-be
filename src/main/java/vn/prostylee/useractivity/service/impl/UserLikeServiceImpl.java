@@ -1,6 +1,5 @@
 package vn.prostylee.useractivity.service.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
@@ -19,7 +19,6 @@ import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.post.service.PostService;
 import vn.prostylee.product.service.ProductService;
-import vn.prostylee.useractivity.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
@@ -104,7 +103,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     }
 
     @Override
-    public Page<LikeCountResponse> countNumberLike(PagingParam pagingParam, String targetType){
+    public Page<LikeCountResponse> countNumberLike(PagingParam pagingParam, TargetType targetType){
         Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
         return repository.countNumberLike(pageSpecification, targetType);
     }
@@ -134,8 +133,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     private UserLikeResponse convertToResponse(UserLike userLike) {
         UserLikeResponse userLikeResponse = BeanUtil.copyProperties(userLike, UserLikeResponse.class);
-        TargetType targetType = TargetType.valueOf(userLike.getTargetType());
-        switch (targetType){
+        switch (userLike.getTargetType()){
             case PRODUCT:
                 Optional.ofNullable(userLikeResponse.getTargetId())
                         .ifPresent(targetID -> userLikeResponse.setProduct(productService.findById(targetID)));
@@ -147,9 +145,7 @@ public class UserLikeServiceImpl implements UserLikeService {
             default:
                 break;
         }
-        if (userLike.getTargetType() == TargetType.PRODUCT.toString()){
 
-        }
         return userLikeResponse;
     }
 

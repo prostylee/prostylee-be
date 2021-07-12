@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.core.constant.TargetType;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class UpdateRequestTest {
     private Long targetId;
     private long parentId;
-    private String targetType;
+    private TargetType targetType;
     private String content;
     private List<Long> attachmentId;
 }

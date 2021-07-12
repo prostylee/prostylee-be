@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import vn.prostylee.BaseRestControllerE2eTest;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.request.UserRatingRequestTest;
 
 import static io.restassured.RestAssured.given;
@@ -54,7 +55,7 @@ public class UserRatingControllerE2eTest extends BaseRestControllerE2eTest {
     private UserRatingRequestTest createRequest() {
         return UserRatingRequestTest.builder()
                 .targetId(Long.valueOf(1))
-                .targetType("product")
+                .targetType(TargetType.PRODUCT)
                 .value(5)
                 .content("Test")
                 .build();

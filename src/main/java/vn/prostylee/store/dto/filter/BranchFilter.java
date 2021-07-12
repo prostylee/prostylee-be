@@ -1,5 +1,6 @@
 package vn.prostylee.store.dto.filter;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import vn.prostylee.core.dto.filter.BaseFilter;
@@ -9,6 +10,8 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class BranchFilter extends BaseFilter  {
 
     private Long storeId;
+
+    private String cityCode;
 
     private Boolean active;
 
@@ -31,6 +34,14 @@ public class BranchFilter extends BaseFilter  {
                 "active",
                 "createdAt",
                 "updatedAt",
+                "cityCode",
+                "districtCode"
         };
+    }
+
+    @Schema(name = "sorts", example = "sorts=+name&-cityCode&districtCode")
+    @Override
+    public String[] getSorts() {
+        return super.getSorts();
     }
 }

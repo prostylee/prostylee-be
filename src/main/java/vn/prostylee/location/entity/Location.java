@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.entity.AuditEntity;
 
 import javax.persistence.*;
@@ -51,6 +52,7 @@ public class Location extends AuditEntity {
 	private String zipcode;
 
 	@Column(name = "target_type", length = 64)
-	private String targetType;
+	@Enumerated(EnumType.STRING)
+	private TargetType targetType;
 
 }

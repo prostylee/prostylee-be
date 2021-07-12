@@ -3,6 +3,7 @@ package vn.prostylee.product.dto.filter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.BaseFilter;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class NewFeedsFilter extends BaseFilter {
 
     private List<Long> storeIds;
     private List<Long> userIds;
-    private String targetType;
+    private TargetType targetType;
 
     @Override
     public String[] getSearchableFields() {

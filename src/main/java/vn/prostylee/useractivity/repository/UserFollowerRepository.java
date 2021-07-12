@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.repository.BaseRepository;
 import vn.prostylee.useractivity.entity.UserFollower;
 
@@ -23,16 +24,16 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
     @Query("DELETE FROM #{#entityName} WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:createdBy")
     void unfollow(
             @Param("targetId") Long targetId,
-            @Param("targetType") String targetType,
+            @Param("targetType") TargetType targetType,
             @Param("createdBy") Long createdBy
     );
 
-    boolean existsByTargetIdAndTargetType(Long userId, String targetType);
+    boolean existsByTargetIdAndTargetType(Long userId, TargetType targetType);
 
     @Query("SELECT e.targetId FROM #{#entityName} e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusFollows(
             @Param("targetIds") List<Long> targetIds,
-            @Param("targetType") String targetType,
+            @Param("targetType") TargetType targetType,
             @Param("createdBy") Long createdBy
     );
 
@@ -44,7 +45,7 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
             "GROUP BY e.targetId " +
             "ORDER BY count(e.targetId) DESC ")
     List<Long> getTopBeFollows(
-            @Param("targetTypes") List<String> targetTypes,
+            @Param("targetTypes") List<TargetType> targetTypes,
             @Param("customFieldId1") Long customFieldId1,
             @Param("customFieldId2") Long customFieldId2,
             @Param("customFieldId3") Long customFieldId3,

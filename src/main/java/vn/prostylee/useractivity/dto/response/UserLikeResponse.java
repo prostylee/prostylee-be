@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.post.dto.response.PostResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 
@@ -21,7 +22,7 @@ public class UserLikeResponse implements Serializable {
 
     private PostResponse post;
 
-    private String targetType;
+    private TargetType targetType;
 
     private Long customFieldId1;
 
