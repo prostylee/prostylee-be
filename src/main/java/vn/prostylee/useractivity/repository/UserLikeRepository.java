@@ -25,16 +25,16 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
     @Modifying
     void unlike(
             @Param("targetId") Long targetId,
-            @Param("targetType") String targetType,
+            @Param("targetType") TargetType targetType,
             @Param("createdBy") Long createdBy
     );
 
-    boolean existsByTargetIdAndTargetType(Long userId, String targetType);
+    boolean existsByTargetIdAndTargetType(Long userId, TargetType targetType);
     
     @Query("SELECT e.targetId FROM #{#entityName} e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusLikes(
             @Param("targetIds") List<Long> targetIds,
-            @Param("targetType") String targetType,
+            @Param("targetType") TargetType targetType,
             @Param("createdBy") Long createdBy
     );
 

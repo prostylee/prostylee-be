@@ -68,7 +68,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     public boolean like(UserLikeRequest request) {
         try {
             UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
-            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType().name()))
+            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
                 repository.save(entity);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
@@ -79,7 +79,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     @Override
     public boolean unlike(UserLikeRequest request) {
         try {
-            repository.unlike(request.getTargetId(), request.getTargetType().name(), authenticatedProvider.getUserIdValue());
+            repository.unlike(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue());
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;
@@ -88,7 +88,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Override
     public List<Long> loadStatusLikes(StatusLikeRequest request) {
-        return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType().name(), authenticatedProvider.getUserIdValue());
+        return repository.loadStatusLikes(request.getTargetIds(), request.getTargetType(), authenticatedProvider.getUserIdValue());
     }
 
     @Override
