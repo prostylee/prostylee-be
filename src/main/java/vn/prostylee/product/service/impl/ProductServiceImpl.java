@@ -14,10 +14,12 @@ import vn.prostylee.location.dto.request.LocationRequest;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.converter.ProductConverter;
+import vn.prostylee.product.dto.filter.NewFeedsFilter;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.RecentViewProductFilter;
 import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
+import vn.prostylee.product.dto.response.NewFeedResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.*;
@@ -177,6 +179,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> getNewFeeds(ProductFilter productFilter) {
         return findAll(productFilter); // TODO get new feeds
+    }
+
+    @Override
+    public Page<NewFeedResponse> getNewFeedsOfStore(NewFeedsFilter newFeedsFilter){
+        Page<NewFeedResponse> page = productExtRepository.findNewFeedsOfStore(newFeedsFilter);
+        List<NewFeedResponse> newFeeds = page.stream()
+                .map(item->productConverter.toResponseForNewFeed(item, newFeedsFilter.getTargetType()))
+                .collect(Collectors.toList());
+        return new PageImpl<>(newFeeds, page.getPageable(), page.getTotalElements());
     }
 
 }

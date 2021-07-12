@@ -9,13 +9,18 @@ import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.query.HibernateQueryResult;
 import vn.prostylee.core.repository.query.NativeQueryResult;
 import vn.prostylee.core.utils.DbUtil;
+import vn.prostylee.product.dto.filter.NewFeedsFilter;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
+import vn.prostylee.product.dto.response.NewFeedResponse;
+import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductExtRepository;
+import vn.prostylee.product.repository.specification.NewFeedsSpecificationBuilder;
 import vn.prostylee.product.repository.specification.ProductSpecificationBuilder;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +31,7 @@ public class ProductExtRepositoryImpl implements ProductExtRepository {
 
     private final EntityManager em;
     private final ProductSpecificationBuilder productSpecificationBuilder;
+    private final NewFeedsSpecificationBuilder newFeedsSpecificationBuilder;
 
     @Override
     public Page<Product> findAll(ProductFilter productFilter) {
@@ -67,5 +73,13 @@ public class ProductExtRepositoryImpl implements ProductExtRepository {
         }
 
         return params;
+    }
+
+    @Override
+    public Page<NewFeedResponse> findNewFeedsOfStore(NewFeedsFilter newFeedsFilter) {
+        Pageable pageable = PageRequest.of(newFeedsFilter.getPage(), newFeedsFilter.getLimit());
+        NativeQueryResult<NewFeedResponse> nativeQueryResult = new NativeQueryResult<>(
+                em, NewFeedResponse.class, newFeedsSpecificationBuilder.buildQuery(newFeedsFilter), pageable);
+        return nativeQueryResult.getResultList(newFeedsSpecificationBuilder.buildParams(newFeedsFilter));
     }
 }

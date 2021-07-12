@@ -12,6 +12,7 @@ import vn.prostylee.core.controller.TrackingCrudController;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.product.dto.filter.*;
 import vn.prostylee.product.dto.request.ProductRequest;
+import vn.prostylee.product.dto.response.NewFeedResponse;
 import vn.prostylee.product.dto.response.ProductForStoryResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.dto.response.ProductTabsServiceResponse;
@@ -49,6 +50,11 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     @GetMapping("/new-feeds")
     public Page<ProductResponse> getNewFeeds(@Valid ProductFilter productFilter) {
         return productService.getNewFeeds(productFilter);
+    }
+
+    @GetMapping("/new-feeds/store")
+    public Page<NewFeedResponse> getNewFeedsOfStore(@Valid NewFeedsFilter newFeedsFilter) {
+        return productService.getNewFeedsOfStore(newFeedsFilter);
     }
 
     @GetMapping("/product-for-story/{productId}")
