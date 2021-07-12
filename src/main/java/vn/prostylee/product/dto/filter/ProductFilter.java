@@ -20,6 +20,7 @@ public class ProductFilter extends BaseFilter {
     private Long productId;
     private Long categoryId;
     private Long storeId;
+    private Long brandId;
     private List<Long> storeIds;
     private Map<String, List<String>> attributes;
 
