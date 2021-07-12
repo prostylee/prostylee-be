@@ -38,6 +38,7 @@ public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
             " WHERE ur.targetType = :targetType" +
             " GROUP BY ur.targetId" +
             " ORDER BY ur.targetId")
+
     Page<ReviewCountResponse> countNumberReview(Pageable pageable,@Param("targetType") TargetType targetType);
 
     @Query("SELECT e FROM UserRating e WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:userId")
