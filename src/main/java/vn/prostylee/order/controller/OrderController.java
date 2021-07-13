@@ -5,10 +5,13 @@ import org.springframework.web.bind.annotation.*;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.order.dto.filter.OrderFilter;
+import vn.prostylee.order.dto.request.OrderAtStoreRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
+import vn.prostylee.order.dto.response.OrderAtStoreResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.dto.response.VoucherCheckResultResponse;
+import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.service.OrderService;
 
 import javax.validation.Valid;
@@ -33,5 +36,10 @@ public class OrderController extends CrudController<OrderRequest, OrderResponse,
     @PatchMapping("/reOder/{id}")
     public OrderResponse reOrder(@PathVariable Long id){
         return orderService.reOrder(id);
+    }
+
+    @PostMapping("/orderAtStore")
+    public OrderAtStoreResponse orderAtStore(@Valid @RequestBody OrderAtStoreRequest request){
+        return orderService.orderAtStore(request);
     }
 }

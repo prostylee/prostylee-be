@@ -177,12 +177,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getNewFeeds(ProductFilter productFilter) {
-        return findAll(productFilter); // TODO get new feeds
-    }
-
-    @Override
-    public Page<NewFeedResponse> getNewFeedsOfStore(NewFeedsFilter newFeedsFilter){
+    public Page<NewFeedResponse> getNewFeeds(NewFeedsFilter newFeedsFilter){
         Page<NewFeedResponse> page = productExtRepository.findNewFeedsOfStore(newFeedsFilter);
         List<NewFeedResponse> newFeeds = page.stream()
                 .map(item->productConverter.toResponseForNewFeed(item, newFeedsFilter.getTargetType()))

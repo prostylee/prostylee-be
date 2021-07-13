@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.JsonUtils;
@@ -12,6 +13,7 @@ import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.order.constants.OrderHistoryStatus;
 import vn.prostylee.order.constants.OrderStatus;
+import vn.prostylee.order.dto.request.OrderAtStoreRequest;
 import vn.prostylee.order.dto.request.OrderDetailRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.response.*;
@@ -35,6 +37,7 @@ import vn.prostylee.store.entity.Branch;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.BranchService;
 import vn.prostylee.store.service.StoreService;
+import vn.prostylee.story.dto.response.UserResponseLite;
 import vn.prostylee.useractivity.entity.UserRating;
 import vn.prostylee.useractivity.service.UserRatingService;
 
@@ -54,6 +57,7 @@ public class OrderConverter {
     private final OrderStatusMstRepository orderStatusMstRepository;
     private final UserRatingService userRatingService;
     private final AuthenticatedProvider authenticatedProvider;
+    private final UserService userService;
 
     public void toEntity(OrderRequest request, Order order) {
         Optional.ofNullable(request.getPaymentTypeId())
@@ -267,5 +271,17 @@ public class OrderConverter {
             return true;
         }
         return false;
+    }
+
+    public OrderAtStoreResponse convertOrderAtStore(OrderAtStoreRequest request){
+        OrderAtStoreResponse response = OrderAtStoreResponse.builder()
+                .productResponseLite(BeanUtil.copyProperties(productService.getById(request.getProductId()), ProductResponseLite.class))
+                .storeResponseLite(BeanUtil.copyProperties(storeService.getById(request.getStoreId()) , StoreResponseLite.class))
+                .branchResponse(BeanUtil.copyProperties(branchService.getById(request.getBranchId()),BranchResponse.class))
+                .userResponseLite(BeanUtil.copyProperties(userService.findById(request.getBuyerId()), UserResponseLite.class))
+                .data(true)
+                .build();
+
+        return response;
     }
 }

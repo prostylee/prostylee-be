@@ -19,4 +19,6 @@ public class ProductOwnerResponse implements Serializable {
 
     private String logoUrl;
 
+    private String fullAddress;
+
 }

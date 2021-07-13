@@ -48,13 +48,8 @@ public class ProductController extends TrackingCrudController<ProductRequest, Pr
     }
 
     @GetMapping("/new-feeds")
-    public Page<ProductResponse> getNewFeeds(@Valid ProductFilter productFilter) {
-        return productService.getNewFeeds(productFilter);
-    }
-
-    @GetMapping("/new-feeds/store")
-    public Page<NewFeedResponse> getNewFeedsOfStore(@Valid NewFeedsFilter newFeedsFilter) {
-        return productService.getNewFeedsOfStore(newFeedsFilter);
+    public Page<NewFeedResponse> getNewFeeds(@Valid NewFeedsFilter newFeedsFilter) {
+        return productService.getNewFeeds(newFeedsFilter);
     }
 
     @GetMapping("/product-for-story/{productId}")

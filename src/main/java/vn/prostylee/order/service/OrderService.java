@@ -4,8 +4,10 @@ import org.springframework.data.domain.Page;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.service.CrudService;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
+import vn.prostylee.order.dto.request.OrderAtStoreRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
+import vn.prostylee.order.dto.response.OrderAtStoreResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 
@@ -22,4 +24,6 @@ public interface OrderService extends CrudService<OrderRequest, OrderResponse, L
     Page<Long> getPurchasedProductIdsByUserId(Long userId, PagingParam pagingParam);
 
     OrderResponse reOrder(Long id);
+
+    OrderAtStoreResponse orderAtStore(OrderAtStoreRequest request);
 }

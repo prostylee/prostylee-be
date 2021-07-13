@@ -13,8 +13,11 @@ import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
+import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.product.dto.response.ProductResponseLite;
+import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.service.StoreService;
 import vn.prostylee.story.dto.filter.StoryFilter;
@@ -30,13 +33,11 @@ import vn.prostylee.story.service.StoryImageService;
 import vn.prostylee.story.service.StoryService;
 import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
+import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.response.UserFollowerResponse;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +45,8 @@ import java.util.stream.Collectors;
 public class StoryServiceImpl implements StoryService {
 
     public static final int FIRST_INDEX = 0;
+    private static final int DEFAULT_TIME_RANGE_IN_DAYS = 90;
+    private static final int NUMBER_OF_TOP_FOLLOWING = 15;
     private final StoryRepository storyRepository;
     private final BaseFilterSpecs<Story> baseFilterSpecs;
     private final AuthenticatedProvider authenticatedProvider;
@@ -52,6 +55,7 @@ public class StoryServiceImpl implements StoryService {
     private final StoryImageService storyImageService;
     private final StoreService storeService;
     private final FileUploadService fileUploadService;
+    private final ProductService productService;
 
     @Override
     public Page<UserStoryResponse> findAll(BaseFilter baseFilter) {
@@ -73,6 +77,15 @@ public class StoryServiceImpl implements StoryService {
     private Page<UserStoryResponse> getUserStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+        if (CollectionUtils.isEmpty(idFollows)  || idFollows.stream().count() < NUMBER_OF_TOP_FOLLOWING){
+            MostActiveRequest mostActiveRequest = MostActiveRequest.builder()
+                    .targetTypes(Collections.singletonList(type))
+                    .fromDate(DateUtils.getLastDaysBefore(DEFAULT_TIME_RANGE_IN_DAYS))
+                    .toDate(Calendar.getInstance().getTime()).build();
+            mostActiveRequest.setLimit(NUMBER_OF_TOP_FOLLOWING);
+            idFollows.addAll(userFollowerService.getTopBeFollows(mostActiveRequest));
+        }
+        idFollows.add(FIRST_INDEX, authenticatedProvider.getUserIdValue());
 
         Page<UserStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, UserStoryResponse.class));
@@ -91,6 +104,14 @@ public class StoryServiceImpl implements StoryService {
     private Page<StoreStoryResponse> getStoreStoryResponses(StoryFilter filter, TargetType type) {
         Pageable pageable = baseFilterSpecs.page(filter);
         List<Long> idFollows = getFollowsBy(authenticatedProvider.getUserIdValue(), type);
+        if (CollectionUtils.isEmpty(idFollows) || idFollows.stream().count() < NUMBER_OF_TOP_FOLLOWING){
+            MostActiveRequest mostActiveRequest = MostActiveRequest.builder()
+                    .targetTypes(Collections.singletonList(type))
+                    .fromDate(DateUtils.getLastDaysBefore(DEFAULT_TIME_RANGE_IN_DAYS))
+                    .toDate(Calendar.getInstance().getTime()).build();
+            mostActiveRequest.setLimit(NUMBER_OF_TOP_FOLLOWING);
+            idFollows.addAll(userFollowerService.getTopBeFollows(mostActiveRequest));
+        }
 
         Page<StoreStoryResponse> responses = storyRepository.getStories(idFollows, type.name(), pageable)
                 .map(entity -> BeanUtil.copyProperties(entity, StoreStoryResponse.class));
@@ -99,6 +120,10 @@ public class StoryServiceImpl implements StoryService {
             response.setStoryLargeImageUrls(this.fetchUrls(ImageSize.STORY_LARGE, response.getId()));
             response.setStorySmallImageUrls(this.fetchUrls(ImageSize.STORY_SMALL, response.getId()));
             response.setStoreForStoryResponse(this.getStoreForStoryBy(response.getCreatedBy()));
+            response.setProductResponseLite(Optional.ofNullable(response.getProductId())
+                    .map(e -> {
+                        return BeanUtil.copyProperties(productService.findById(e),ProductResponseLite.class);
+                    }).orElse(null));
         });
         return responses;
     }

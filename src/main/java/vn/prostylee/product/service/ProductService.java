@@ -26,7 +26,5 @@ public interface ProductService extends CrudService<ProductRequest, ProductRespo
 
     List<ProductResponseLite> findByIds(List<Long> productIds);
 
-    Page<ProductResponse> getNewFeeds(ProductFilter productFilter);
-
-    Page<NewFeedResponse> getNewFeedsOfStore(NewFeedsFilter newFeedsFilter);
+    Page<NewFeedResponse> getNewFeeds(NewFeedsFilter newFeedsFilter);
 }

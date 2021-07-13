@@ -61,8 +61,8 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     @Override
-    public Page<UserAddressResponse> findByUserLogin(){
-        List<UserAddress> userAddressList = userAddressRepository.findAddressByUserLogin(authenticatedProvider.getUserIdValue());
+    public Page<UserAddressResponse> findByUserId(Long userId){
+        List<UserAddress> userAddressList = userAddressRepository.findAddressByUserLogin(userId);
         Page<UserAddress> userAddressPage = new PageImpl<>(userAddressList);
         return userAddressPage.map(this::toResponse);
     }
