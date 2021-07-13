@@ -26,18 +26,19 @@ public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
             @Param("targetType") TargetType targetType
     );
 
-    @Query(value = "SELECT ur.target_id AS productId, round(AVG(ur.value),1) AS count " +
-            "   FROM user_rating ur " +
-            "   WHERE ur.target_type = :targetType " +
-            "   GROUP BY ur.target_id " +
-            "   ORDER BY ur.target_id", nativeQuery = true)
+    @Query(value = "SELECT ur.targetId AS productId, round(AVG(ur.value),1) AS count " +
+            "   FROM UserRating ur " +
+            "   WHERE ur.targetType = :targetType " +
+            "   GROUP BY ur.targetId " +
+            "   ORDER BY ur.targetId")
     Page<RatingResultCountResponse> countRatingResult(Pageable pageable,@Param("targetType") TargetType targetType);
 
-    @Query(value = "SELECT ur.target_id AS productId, COUNT(ur.id) AS count" +
-            " FROM user_rating ur" +
-            " WHERE ur.target_type = :targetType" +
-            " GROUP BY ur.target_id" +
-            " ORDER BY ur.target_id", nativeQuery = true)
+    @Query(value = "SELECT ur.targetId AS productId, COUNT(ur.id) AS count" +
+            " FROM UserRating ur" +
+            " WHERE ur.targetType = :targetType" +
+            " GROUP BY ur.targetId" +
+            " ORDER BY ur.targetId")
+
     Page<ReviewCountResponse> countNumberReview(Pageable pageable,@Param("targetType") TargetType targetType);
 
     @Query("SELECT e FROM UserRating e WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:userId")

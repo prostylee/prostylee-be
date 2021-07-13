@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.prostylee.core.constant.TargetType;
+import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
@@ -22,6 +24,7 @@ import vn.prostylee.useractivity.dto.filter.UserLikeFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.request.UserLikeRequest;
+import vn.prostylee.useractivity.dto.response.LikeCountResponse;
 import vn.prostylee.useractivity.dto.response.UserLikeResponse;
 import vn.prostylee.useractivity.entity.UserLike;
 import vn.prostylee.useractivity.repository.UserLikeRepository;
@@ -68,7 +71,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     public boolean like(UserLikeRequest request) {
         try {
             UserLike entity = BeanUtil.copyProperties(request, UserLike.class);
-            if(!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
+            if(!repository.existsByCreatedByAndTargetIdAndTargetType(authenticatedProvider.getUserIdValue(), request.getTargetId(), request.getTargetType()))
                 repository.save(entity);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
@@ -97,6 +100,12 @@ public class UserLikeServiceImpl implements UserLikeService {
         return repository.getTopBeLikes(request.getTargetTypes(),
                 request.getCustomFieldId1(), request.getCustomFieldId2(), request.getCustomFieldId3(),
                 request.getFromDate(), request.getToDate(), pageSpecification);
+    }
+
+    @Override
+    public Page<LikeCountResponse> countNumberLike(PagingParam pagingParam, TargetType targetType){
+        Pageable pageSpecification = PageRequest.of(pagingParam.getPage(), pagingParam.getLimit());
+        return repository.countNumberLike(pageSpecification, targetType);
     }
 
     private Specification<UserLike> getUserLikeSpecification(UserLikeFilter filter) {

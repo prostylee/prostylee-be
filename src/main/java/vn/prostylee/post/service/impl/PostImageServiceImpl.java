@@ -6,6 +6,7 @@ import vn.prostylee.media.dto.request.MediaRequest;
 import vn.prostylee.media.service.AttachmentService;
 import vn.prostylee.post.entity.Post;
 import vn.prostylee.post.entity.PostImage;
+import vn.prostylee.post.repository.PostImageRepository;
 import vn.prostylee.post.service.PostImageService;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class PostImageServiceImpl implements PostImageService {
 
     private final AttachmentService attachmentService;
+    private final PostImageRepository postImageRepository;
 
     @Override
     public Set<PostImage> saveImages(List<MediaRequest> postImageRequests, Post postEntity) {
@@ -24,6 +26,11 @@ public class PostImageServiceImpl implements PostImageService {
                 .stream()
                 .map(attachment -> buildProductImage(postEntity, attachment.getId()))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<Long> getAttachmentIdByPostID(Long postId){
+        return postImageRepository.getAttachmentIdByPostId(postId);
     }
 
     private PostImage buildProductImage(Post postEntity, Long id) {

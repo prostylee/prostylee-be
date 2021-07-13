@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
 import vn.prostylee.order.service.OrderService;
 import vn.prostylee.product.entity.ProductStatistic;
 import vn.prostylee.product.repository.ProductStatisticRepository;
+import vn.prostylee.useractivity.dto.response.LikeCountResponse;
 import vn.prostylee.useractivity.dto.response.RatingResultCountResponse;
 import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
+import vn.prostylee.useractivity.service.UserLikeService;
 import vn.prostylee.useractivity.service.UserRatingService;
 
 import java.util.List;
@@ -36,6 +39,9 @@ public class ProductStatisticJob extends QuartzJobBean {
 
     @Autowired
     private UserRatingService userRatingService;
+
+    @Autowired
+    private UserLikeService userLikeService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
@@ -60,7 +66,15 @@ public class ProductStatisticJob extends QuartzJobBean {
     }
 
     private void countNumberOfLike() {
-        // TODO
+        int page = 0;
+        Page<LikeCountResponse> likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT);
+        log.debug("totalPages={}, totalElements={}, postLikeSize={}", likeCountResponsePage.getTotalPages(), likeCountResponsePage.getTotalElements(), likeCountResponsePage.getNumberOfElements());
+        while (likeCountResponsePage.getNumberOfElements() > 0) {
+            upsertLikeStatistic(likeCountResponsePage.getContent());
+            page++;
+            likeCountResponsePage = userLikeService.countNumberLike(new PagingParam(page, LIMIT), TargetType.PRODUCT);
+            log.debug("totalPages={}, totalElements={}, postLikeSize={}", likeCountResponsePage.getTotalPages(), likeCountResponsePage.getTotalElements(), likeCountResponsePage.getNumberOfElements());
+        }
     }
 
     private void countNumberOfComment() {
@@ -160,6 +174,32 @@ public class ProductStatisticJob extends QuartzJobBean {
                     return ProductStatistic.builder()
                             .id(productId)
                             .numberOfReview(mapProductCount.getOrDefault(productId, 0L))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        statistics.addAll(adds);
+
+        productStatisticRepository.saveAll(statistics);
+    }
+
+    private void upsertLikeStatistic(List<LikeCountResponse> likeCountResponses) {
+        final Map<Long, Long> mapProductCount = likeCountResponses.stream()
+                .collect(Collectors.toMap(LikeCountResponse::getId, LikeCountResponse::getCount));
+
+        List<ProductStatistic> statistics = productStatisticRepository.findByProductIds(mapProductCount.keySet());
+
+        statistics.forEach(productStatistic -> {
+            productStatistic.setNumberOfLike(mapProductCount.getOrDefault(productStatistic.getId(), 0L));
+            mapProductCount.remove(productStatistic.getId());
+        });
+
+        List<ProductStatistic> adds = mapProductCount.keySet()
+                .stream()
+                .map(productId -> {
+                    return ProductStatistic.builder()
+                            .id(productId)
+                            .numberOfLike(mapProductCount.getOrDefault(productId, 0L))
                             .build();
                 })
                 .collect(Collectors.toList());

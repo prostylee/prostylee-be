@@ -11,6 +11,9 @@ import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
 import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
+import vn.prostylee.post.dto.response.PostStatisticResponse;
+import vn.prostylee.post.service.PostImageService;
+import vn.prostylee.post.service.PostStatisticService;
 import vn.prostylee.product.dto.response.*;
 import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.entity.Product;
@@ -46,6 +49,8 @@ public class ProductConverter {
     private final CategoryService categoryService;
     private final BrandService brandService;
     private final UserWishListService userWishListService;
+    private final PostImageService postImageService;
+    private final PostStatisticService postStatisticService;
 
     public ProductConverter(@Lazy UserWishListService userWishListService,
                             LocationService locationService,
@@ -59,7 +64,9 @@ public class ProductConverter {
                             AttributeService attributeService,
                             ProductPriceService productPriceService,
                             CategoryService categoryService,
-                            BrandService brandService){
+                            BrandService brandService,
+                            PostImageService postImageService,
+                            PostStatisticService postStatisticService){
         this.locationService = locationService;
         this.fileUploadService = fileUploadService;
         this.userService = userService;
@@ -73,6 +80,8 @@ public class ProductConverter {
         this.categoryService = categoryService;
         this.brandService = brandService;
         this.userWishListService = userWishListService;
+        this.postImageService = postImageService;
+        this.postStatisticService = postStatisticService;
     }
 
     public ProductResponse toResponse(Product product) {
@@ -82,7 +91,7 @@ public class ProductConverter {
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
         productResponse.setProductStatisticResponse(buildProductStatistic(product.getId()));
-        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId()));
+        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId(),TargetType.PRODUCT));
         productResponse.setProductAttributeOptionResponse(buildAttributeOption(product.getId()));
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
         productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
@@ -99,6 +108,23 @@ public class ProductConverter {
         return productResponseLite;
     }
 
+    public NewFeedResponse toResponseForNewFeed(NewFeedResponse newFeedResponse, TargetType targetType){
+        if(TargetType.valueOf(newFeedResponse.getType()) == TargetType.PRODUCT){
+            newFeedResponse.setImageUrls(buildImageUrls(newFeedResponse.getId()));
+            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT));
+            newFeedResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(newFeedResponse.getId()));
+            newFeedResponse.setProductStatisticResponse(buildProductStatistic(newFeedResponse.getId()));
+        }
+        if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST){
+            newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
+            newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
+            newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
+        }
+        newFeedResponse.setNewFeedOwnerResponse(buildNewFeedOwner(newFeedResponse.getOwnerId(), targetType));
+        newFeedResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
+        return newFeedResponse;
+    }
+
     private List<String> buildImageUrls(long productId) {
         List<Long> attachmentIds = Optional.ofNullable(productId)
                 .map(productImageService::getAttachmentIdByProductID)
@@ -106,6 +132,20 @@ public class ProductConverter {
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             try {
                 return fileUploadService.getImageUrls(attachmentIds, ImageSize.PRODUCT_SIZE.getWidth(), ImageSize.PRODUCT_SIZE.getHeight());
+            } catch (ResourceNotFoundException e) {
+                log.debug("Could not build image Urls from attachmentIds={}", attachmentIds, e);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> buildPostImageUrls(long postId) {
+        List<Long> attachmentIds = Optional.ofNullable(postId)
+                .map(postImageService::getAttachmentIdByPostID)
+                .orElse(null);
+        if (CollectionUtils.isNotEmpty(attachmentIds)) {
+            try {
+                return fileUploadService.getImageUrls(attachmentIds, ImageSize.POST_SIZE.getWidth(), ImageSize.POST_SIZE.getHeight());
             } catch (ResourceNotFoundException e) {
                 log.debug("Could not build image Urls from attachmentIds={}", attachmentIds, e);
             }
@@ -144,10 +184,16 @@ public class ProductConverter {
                 .orElse(null);
     }
 
-    private Boolean getLikeStatusOfUserLogin(Long productId){
+    private PostStatisticResponse buildPostStatistic(Long id){
+        return Optional.ofNullable(id)
+                .flatMap(postStatisticService::fetchById)
+                .orElse(null);
+    }
+
+    private Boolean getLikeStatusOfUserLogin(Long id, TargetType targetType){
         StatusLikeRequest request = StatusLikeRequest.builder()
-                .targetIds(Collections.singletonList(productId))
-                .targetType(TargetType.PRODUCT)
+                .targetIds(Collections.singletonList(id))
+                .targetType(targetType)
                 .build();
         List<Long> result = userLikeService.loadStatusLikes(request);
         if (result.stream().count() > 0){
@@ -217,5 +263,20 @@ public class ProductConverter {
     private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
         Map<Object, Boolean> uniqueMap = new ConcurrentHashMap<>();
         return t -> uniqueMap.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    private ProductOwnerResponse buildNewFeedOwner(Long id, TargetType targetType) {
+        final ProductOwnerResponse[] productOwnerResponse = new ProductOwnerResponse[1];
+        if (targetType == TargetType.STORE) {
+            productOwnerResponse[0] = productStoreService.getStoreOwner(id);
+        } else {
+            userService.fetchById(id).ifPresent(user ->
+                    productOwnerResponse[0] = ProductOwnerResponse.builder()
+                            .id(user.getId())
+                            .name(user.getFullName())
+                            .logoUrl(user.getAvatar())
+                            .build());
+        }
+        return productOwnerResponse[0];
     }
 }

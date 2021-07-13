@@ -57,7 +57,7 @@ app:
         detail:
           name: 'Product Statistic Trigger'
           group: 'ProductStatisticTrigger'
-          cron: '0 0/15 * * * ?' # At every 15th minute.
+          cron: '0 0/1 * * * ?' # At every 15th minute.
       - # store-statistic
         name: 'Store Statistic Job'
         group: 'STORE'
@@ -80,6 +80,17 @@ app:
           name: 'User Statistic Trigger'
           group: 'UserStatisticTrigger'
           cron: '0 0/30 * * * ?' # At every 30th minute.
+      - # post-statistic
+        name: 'Post Statistic Job'
+        group: 'POST'
+        description: 'For post statistic job'
+        job-clazz: vn.prostylee.post.job.PostStatisticJob
+        job-id: 4
+        job-type: 'STATISTIC'
+        detail:
+          name: 'Post Statistic Trigger'
+          group: 'PostStatisticTrigger'
+          cron: '0 0/1 * * * ?' # At every 15th minute.
 
   ## Caching
   cache:

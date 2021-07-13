@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.repository;
 
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.useractivity.dto.response.LikeCountResponse;
+import vn.prostylee.useractivity.dto.response.ReviewCountResponse;
 import vn.prostylee.useractivity.entity.UserLike;
 
 import java.util.Date;
@@ -29,7 +32,7 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
             @Param("createdBy") Long createdBy
     );
 
-    boolean existsByTargetIdAndTargetType(Long userId, TargetType targetType);
+    boolean existsByCreatedByAndTargetIdAndTargetType(Long userId, Long targetId, TargetType targetType);
     
     @Query("SELECT e.targetId FROM #{#entityName} e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusLikes(
@@ -53,6 +56,13 @@ public interface UserLikeRepository extends BaseRepository<UserLike, Long> {
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate,
             Pageable pageable);
+
+    @Query(value = "SELECT ur.targetId AS id, COUNT(ur.id) AS count" +
+            " FROM #{#entityName} ur" +
+            " WHERE ur.targetType = :targetType" +
+            " GROUP BY ur.targetId" +
+            " ORDER BY ur.targetId")
+    Page<LikeCountResponse> countNumberLike(Pageable pageable, @Param("targetType") TargetType targetType);
     
 }
 

@@ -10,4 +10,5 @@ import java.util.Set;
 public interface PostImageService {
 
     Set<PostImage> saveImages(List<MediaRequest> images, Post postEntity);
+    List<Long> getAttachmentIdByPostID(Long postId);
 }

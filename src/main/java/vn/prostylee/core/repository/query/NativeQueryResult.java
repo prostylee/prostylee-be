@@ -72,7 +72,7 @@ public class NativeQueryResult<R> {
 
 	private Page<R> getAllPagedList(Map<String, Object> filterParameters) {
 		String optimizedQuery = queryBuilder.toString();
-		int indexOfOrderClause = optimizedQuery.indexOf("ORDER BY");
+		int indexOfOrderClause = optimizedQuery.lastIndexOf("ORDER BY");
 		if (indexOfOrderClause > 0) {
 			optimizedQuery = optimizedQuery.substring(0, indexOfOrderClause);
 		}
