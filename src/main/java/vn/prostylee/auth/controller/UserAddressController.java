@@ -12,6 +12,7 @@ import vn.prostylee.auth.service.UserAddressService;
 import vn.prostylee.core.constant.ApiVersion;
 import vn.prostylee.core.controller.CrudController;
 import vn.prostylee.core.dto.filter.BaseFilter;
+import vn.prostylee.core.provider.AuthenticatedProvider;
 
 import java.util.List;
 
@@ -20,16 +21,19 @@ import java.util.List;
 public class UserAddressController extends CrudController<UserAddressRequest, UserAddressResponse, Long, UserAddressFilter> {
 
     private final UserAddressService userAddressService;
+    private final AuthenticatedProvider authenticatedProvider;
     
     @Autowired
     public UserAddressController(UserAddressService userProfileService,
-                                 UserAddressService userAddressService) {
+                                 UserAddressService userAddressService,
+                                 AuthenticatedProvider authenticatedProvider) {
         super(userProfileService);
         this.userAddressService = userAddressService;
+        this.authenticatedProvider = authenticatedProvider;
     }
 
     @GetMapping("/userLogin")
     public Page<UserAddressResponse> getUserLoginAddress(BaseFilter baseFilter){
-        return userAddressService.findByUserLogin();
+        return userAddressService.findByUserId(authenticatedProvider.getUserIdValue());
     }
 }

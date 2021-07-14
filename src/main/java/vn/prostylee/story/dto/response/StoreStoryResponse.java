@@ -3,6 +3,7 @@ package vn.prostylee.story.dto.response;
 import lombok.Data;
 import vn.prostylee.auth.entity.User;
 import vn.prostylee.core.constant.TargetType;
+import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.store.entity.Store;
 
 import java.io.Serializable;
@@ -23,4 +24,5 @@ public class StoreStoryResponse implements Serializable {
     private List<String> storyLargeImageUrls;
     private StoreForStoryResponse storeForStoryResponse;
     private Long productId;
+    private ProductResponseLite productResponseLite;
 }

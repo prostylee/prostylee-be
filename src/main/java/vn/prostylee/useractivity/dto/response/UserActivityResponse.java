@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.dto.response;
 
 import lombok.Data;
+import vn.prostylee.auth.dto.response.UserAddressResponse;
 import vn.prostylee.location.dto.response.LocationResponse;
 
 import java.io.Serializable;
@@ -23,6 +24,10 @@ public class UserActivityResponse implements Serializable {
     private Boolean active;
 
     private String avatar;
+
+    private UserAddressResponse userAddressResponse;
+
+    private Boolean followStatusOfUserLogin;
 
     private LocationResponse locationResponse;
 }

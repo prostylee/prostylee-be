@@ -22,8 +22,6 @@ public class ProductStatistic extends AuditEntity {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @SequenceGenerator(name = "product_statistic_seq", sequenceName = "product_statistic_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_statistic_seq")
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
 

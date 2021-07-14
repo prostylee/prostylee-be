@@ -25,8 +25,10 @@ import vn.prostylee.order.constants.OrderStatus;
 import vn.prostylee.order.converter.OrderConverter;
 import vn.prostylee.order.dto.filter.BestSellerFilter;
 import vn.prostylee.order.dto.filter.OrderFilter;
+import vn.prostylee.order.dto.request.OrderAtStoreRequest;
 import vn.prostylee.order.dto.request.OrderRequest;
 import vn.prostylee.order.dto.request.OrderStatusRequest;
+import vn.prostylee.order.dto.response.OrderAtStoreResponse;
 import vn.prostylee.order.dto.response.OrderResponse;
 import vn.prostylee.order.dto.response.ProductOrderResponse;
 import vn.prostylee.order.dto.response.ProductSoldCountResponse;
@@ -34,10 +36,14 @@ import vn.prostylee.order.entity.Order;
 import vn.prostylee.order.entity.OrderDetail;
 import vn.prostylee.order.entity.OrderDiscount;
 import vn.prostylee.order.entity.OrderHistory;
+import vn.prostylee.order.handler.OrderAtStoreMutationEventHandler;
 import vn.prostylee.order.handler.OrderMutationEventHandler;
 import vn.prostylee.order.repository.OrderDetailRepository;
 import vn.prostylee.order.repository.OrderRepository;
 import vn.prostylee.order.service.OrderService;
+import vn.prostylee.product.dto.response.ProductResponseLite;
+import vn.prostylee.product.service.ProductService;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import javax.persistence.criteria.Predicate;
 import java.text.SimpleDateFormat;
@@ -200,5 +206,11 @@ public class OrderServiceImpl implements OrderService {
         Page<ProductOrderResponse> page = orderDetailRepository.getPurchasedProductIdsByUserId(userId, pageSpecification);
         List<Long> productIds = page.stream().map(ProductOrderResponse::getProductId).collect(Collectors.toList());
         return new PageImpl<>(productIds, page.getPageable(), page.getTotalElements());
+    }
+
+    @Override
+    @MutationEventListener(handler = OrderAtStoreMutationEventHandler.class, action = MutationAction.CREATE, phase = MutationPhase.AFTER)
+    public OrderAtStoreResponse orderAtStore(OrderAtStoreRequest request){
+        return orderConverter.convertOrderAtStore(request);
     }
 }

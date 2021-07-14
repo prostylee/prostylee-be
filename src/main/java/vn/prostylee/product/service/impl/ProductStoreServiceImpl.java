@@ -34,6 +34,7 @@ public class ProductStoreServiceImpl implements ProductStoreService {
                             .id(store.getId())
                             .name(store.getName())
                             .logoUrl(logoUrl)
+                            .fullAddress(store.getAddress())
                             .build();
                 }).orElse(null);
     }

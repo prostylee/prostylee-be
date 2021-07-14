@@ -9,5 +9,5 @@ import vn.prostylee.core.validator.FieldValueExists;
 
 public interface UserAddressService extends CrudService<UserAddressRequest, UserAddressResponse, Long>, FieldValueExists, EntityExists<Long> {
 
-    Page<UserAddressResponse> findByUserLogin();
+    Page<UserAddressResponse> findByUserId(Long userId);
 }
