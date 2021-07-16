@@ -60,6 +60,7 @@ public class NewFeedsSpecificationBuilder {
         sbFrom.append(" SELECT '"+ TargetType.POST.name() +"' AS type" +
                 " , p.id AS id" +
                 " , p.description AS content" +
+                " , p.store_id AS store_ads_id" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price_sale" +
                 " , CAST(p.created_at AS date) AS created_at");
@@ -84,6 +85,7 @@ public class NewFeedsSpecificationBuilder {
         sbFrom.append(" SELECT '"+ TargetType.PRODUCT.name() +"' AS type" +
                 " , pr.id AS id" +
                 " , pr.name AS content" +
+                " , 0 AS store_ads_id" +
                 " , CAST(pr.price AS DOUBLE PRECISION) AS price" +
                 " , CAST(pr.price_sale AS DOUBLE PRECISION) AS price_sale" +
                 " , pr.created_at AS created_at");
@@ -108,6 +110,7 @@ public class NewFeedsSpecificationBuilder {
         sbFrom.append(" SELECT '"+ TargetType.POST.name() +"' AS type" +
                 " , p.id AS id" +
                 " , p.description AS content" +
+                " , p.store_id AS store_ads_id" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price_sale" +
                 " , CAST(p.created_at AS date) AS created_at" +
@@ -131,6 +134,7 @@ public class NewFeedsSpecificationBuilder {
         sbFrom.append(" SELECT '"+ TargetType.PRODUCT.name() +"' AS type" +
                 " , pr.id AS id" +
                 " , pr.name AS content" +
+                " , 0 AS store_ads_id" +
                 " , CAST(pr.price AS DOUBLE PRECISION) AS price" +
                 " , CAST(pr.price_sale AS DOUBLE PRECISION) AS price_sale" +
                 " , pr.created_at AS created_at" +
