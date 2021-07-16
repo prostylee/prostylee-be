@@ -2,6 +2,7 @@ package vn.prostylee.product.dto.response;
 
 import lombok.*;
 import vn.prostylee.post.dto.response.PostStatisticResponse;
+import vn.prostylee.store.dto.response.StoreResponseLite;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,6 +20,10 @@ public class NewFeedResponse implements Serializable {
     private Long id;
 
     private String content;
+
+    private Long storeAdsId;
+
+    private StoreResponseLite storeAdsResponseLite;
 
     private Double price;
 

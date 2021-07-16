@@ -21,6 +21,8 @@ import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
 import vn.prostylee.core.constant.TargetType;
+import vn.prostylee.store.dto.response.StoreResponseLite;
+import vn.prostylee.store.service.StoreService;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
@@ -51,6 +53,7 @@ public class ProductConverter {
     private final UserWishListService userWishListService;
     private final PostImageService postImageService;
     private final PostStatisticService postStatisticService;
+    private final StoreService storeService;
 
     public ProductConverter(@Lazy UserWishListService userWishListService,
                             LocationService locationService,
@@ -66,7 +69,8 @@ public class ProductConverter {
                             CategoryService categoryService,
                             BrandService brandService,
                             PostImageService postImageService,
-                            PostStatisticService postStatisticService){
+                            PostStatisticService postStatisticService,
+                            StoreService storeService){
         this.locationService = locationService;
         this.fileUploadService = fileUploadService;
         this.userService = userService;
@@ -82,6 +86,7 @@ public class ProductConverter {
         this.userWishListService = userWishListService;
         this.postImageService = postImageService;
         this.postStatisticService = postStatisticService;
+        this.storeService = storeService;
     }
 
     public ProductResponse toResponse(Product product) {
@@ -119,6 +124,7 @@ public class ProductConverter {
             newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
             newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
+            newFeedResponse.setStoreAdsResponseLite(getStoreResponseLite(newFeedResponse.getStoreAdsId()));
         }
         newFeedResponse.setNewFeedOwnerResponse(buildNewFeedOwner(newFeedResponse.getOwnerId(), targetType));
         newFeedResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
@@ -278,5 +284,11 @@ public class ProductConverter {
                             .build());
         }
         return productOwnerResponse[0];
+    }
+
+    private StoreResponseLite getStoreResponseLite(Long storeId){
+        return Optional.ofNullable(storeId)
+                .map(storeService::getStoreResponseLite)
+                .orElse(null);
     }
 }
