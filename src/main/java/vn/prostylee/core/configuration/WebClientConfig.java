@@ -3,8 +3,8 @@ package vn.prostylee.core.configuration;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 import reactor.netty.transport.ProxyProvider;
+import vn.prostylee.core.configuration.properties.HttpProperties;
 import vn.prostylee.core.constant.TracingConstant;
 
 import java.time.LocalDateTime;
@@ -25,27 +26,18 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@RequiredArgsConstructor
 @Configuration
 public class WebClientConfig {
 
-    @Value("${app.http.connectTimeout:5000}")
-    private int connectTimeout;
-
-    @Value("${app.http.responseTimeout:5000}")
-    private int responseTimeoutInMs;
-
-    @Value("${app.http.httpUseProxy:false}")
-    private boolean httpUseProxy;
-
-    @Value("${app.http.proxyHost:localhost}")
-    private String proxyHost;
-
-    @Value("${app.http.proxyPort:3128}")
-    private int proxyPort;
+    private final HttpProperties httpProperties;
 
     @Bean
     public WebClient webClient(TcpClient tcpClient) {
-        HttpClient httpClient = HttpClient.from(tcpClient);
+        HttpClient httpClient = HttpClient.create()
+                .tcpConfiguration(client -> tcpClient)
+                .compress(true);
+
         httpClient = httpClient.compress(true);
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
@@ -59,14 +51,16 @@ public class WebClientConfig {
     @Bean
     public TcpClient tcpClient() {
         TcpClient client = TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, httpProperties.getConnectTimeout())
                 .doOnConnected(connection -> {
-                    connection.addHandlerLast(new ReadTimeoutHandler(responseTimeoutInMs, TimeUnit.MILLISECONDS));
-                    connection.addHandlerLast(new WriteTimeoutHandler(responseTimeoutInMs, TimeUnit.MILLISECONDS));
+                    connection.addHandlerLast(new ReadTimeoutHandler(httpProperties.getResponseTimeoutInMs(), TimeUnit.MILLISECONDS));
+                    connection.addHandlerLast(new WriteTimeoutHandler(httpProperties.getResponseTimeoutInMs(), TimeUnit.MILLISECONDS));
                 });
 
-        if (httpUseProxy) {
-            client = client.proxy(proxy -> proxy.type((ProxyProvider.Proxy.HTTP)).host(proxyHost).port(proxyPort));
+        if (httpProperties.isHttpUseProxy()) {
+            client = client.proxy(proxy -> proxy.type((ProxyProvider.Proxy.HTTP))
+                    .host(httpProperties.getProxyHost())
+                    .port(httpProperties.getProxyPort()));
         }
 
         return client;
@@ -82,7 +76,7 @@ public class WebClientConfig {
 
     private ExchangeFilterFunction responseProcessor() {
         return (request, next) -> next.exchange(request).flatMap(response -> {
-            String correlationId = Optional.ofNullable(response.headers())
+            String correlationId = Optional.of(response.headers())
                     .map(ClientResponse.Headers::asHttpHeaders)
                     .map(httpHeaders -> httpHeaders.getFirst(TracingConstant.CORRELATION_ID))
                     .orElseGet(() -> request.headers().getFirst(TracingConstant.CORRELATION_ID));

@@ -41,7 +41,6 @@ public class PushNotificationEventListener implements ApplicationListener<PushNo
 
         try {
             PushNotificationEventDto<?> eventData = (PushNotificationEventDto<?>) event.getSource();
-            PushNotificationTemplateResponse template = templateService.findByType(eventData.getTemplateType().name());
 
             Set<UserToken> tokens = new HashSet<>();
             if (CollectionUtils.isNotEmpty(eventData.getUserIds())) {
@@ -57,6 +56,7 @@ public class PushNotificationEventListener implements ApplicationListener<PushNo
                 return;
             }
 
+            PushNotificationTemplateResponse template = templateService.findByType(eventData.getTemplateType().name());
             PushNotificationDto pushNotificationRequest = PushNotificationDto.builder()
                     .title(templateProcessor.process(template.getTitle(), eventData.getFillData()))
                     .body(templateProcessor.process(template.getContent(), eventData.getFillData()))

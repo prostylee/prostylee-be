@@ -17,9 +17,9 @@ public class NotificationResponse implements Serializable {
 
     private Integer type;
 
-    private Map<String, Object> data;
+    private transient Map<String, Object> data;
 
-    private NotificationSender sender;
+    private transient NotificationSender sender;
 
     private Boolean markAsRead;
 
