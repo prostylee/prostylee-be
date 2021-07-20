@@ -2,11 +2,12 @@ package vn.prostylee.notification.dto.response;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
-public class NotificationDiscountResponse {
+public class NotificationDiscountResponse implements Serializable {
 
     private Long id;
 
@@ -14,9 +15,9 @@ public class NotificationDiscountResponse {
 
     private String content;
 
-    private Map<String, Object> data;
+    private transient Map<String, Object> data;
 
-    private NotificationSender sender;
+    private transient NotificationSender sender;
 
     private LocalDateTime createdAt;
 }
