@@ -2,6 +2,7 @@ package vn.prostylee.notification.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ import vn.prostylee.notification.service.NotificationService;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
 
     private final AuthenticatedProvider authenticatedProvider;
+
     private final UserService userService;
 
     private final NotificationRepository notificationRepository;
@@ -157,6 +160,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public boolean sendNotification(PushNotificationDto request) {
+        saveToDb(request);
         sendPushNotification(request);
         return true;
     }
@@ -179,6 +183,29 @@ public class NotificationServiceImpl implements NotificationService {
                 });
     }
 
+    private void saveToDb(PushNotificationDto request) {
+        List<NotificationRequest> notificationRequests = request.getUserTokens().stream()
+                .map(UserToken::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet())
+                .stream()
+                .map(userId -> toNotificationRequest(userId, request))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(notificationRequests)) {
+            saveAll(notificationRequests);
+        }
+    }
+
+    private NotificationRequest toNotificationRequest(Long userId, PushNotificationDto request) {
+        return NotificationRequest.builder()
+                .title(request.getTitle())
+                .content(request.getBody())
+                .data(request.getData())
+                .userId(userId)
+                .build();
+    }
+
     private void sendPushNotification(PushNotificationDto request) {
         NotificationProvider.findProvider(request.getProvider()).ifPresent(provider -> {
             switch (provider) {
@@ -195,24 +222,26 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendViaExpoPush(PushNotificationDto request, NotificationProvider provider) {
-        String[] tokens = request.getUserTokens().stream().map(UserToken::getToken).distinct().toArray(String[]::new);
+        String[] tokens = extractTokens(request.getUserTokens()).toArray(String[]::new);
         ExpoPushNotificationRequest pushNotificationRequest = ExpoPushNotificationRequest.builder()
                 .to(tokens)
                 .title(request.getTitle())
                 .body(request.getBody())
                 .data(request.getData())
                 .build();
+
         log.debug("Push data={}", pushNotificationRequest);
         PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(pushNotificationRequest);
     }
 
     private void sendViaFcm(PushNotificationDto request, NotificationProvider provider) {
-        List<String> tokens = request.getUserTokens().stream().map(UserToken::getToken).distinct().collect(Collectors.toList());
+        List<String> tokens = extractTokens(request.getUserTokens());
         FcmPushNotificationRequest.FcmPushNotificationRequestBuilder notificationRequest = FcmPushNotificationRequest.builder()
                 .tokens(tokens)
                 .title(request.getTitle())
                 .body(request.getBody())
                 .data(request.getData());
+
         if (StringUtils.isNotBlank(request.getTopicName())) {
             FcmSubscriptionRequest subscriptionRequest = FcmSubscriptionRequest.builder()
                     .topicName(request.getTopicName())
@@ -224,5 +253,13 @@ public class NotificationServiceImpl implements NotificationService {
             log.debug("Push data={}", notificationRequest.build());
             PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(notificationRequest.build());
         }
+    }
+
+    private List<String> extractTokens(List<UserToken> userTokens) {
+        return userTokens.stream()
+                .map(UserToken::getToken)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
     }
 }
