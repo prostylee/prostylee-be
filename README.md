@@ -152,3 +152,26 @@ docker build -t prostylee-be -f ./src/main/docker/Dockerfile .
 ```shell
 docker run -p 8090:8090 --env SPRING_ACTIVE_PROFILE=staging prostylee-be:latest
 ```
+
+### How to encrypt and decrypt credential using jasypt
+
+Encrypt
+
+```
+docker run --rm \
+    -e MASTER_KEY="pro-stylee.2020@secret" \
+    -e INPUT_PASSWORD="secret" \
+    dperezcabrera/jasypt-encrypt-cli
+```
+
+Decrypt
+
+```
+docker run --rm \
+    -e MASTER_KEY="pro-stylee.2020@secret" \
+    -e ENCRYPTED_PASSWORD="4Egov2lOLJJXK+nEMg9ozg==" \
+    dperezcabrera/jasypt-decrypt-cli
+```
+
+
+

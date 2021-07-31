@@ -57,7 +57,7 @@ app:
         detail:
           name: 'Product Statistic Trigger'
           group: 'ProductStatisticTrigger'
-          cron: '0 0/1 * * * ?' # At every 15th minute.
+          cron: '0 */15 * * * ?' # At every 15th minute.
       - # store-statistic
         name: 'Store Statistic Job'
         group: 'STORE'
@@ -94,7 +94,7 @@ app:
 
   ## Caching
   cache:
-    time-to-live-in-seconds: 14400 # 4 hours
+    time-to-live-in-seconds: 900 # 15 minutes
 
   ## Multi-thread
   thread-executor:
@@ -185,24 +185,24 @@ app:
   aws:
     # AWS Credential -
     credential:
-      accessKey: AKIA5IRSGPONZVRYLWV5
-      secretKey: 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
+      accessKey: AKIA6OUDOB6PK7ZTHGAM
+      secretKey: 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
     # AWS S3
     s3:
-      bucket: psmedia224241-staging
-      region: ap-southeast-1
+      bucket: psmedia214808-staging
+      region: ap-northeast-2
       bucketUrl: https://${app.aws.s3.bucket}.s3.${app.aws.s3.region}.amazonaws.com/
-      cloudFrontId: d1fq4uh0wyvt14
+      cloudFrontId: d7noijxgulhh2
       cloudFrontUrl: https://${app.aws.s3.cloudFrontId}.cloudfront.net/
       s3ResizeImagePrefix: fit-in/
       s3MediaPublicFolder: public
     # AWS Cognito
     cognito:
-      clientId: 2cjbb1o65lh7upb6gppdb0ddp8
-      poolId: ap-southeast-1_dSSJM8sQe
-      endpoint: prostylee-staging.auth.ap-southeast-1.amazoncognito.com
-      identityPoolId: ap-southeast-1:04513a47-2cf0-47fe-a766-606510e6be33
-      region: ap-southeast-1
+      clientId: 780jet4be4koug09joui82mlo2
+      poolId: ap-northeast-2_rW0NZTnuq
+      endpoint: prostylee-staging.auth.ap-northeast-2.amazoncognito.com
+      identityPoolId: ap-northeast-2:6f692db3-8d7b-4f30-8572-4e2e9ca8deb3
+      region: ap-northeast-2
       issuer: https://cognito-idp.${app.aws.cognito.region}.amazonaws.com/${app.aws.cognito.poolId}
       jwkUrl: ${app.aws.cognito.issuer}/.well-known/jwks.json
       connectionTimeout: 2000
