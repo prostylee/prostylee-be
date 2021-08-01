@@ -148,8 +148,11 @@ app:
     allowed-origins:
       - https://${CORS_DOMAIN}
       - https://prostylee.vn
+      - https://prostylee.com
       - http://localhost:4200
       - http://localhost:8080
+      - http://3.37.47.64
+      - http://52.77.35.71
     allowed-methods:
       - GET
       - POST
