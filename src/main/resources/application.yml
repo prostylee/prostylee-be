@@ -57,7 +57,7 @@ app:
         detail:
           name: 'Product Statistic Trigger'
           group: 'ProductStatisticTrigger'
-          cron: '0 0/1 * * * ?' # At every 15th minute.
+          cron: '0 0/15 * * * ?' # At every 15th minute.
       - # store-statistic
         name: 'Store Statistic Job'
         group: 'STORE'
@@ -94,7 +94,7 @@ app:
 
   ## Caching
   cache:
-    time-to-live-in-seconds: 14400 # 4 hours
+    time-to-live-in-seconds: 900 # 4 hours
 
   ## Multi-thread
   thread-executor:
