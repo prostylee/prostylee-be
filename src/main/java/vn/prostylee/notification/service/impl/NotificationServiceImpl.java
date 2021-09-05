@@ -216,6 +216,7 @@ public class NotificationServiceImpl implements NotificationService {
                     sendViaFcm(request, provider);
                     break;
                 default:
+                    sendViaAwsPinpoint(request);
                     break;
             }
         });
@@ -253,6 +254,19 @@ public class NotificationServiceImpl implements NotificationService {
             log.debug("Push data={}", notificationRequest.build());
             PushNotificationServiceFactory.getService(provider).sendPushNotificationAsync(notificationRequest.build());
         }
+    }
+
+    private void sendViaAwsPinpoint(PushNotificationDto request) {
+        String[] tokens = extractTokens(request.getUserTokens()).toArray(String[]::new);
+        ExpoPushNotificationRequest pushNotificationRequest = ExpoPushNotificationRequest.builder()
+                .to(tokens)
+                .title(request.getTitle())
+                .body(request.getBody())
+                .data(request.getData())
+                .build();
+
+        log.debug("Push data={}", pushNotificationRequest);
+        PushNotificationServiceFactory.getService(NotificationProvider.AWS_PINPOINT).sendPushNotificationAsync(pushNotificationRequest);
     }
 
     private List<String> extractTokens(List<UserToken> userTokens) {
