@@ -95,7 +95,6 @@ app:
   ## Caching
   cache:
     time-to-live-in-seconds: 900 # 15 minutes
-
   ## Multi-thread
   thread-executor:
     core-pool-size: 2
