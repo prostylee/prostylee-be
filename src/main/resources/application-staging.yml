@@ -7,21 +7,13 @@ app:
   security:
     allowed-origins:
       - "*"
-  aws:
-    s3:
-      bucket: psmedia224241-staging
-    cognito:
-      clientId: 2cjbb1o65lh7upb6gppdb0ddp8
-      poolId: ap-southeast-1_dSSJM8sQe
-      endpoint: prostylee-staging.auth.ap-southeast-1.amazoncognito.com
-      identityPoolId: ap-southeast-1:04513a47-2cf0-47fe-a766-606510e6be33
 
 spring:
   flyway:
     locations: db/migration,db/func,db/masterdata,db/sampledata
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:postgresql://prostylee.csccjfkru4sa.ap-southeast-1.rds.amazonaws.com:5432/prostylee4dev
+    url: jdbc:log4jdbc:postgresql://prostylee-staging.c1dxc8a3mvof.ap-northeast-2.rds.amazonaws.com:5432/prostylee4staging
     username: postgres
     password: ENC(dMtpW4hsjR85/HRfyaYJRSxuY9Dziw/w1HtKjegRJwY=)
   jpa:
