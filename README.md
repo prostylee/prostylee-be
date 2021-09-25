@@ -114,7 +114,7 @@ Run the following command:
 
 ```shell
 ./gradlew clean build
-```
+```RestExceptionHandler
 
 or run without test:
 
@@ -131,7 +131,25 @@ java -Dspring.profiles.active=staging -jar ./build/libs/prostylee-be-1.0.0-SNAPS
 
 ### Deploy the application to AWS
 
-TODO
+- Create EC2 instance
+
+- Setup JDK
+
+- Create a folder name: `/var/www/app/prostylee-be`
+
+- Set folder permission: `chmod -R 777 folder`
+
+- Start server:
+
+> nohup java -Dspring.profiles.active=staging -jar ./prostylee-be-1.0.0-SNAPSHOT.jar /tmp 2>> /dev/null >>/dev/null &
+
+- Check server was started:
+
+> sudo lsof -i -P -n | grep LISTEN
+
+- Restart EC2 instance if needed:
+
+> sudo reboot now
 
 ### How to build and run docker image
 
@@ -153,25 +171,36 @@ docker build -t prostylee-be -f ./src/main/docker/Dockerfile .
 docker run -p 8090:8090 --env SPRING_ACTIVE_PROFILE=staging prostylee-be:latest
 ```
 
-### How to encrypt and decrypt credential using jasypt
+- Push to ECR
 
-Encrypt
-
+```shell
+aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 911712091035.dkr.ecr.ap-southeast-1.amazonaws.com
 ```
+
+```shell
+docker tag prostylee-be:latest 911712091035.dkr.ecr.ap-southeast-1.amazonaws.com/prostylee-staging:latest
+```
+
+```shell
+docker push 911712091035.dkr.ecr.ap-southeast-1.amazonaws.com/prostylee-staging:latest
+```
+
+### How to encrypt and decrypt credential using Jasypt
+
+- Encrypt: [Jasypt Encrypt Cli](https://hub.docker.com/r/dperezcabrera/jasypt-encrypt-cli)
+
+```shell
 docker run --rm \
     -e MASTER_KEY="pro-stylee.2020@secret" \
-    -e INPUT_PASSWORD="secret" \
+    -e INPUT_PASSWORD="secret1234567" \
     dperezcabrera/jasypt-encrypt-cli
 ```
 
-Decrypt
+- Decrypt: [Jasypt Decrypt Cli](https://hub.docker.com/r/dperezcabrera/jasypt-decrypt-cli)
 
-```
+```shell
 docker run --rm \
     -e MASTER_KEY="pro-stylee.2020@secret" \
-    -e ENCRYPTED_PASSWORD="4Egov2lOLJJXK+nEMg9ozg==" \
+    -e ENCRYPTED_PASSWORD="LIutR+3yZgTVvs2yu+IzPQ==" \
     dperezcabrera/jasypt-decrypt-cli
 ```
-
-
-

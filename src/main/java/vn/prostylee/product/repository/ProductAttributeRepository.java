@@ -1,12 +1,15 @@
 package vn.prostylee.product.repository;
 // Generated Nov 28, 2020, 9:47:00 PM by Hibernate Tools 5.2.12.Final
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.prostylee.core.repository.BaseRepository;
+import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
+import vn.prostylee.product.entity.ProductPrice;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Repository for domain model class ProductAttribute.
@@ -15,12 +18,11 @@ import java.util.Map;
  */
 @Repository
 public interface ProductAttributeRepository extends BaseRepository<ProductAttribute, Long> {
-    List<Long> findCrossTabProductAttribute(Map<String, List<String>> attributesRequest,
-                                            Map<Long, String> attributeTypes);
 
-    List<ProductAttribute> getProductAttributeByProductId(Long productId);
+    List<ProductAttribute> findAllByProduct(Product product);
 
-    List<ProductAttribute> getProductAttributeByPriceId(Long priceId);
+    List<ProductAttribute> findAllByProductPrice(ProductPrice productPrice);
 
-    List<ProductAttribute> findByIdIn(List<Long> ids);
+    @Query("SELECT e FROM #{#entityName} e WHERE id IN :ids")
+    List<ProductAttribute> findByIdIn(@Param("ids") List<Long> ids);
 }

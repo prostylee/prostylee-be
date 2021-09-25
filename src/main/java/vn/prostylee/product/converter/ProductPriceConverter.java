@@ -6,15 +6,12 @@ import org.springframework.stereotype.Component;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.product.dto.request.ProductAttributeRequest;
 import vn.prostylee.product.dto.request.ProductPriceRequest;
-import vn.prostylee.product.dto.response.ProductAttributeResponse;
 import vn.prostylee.product.dto.response.ProductPriceResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Component
@@ -26,25 +23,21 @@ public class ProductPriceConverter {
 
     public ProductPriceResponse toDto(ProductPrice productPrice) {
         ProductPriceResponse productPriceResponse = BeanUtil.copyProperties(productPrice, ProductPriceResponse.class);
-        if(productPrice.getProductAttributes() == null) {
+        if (productPrice.getProductAttributes() == null) {
             return productPriceResponse;
         }
-        List<ProductAttributeResponse> attrs = new ArrayList<>();
-        for (ProductAttribute attr : productPrice.getProductAttributes()) {
-            attrs.add(productAttributeConverter.toDto(attr));
-        }
-        productPriceResponse.setProductAttributes(attrs);
+        productPriceResponse.setProductAttributes(productAttributeConverter.toResponse(productPrice.getProductAttributes()));
         return productPriceResponse;
     }
 
     public void toEntity(ProductPriceRequest productPriceRequest, ProductPrice productPrice) {
         Product product = Product.builder().id(productPriceRequest.getProductId()).build();
         productPrice.setProduct(product);
-        if(productPriceRequest.getProductAttributes() == null) {
+        if (productPriceRequest.getProductAttributes() == null) {
             return;
         }
         Set<ProductAttribute> productAttributes = new HashSet<>();
-        for(ProductAttributeRequest request : productPriceRequest.getProductAttributes()) {
+        for (ProductAttributeRequest request : productPriceRequest.getProductAttributes()) {
             ProductAttribute productAttribute = BeanUtil.copyProperties(request, ProductAttribute.class);
             productAttributeConverter.toEntity(request, productAttribute, productPrice);
             productAttributes.add(productAttribute);

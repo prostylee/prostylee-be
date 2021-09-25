@@ -16,6 +16,7 @@ import vn.prostylee.product.dto.response.ProductPriceResponse;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.repository.ProductPriceRepository;
+import vn.prostylee.product.service.AttributeService;
 import vn.prostylee.product.service.ProductPriceService;
 
 import java.util.HashSet;
@@ -25,18 +26,20 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-
-public class ProductPriceServiceImplTest {
+class ProductPriceServiceImplTest {
 
     @Mock
     private ProductPriceRepository productPriceRepository;
 
+    @Mock
+    private AttributeService attributeService;
+
     private ProductPriceService productPriceService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
-        ProductAttributeConverter productAttributeConverter = new ProductAttributeConverter();
+        ProductAttributeConverter productAttributeConverter = new ProductAttributeConverter(attributeService);
         ProductPriceConverter productPriceConverter = new ProductPriceConverter(productAttributeConverter);
         this.productPriceService = new ProductPriceServiceImpl(productPriceRepository, productPriceConverter);
     }

@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.dto.response.LocationResponse;
@@ -17,10 +18,8 @@ import vn.prostylee.post.service.PostStatisticService;
 import vn.prostylee.product.dto.response.*;
 import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.entity.Product;
-import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.service.StoreService;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
@@ -28,10 +27,9 @@ import vn.prostylee.useractivity.dto.response.UserWishListResponse;
 import vn.prostylee.useractivity.service.UserLikeService;
 import vn.prostylee.useractivity.service.UserWishListService;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +44,6 @@ public class ProductConverter {
     private final ProductImageService productImageService;
     private final UserLikeService userLikeService;
     private final ProductAttributeService productAttributeService;
-    private final AttributeService attributeService;
     private final ProductPriceService productPriceService;
     private final CategoryService categoryService;
     private final BrandService brandService;
@@ -64,13 +61,12 @@ public class ProductConverter {
                             ProductImageService productImageService,
                             UserLikeService userLikeService,
                             ProductAttributeService productAttributeService,
-                            AttributeService attributeService,
                             ProductPriceService productPriceService,
                             CategoryService categoryService,
                             BrandService brandService,
                             PostImageService postImageService,
                             PostStatisticService postStatisticService,
-                            StoreService storeService){
+                            StoreService storeService) {
         this.locationService = locationService;
         this.fileUploadService = fileUploadService;
         this.userService = userService;
@@ -79,7 +75,6 @@ public class ProductConverter {
         this.productImageService = productImageService;
         this.userLikeService = userLikeService;
         this.productAttributeService = productAttributeService;
-        this.attributeService =attributeService;
         this.productPriceService = productPriceService;
         this.categoryService = categoryService;
         this.brandService = brandService;
@@ -96,7 +91,7 @@ public class ProductConverter {
         productResponse.setIsAdvertising(false); // TODO Will be implemented after Ads feature completed: https://prostylee.atlassian.net/browse/BE-127
         productResponse.setProductOwnerResponse(buildProductOwner(product));
         productResponse.setProductStatisticResponse(buildProductStatistic(product.getId()));
-        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId(),TargetType.PRODUCT));
+        productResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(product.getId(), TargetType.PRODUCT));
         productResponse.setProductAttributeOptionResponse(buildAttributeOption(product.getId()));
         productResponse.setProductPriceResponseList(buildProductPrice(product.getId()));
         productResponse.setCategoryResponse(buildCategory(product.getCategoryId()));
@@ -113,14 +108,14 @@ public class ProductConverter {
         return productResponseLite;
     }
 
-    public NewFeedResponse toResponseForNewFeed(NewFeedResponse newFeedResponse, TargetType targetType){
-        if(TargetType.valueOf(newFeedResponse.getType()) == TargetType.PRODUCT){
+    public NewFeedResponse toResponseForNewFeed(NewFeedResponse newFeedResponse, TargetType targetType) {
+        if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.PRODUCT) {
             newFeedResponse.setImageUrls(buildImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT));
             newFeedResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(newFeedResponse.getId()));
             newFeedResponse.setProductStatisticResponse(buildProductStatistic(newFeedResponse.getId()));
         }
-        if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST){
+        if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST) {
             newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
             newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
@@ -131,7 +126,7 @@ public class ProductConverter {
         return newFeedResponse;
     }
 
-    private List<String> buildImageUrls(long productId) {
+    private List<String> buildImageUrls(Long productId) {
         List<Long> attachmentIds = Optional.ofNullable(productId)
                 .map(productImageService::getAttachmentIdByProductID)
                 .orElse(null);
@@ -145,7 +140,7 @@ public class ProductConverter {
         return Collections.emptyList();
     }
 
-    private List<String> buildPostImageUrls(long postId) {
+    private List<String> buildPostImageUrls(Long postId) {
         List<Long> attachmentIds = Optional.ofNullable(postId)
                 .map(postImageService::getAttachmentIdByPostID)
                 .orElse(null);
@@ -184,74 +179,46 @@ public class ProductConverter {
         return productOwnerResponse[0];
     }
 
-    private ProductStatisticResponse buildProductStatistic(Long id){
+    private ProductStatisticResponse buildProductStatistic(Long id) {
         return Optional.ofNullable(id)
                 .flatMap(productStatisticService::fetchById)
                 .orElse(null);
     }
 
-    private PostStatisticResponse buildPostStatistic(Long id){
+    private PostStatisticResponse buildPostStatistic(Long id) {
         return Optional.ofNullable(id)
                 .flatMap(postStatisticService::fetchById)
                 .orElse(null);
     }
 
-    private Boolean getLikeStatusOfUserLogin(Long id, TargetType targetType){
+    private Boolean getLikeStatusOfUserLogin(Long id, TargetType targetType) {
         StatusLikeRequest request = StatusLikeRequest.builder()
                 .targetIds(Collections.singletonList(id))
                 .targetType(targetType)
                 .build();
         List<Long> result = userLikeService.loadStatusLikes(request);
-        if (result.stream().count() > 0){
-            return true;
-        }
-        return false;
+        return CollectionUtils.isNotEmpty(result);
     }
 
-    private Boolean getSaveStatusOfUserLogin(Long productId){
+    private Boolean getSaveStatusOfUserLogin(Long productId) {
         UserWishListResponse result = userWishListService.loadStatusFollows(productId);
-        if (result != null){
-            return true;
-        }
-        return false;
+        return result != null;
     }
 
-    private List<ProductAttributeOptionResponse> buildAttributeOption(Long productId){
-        List<ProductAttribute> productAttributeList = productAttributeService.getProductAttributeByProductId(productId);
-        Set<Long> attributeIds = new HashSet<>();
-        productAttributeList.stream()
-                .filter(e -> attributeIds.add(e.getAttribute().getId()))
-                .collect(Collectors.toList());
-        List<ProductAttributeOptionResponse> reponse = new ArrayList<>();
-        for (Long attrId: attributeIds
-             ) {
-            AttributeResponse attributeResponse = attributeService.findById(attrId);
-            ProductAttributeOptionResponse item = BeanUtil.copyProperties(attributeResponse,ProductAttributeOptionResponse.class);
-            List<ProductAttributeResponse> productAttributeResponses = productAttributeList.stream()
-                    .filter(productAttribute -> attrId.equals(productAttribute.getAttribute().getId()))
-                    .map(e -> {
-                        return BeanUtil.copyProperties(e,ProductAttributeResponse.class);
-                    }).collect(Collectors.toList());
-            item.setProductAttributeResponses(productAttributeResponses.stream()
-                    .filter(distinctByKey(e -> e.getAttrValue()))
-                    .collect(Collectors.toList()));
-            reponse.add(item);
-        }
-        return reponse;
+    // TODO
+    private List<ProductAttributeResponse> buildAttributeOption(Long productId) {
+        return productAttributeService.findByProductId(productId);
     }
 
+    // TODO
     private List<ProductPriceResponse> buildProductPrice(Long productId) {
         List<ProductPrice> productPriceList = productPriceService.getProductPricesByProduct(productId);
-        List<ProductPriceResponse> productPriceResponseList = productPriceList.stream()
+        return productPriceList.stream()
                 .map(e -> {
-                    ProductPriceResponse obj = BeanUtil.copyProperties(e,ProductPriceResponse.class);
-                    obj.setProductAttributes(productAttributeService.getProductAttributeByPriceId(e.getId())
-                            .stream().map(p -> {
-                                return BeanUtil.copyProperties(p,ProductAttributeResponse.class);
-                            }).collect(Collectors.toList()));
+                    ProductPriceResponse obj = BeanUtil.copyProperties(e, ProductPriceResponse.class);
+                    obj.setProductAttributes(productAttributeService.findByProductPriceId(e.getId()));
                     return obj;
                 }).collect(Collectors.toList());
-        return productPriceResponseList;
     }
 
     private CategoryResponse buildCategory(Long categoryId) {
@@ -264,11 +231,6 @@ public class ProductConverter {
         return Optional.ofNullable(brandId)
                 .map(brandService::findById)
                 .orElse(null);
-    }
-
-    private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-        Map<Object, Boolean> uniqueMap = new ConcurrentHashMap<>();
-        return t -> uniqueMap.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private ProductOwnerResponse buildNewFeedOwner(Long id, TargetType targetType) {
@@ -286,7 +248,7 @@ public class ProductConverter {
         return productOwnerResponse[0];
     }
 
-    private StoreResponseLite getStoreResponseLite(Long storeId){
+    private StoreResponseLite getStoreResponseLite(Long storeId) {
         return Optional.ofNullable(storeId)
                 .map(storeService::getStoreResponseLite)
                 .orElse(null);
