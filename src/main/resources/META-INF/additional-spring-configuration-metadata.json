@@ -34,5 +34,10 @@
       "name": "app.order-code.length",
       "type": "java.lang.String",
       "description": "The length of order code."
+    },
+    {
+      "name": "app.cache.enable",
+      "type": "java.lang.String",
+      "description": "Description for app.cache.enable."
     }
   ] }

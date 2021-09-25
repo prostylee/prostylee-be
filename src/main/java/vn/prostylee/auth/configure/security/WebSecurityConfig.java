@@ -1,6 +1,5 @@
 package vn.prostylee.auth.configure.security;
 
-import vn.prostylee.auth.repository.FeatureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +20,7 @@ import vn.prostylee.auth.configure.properties.SecurityProperties;
 import vn.prostylee.auth.constant.AuthRole;
 import vn.prostylee.auth.entity.Feature;
 import vn.prostylee.auth.entity.Role;
+import vn.prostylee.auth.repository.FeatureRepository;
 import vn.prostylee.auth.service.impl.UserDetailsServiceImpl;
 import vn.prostylee.core.constant.ApiVersion;
 
@@ -49,6 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			"/configuration/security",
 			"/swagger-ui.html**",
 			"/swagger-ui/**",
+			"/explorer/**",
 			"/webjars/**",
 			"/favicon.ico"
 	};

@@ -8,16 +8,16 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.constant.ApiParamConstant;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.core.utils.DbUtil;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.repository.AttributeRepository;
-import vn.prostylee.product.repository.ProductAttributeRepository;
+import vn.prostylee.product.repository.ProductAttributeExtRepository;
 import vn.prostylee.store.dto.request.NewestStoreRequest;
 import vn.prostylee.store.dto.request.PaidStoreRequest;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -34,9 +34,9 @@ public class ProductSpecificationBuilder {
 
     private final UserFollowerService userFollowerService;
     private final StoreService storeService;
-    private final ProductAttributeRepository productAttributeRepository;
+    private final ProductAttributeExtRepository productAttributeExtRepository;
     private final AttributeRepository attributeRepository;
-    private static Map<Long,String> attributeTypes;
+    private static Map<Long, String> attributeTypes;
 
     public StringBuilder buildQuery(ProductFilter productFilter) {
         List<Long> storeIds = new ArrayList<>(Optional.ofNullable(productFilter.getStoreIds())
@@ -81,7 +81,7 @@ public class ProductSpecificationBuilder {
     }
 
     private StringBuilder buildWhereClause(ProductFilter productFilter) {
-        final StringBuilder sbWhere = new StringBuilder(" WHERE 1=1");
+        final StringBuilder sbWhere = new StringBuilder(" WHERE p.deleted_at IS NULL ");
         if (productFilter.getUserId() != null) {
             sbWhere.append(" AND p.created_by = :createdBy");
         }
@@ -106,7 +106,7 @@ public class ProductSpecificationBuilder {
             sbWhere.append(" AND (LOWER(p.name) LIKE :keyword OR LOWER(c.name) LIKE :keyword)");
         }
 
-        if (productFilter.getMinPrice()!=null && productFilter.getMaxPrice()!=null) {
+        if (productFilter.getMinPrice() != null && productFilter.getMaxPrice() != null) {
             sbWhere.append(" AND :minPrice <= p.price_sale AND p.price_sale <= :maxPrice");
         }
 
@@ -245,6 +245,6 @@ public class ProductSpecificationBuilder {
             List<Attribute> attrs = attributeRepository.findAll();
             attrs.forEach(attr -> attributeTypes.put(attr.getId(), attr.getKey()));
         }
-        return productAttributeRepository.findCrossTabProductAttribute(attributesRequest, attributeTypes);
+        return productAttributeExtRepository.findCrossTabProductAttribute(attributesRequest, attributeTypes);
     }
 }

@@ -49,7 +49,7 @@ public class ProductResponse implements Serializable {
 
     private BrandResponse brandResponse;
 
-    private List<ProductAttributeOptionResponse> productAttributeOptionResponse;
+    private List<ProductAttributeResponse> productAttributeOptionResponse; // TODO rename
 
     private List<ProductPriceResponse> productPriceResponseList;
 

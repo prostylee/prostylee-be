@@ -24,7 +24,6 @@ import vn.prostylee.product.dto.response.ProductResponseLite;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.entity.ProductAttribute;
 import vn.prostylee.product.entity.ProductImage;
-import vn.prostylee.order.entity.OrderStatusMst;
 import vn.prostylee.product.service.ProductAttributeService;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.shipping.dto.response.ShippingAddressResponse;
@@ -120,7 +119,7 @@ public class OrderConverter {
 
     private List<OrderDetailAttribute> getOrderDetailAttributes(OrderDetailRequest detailRq, OrderDetail detail) {
         List<ProductAttribute> productAttrs =
-                productAttributeService.getProductAttributeByIds(
+                productAttributeService.findByIds(
                         detailRq.getProductAttrIds());
         List<OrderDetailAttribute> orderDetailAttributes = new ArrayList<>();
         productAttrs.forEach(prodAttr ->

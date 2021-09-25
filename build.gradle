@@ -66,6 +66,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
+
 	// Send mail with template
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'

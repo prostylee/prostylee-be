@@ -52,4 +52,8 @@ public class ProductPrice extends AuditEntity {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "productPrice")
 	private Set<ProductAttribute> productAttributes;
 
+	public ProductPrice(Long id) {
+		this.id = id;
+	}
+
 }

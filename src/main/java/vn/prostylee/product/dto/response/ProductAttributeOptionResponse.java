@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @Builder
@@ -14,18 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductAttributeOptionResponse implements Serializable {
     private Long id;
-
-    private String key;
-
-    private Integer order;
-
+    private String name;
+    private String attrValue;
     private String label;
-
-    private String description;
-
-    private Integer type;
-
     private String languageCode;
-
-    private List<ProductAttributeResponse> productAttributeResponses;
 }

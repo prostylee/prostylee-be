@@ -13,14 +13,12 @@ import vn.prostylee.product.dto.filter.NewFeedsFilter;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.dto.response.NewFeedResponse;
-import vn.prostylee.product.dto.response.ProductResponse;
 import vn.prostylee.product.entity.Product;
 import vn.prostylee.product.repository.ProductExtRepository;
 import vn.prostylee.product.repository.specification.NewFeedsSpecificationBuilder;
 import vn.prostylee.product.repository.specification.ProductSpecificationBuilder;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -21,7 +21,7 @@ import javax.sql.DataSource;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name="app.quartz.enable", havingValue="true")
+@ConditionalOnProperty(name="spring.quartz.auto-startup", havingValue="true")
 public class SpringQuartzSchedulerConfig {
 
     @PostConstruct

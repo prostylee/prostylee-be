@@ -44,13 +44,13 @@ public class AttributeServiceImpl implements AttributeService {
     public Page<AttributeResponse> findAll(BaseFilter baseFilter) {
         AttributeFilter categoryFilter = (AttributeFilter) baseFilter;
         Pageable pageable = baseFilterSpecs.page(categoryFilter);
-        Page<Attribute> page = this.attributeRepository.findAll(this.buildSearchable(categoryFilter), pageable);
+        Page<Attribute> page = attributeRepository.findAll(this.buildSearchable(categoryFilter), pageable);
         return page.map(this::toResponse);
     }
 
     @Override
     public AttributeResponse findById(Long id) {
-        return this.toResponse(this.getById(id));
+        return toResponse(getById(id));
     }
 
     private Specification<Attribute> buildSearchable(AttributeFilter attributeFilter) {
@@ -73,12 +73,12 @@ public class AttributeServiceImpl implements AttributeService {
         }
         Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), attributeRequest.getAttributeOptions(), "id", AttributeOption.class);
         mergedAttributes.forEach(attributeOption -> attributeOption.setAttribute(attribute));
-        return toResponse(this.attributeRepository.save(attribute));
+        return toResponse(attributeRepository.save(attribute));
     }
 
     @Override
     public AttributeResponse update(Long id, AttributeRequest request) {
-        Attribute attribute = this.getById(id);
+        Attribute attribute = getById(id);
         BeanUtil.mergeProperties(request, attribute);
         if (attribute.getOrder() == null) {
             attribute.setOrder(1);
@@ -86,13 +86,13 @@ public class AttributeServiceImpl implements AttributeService {
         Set<AttributeOption> mergedAttributes = EntityUtils.merge(attribute.getAttributeOptions(), request.getAttributeOptions(), "id", AttributeOption.class);
         mergedAttributes.forEach(attributeOption -> attributeOption.setAttribute(attribute));
         attribute.setAttributeOptions(mergedAttributes);
-        return toResponse(this.attributeRepository.save(attribute));
+        return toResponse(attributeRepository.save(attribute));
     }
 
     @Override
     public boolean deleteById(Long id) {
         try {
-            this.attributeRepository.deleteById(id);
+            attributeRepository.deleteById(id);
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             log.debug("Category id {} does not exists", id);
@@ -103,16 +103,24 @@ public class AttributeServiceImpl implements AttributeService {
     private AttributeResponse toResponse(Attribute attribute) {
         AttributeResponse response = BeanUtil.copyProperties(attribute, AttributeResponse.class);
         List<AttributeOption> attributeOptions = attributeOptionRepository.getOptionByAttrId(attribute.getId());
-        List<AttributeOptionResponse> options = attributeOptions.stream().map(e -> {
-            return BeanUtil.copyProperties(e, AttributeOptionResponse.class);
-        }).collect(Collectors.toList());
+        List<AttributeOptionResponse> options = attributeOptions.stream()
+                .map(e -> BeanUtil.copyProperties(e, AttributeOptionResponse.class))
+                .collect(Collectors.toList());
         response.setAttributeOptions(options);
         return response;
     }
 
     private Attribute getById(Long id) {
-        return this.attributeRepository.findById(id)
+        return attributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Attribute is not found with id [" + id + "]"));
+    }
+
+    @Override
+    public List<AttributeResponse> findByIdIn(Set<Long> ids) {
+        return attributeRepository.findByIdIn(ids)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
 }
