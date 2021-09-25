@@ -127,7 +127,7 @@ public class VoucherUserServiceImpl implements VoucherUserService {
             if (entity.getUsedAt() != null) {
                 throw new ResourceInUsedException("Voucher is in used, could not delete. VoucherId=" + voucherId);
             }
-            voucherUserRepository.deleteById(voucherId);
+            voucherUserRepository.delete(entity);
             log.info("VoucherUser with id [{}] deleted successfully", entity.getId());
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
