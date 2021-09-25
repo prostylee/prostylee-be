@@ -15,7 +15,11 @@ public class BrandRequest {
     @Size(max = 512)
     private String name;
 
+    @Size(max = 512)
     private String icon;
+
+    @Size(max = 2048)
+    private String banner;
 
     private Integer order;
 }
