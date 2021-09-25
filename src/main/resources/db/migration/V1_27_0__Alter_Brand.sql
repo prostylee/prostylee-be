@@ -1,0 +1,1 @@
+ALTER TABLE "brand" ADD COLUMN banner varchar(2048);
