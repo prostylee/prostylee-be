@@ -106,6 +106,7 @@ dependencies {
 	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.926')
 	implementation 'com.amazonaws:aws-java-sdk-s3'
 	implementation 'com.amazonaws:aws-java-sdk-cognitoidp'
+	implementation 'com.amazonaws:aws-java-sdk-pinpoint'
 
 	// Logging
 	implementation 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
