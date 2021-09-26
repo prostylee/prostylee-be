@@ -210,6 +210,9 @@ app:
       jwkUrl: ${app.aws.cognito.issuer}/.well-known/jwks.json
       connectionTimeout: 2000
       readTimeout: 2000
+    # AWS Pinpoint
+    pinpoint:
+      region: ap-northeast-2
 
   http:
     connectTimeout: 5000
