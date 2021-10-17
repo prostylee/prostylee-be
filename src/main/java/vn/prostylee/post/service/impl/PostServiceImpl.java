@@ -134,17 +134,24 @@ public class PostServiceImpl implements PostService {
         }
 
         Long storeId = post.getStoreId();
-        if (null != storeId)
+        if (null != storeId) {
             postForListResponse.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
-
-        postForListResponse.setUserResponseLite(this.getUserResponseLite(post.getCreatedBy()));
+        }
+        if (null != post.getCreatedBy()) {
+            postForListResponse.setUserResponseLite(this.getUserResponseLite(post.getCreatedBy()));
+        }
 
         return postForListResponse;
     }
 
     private UserResponseLite getUserResponseLite(Long id) {
-        UserResponse profileBy = userProfileService.getProfileBy(id);
-        return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
+        try {
+            UserResponse profileBy = userProfileService.getProfileBy(id);
+            return BeanUtil.copyProperties(profileBy, UserResponseLite.class);
+        } catch (ResourceNotFoundException e) {
+            log.warn("Profile not found with id={}", id, e);
+            return null;
+        }
     }
 
     private PostForUpdateResponse toUpdateResponse(Post post) {

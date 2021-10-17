@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.location.service.LocationService;
@@ -18,7 +19,6 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.StoreBannerService;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -135,10 +135,6 @@ public class StoreConverter {
         StatusFollowRequest request = StatusFollowRequest.builder()
                 .targetIds(Collections.singletonList(storeId))
                 .targetType(TargetType.STORE).build();
-        List<Long> result = userFollowerService.loadStatusFollows(request);
-        if (result.stream().count() > 0) {
-            return true;
-        }
-        return false;
+        return !userFollowerService.loadStatusFollows(request).isEmpty();
     }
 }

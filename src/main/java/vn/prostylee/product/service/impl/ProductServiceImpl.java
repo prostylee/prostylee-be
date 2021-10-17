@@ -180,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<NewFeedResponse> getNewFeeds(NewFeedsFilter newFeedsFilter){
         Page<NewFeedResponse> page = productExtRepository.findNewFeedsOfStore(newFeedsFilter);
         List<NewFeedResponse> newFeeds = page.stream()
-                .map(item->productConverter.toResponseForNewFeed(item, newFeedsFilter.getTargetType()))
+                .map(item->productConverter.toResponseForNewFeed(item, newFeedsFilter.getNewFeedType()))
                 .collect(Collectors.toList());
         return new PageImpl<>(newFeeds, page.getPageable(), page.getTotalElements());
     }

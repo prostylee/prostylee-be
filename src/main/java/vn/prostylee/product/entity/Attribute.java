@@ -52,6 +52,11 @@ public class Attribute extends AuditEntity {
 	@Column(name = "description", length = 512)
 	private String description;
 
+	// 1. TEXT
+	// 2. NUMBER
+	// 3. SELECT_BOX
+	// 4. CHECKBOX
+	// 5. RADIO
 	@Column(name = "type")
 	private Integer type;
 
