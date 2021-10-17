@@ -27,22 +27,22 @@ public class NewFeedsSpecificationBuilder {
     private final AuthenticatedProvider authenticatedProvider;
 
     public StringBuilder buildQuery(NewFeedsFilter newFeedsFilter) {
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             List<Long> listIdsFollowing = this.getListObjectFollowing(authenticatedProvider.getUserIdValue(), TargetType.USER);
-            if(CollectionUtils.isEmpty(listIdsFollowing)){
+            if (CollectionUtils.isEmpty(listIdsFollowing)) {
                 listIdsFollowing = this.getTopFollowing(NUMBER_OF_TOP_FOLLOWING, TargetType.USER, DEFAULT_TIME_RANGE_IN_DAYS);
             }
             newFeedsFilter.setUserIds(listIdsFollowing);
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             List<Long> listIdsFollowing = this.getListObjectFollowing(authenticatedProvider.getUserIdValue(), TargetType.STORE);
-            if(CollectionUtils.isEmpty(listIdsFollowing)){
+            if (CollectionUtils.isEmpty(listIdsFollowing)) {
                 listIdsFollowing = this.getTopFollowing(NUMBER_OF_TOP_FOLLOWING, TargetType.STORE, DEFAULT_TIME_RANGE_IN_DAYS);
             }
             newFeedsFilter.setStoreIds(listIdsFollowing);
         }
 
-        if (CollectionUtils.isEmpty(newFeedsFilter.getUserIds()) && CollectionUtils.isEmpty(newFeedsFilter.getStoreIds())){
+        if (CollectionUtils.isEmpty(newFeedsFilter.getUserIds()) && CollectionUtils.isEmpty(newFeedsFilter.getStoreIds())) {
             return new StringBuilder("SELECT nf.*")
                     .append(buildFromClauseForAllPostAndProduct(newFeedsFilter))
                     .append(buildWhereClause(newFeedsFilter))
@@ -57,57 +57,57 @@ public class NewFeedsSpecificationBuilder {
     private StringBuilder buildFromClause(NewFeedsFilter newFeedsFilter) {
         final StringBuilder sbFrom = new StringBuilder(" FROM (");
 
-        sbFrom.append(" SELECT '"+ TargetType.POST.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.POST.name() + "' AS type" +
                 " , p.id AS id" +
                 " , p.description AS content" +
                 " , p.store_id AS store_ads_id" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price_sale" +
                 " , CAST(p.created_at AS date) AS created_at");
-        if (newFeedsFilter.getTargetType()  == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , rank() OVER (PARTITION BY p.created_by ORDER BY p.created_at DESC) AS rank");
             sbFrom.append(" , p.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" , rank() OVER (PARTITION BY p.store_owner ORDER BY p.created_at DESC) AS rank");
-            sbFrom.append(" , p.store_owner AS owner_id");
+            sbFrom.append(" , COALESCE(p.store_owner, p.created_by) AS owner_id");
         }
         sbFrom.append(" , 1 AS priority");
         sbFrom.append(" FROM post p");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE p.created_by IN (:userIds) AND p.store_owner IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE p.store_owner IN (:storeIds)");
         }
 
         sbFrom.append(" UNION");
-        sbFrom.append(" SELECT '"+ TargetType.PRODUCT.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.PRODUCT.name() + "' AS type" +
                 " , pr.id AS id" +
                 " , pr.name AS content" +
                 " , 0 AS store_ads_id" +
                 " , CAST(pr.price AS DOUBLE PRECISION) AS price" +
                 " , CAST(pr.price_sale AS DOUBLE PRECISION) AS price_sale" +
                 " , pr.created_at AS created_at");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , rank() OVER (PARTITION BY pr.created_by ORDER BY pr.created_at DESC) AS rank");
             sbFrom.append(" , pr.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" , rank() OVER (PARTITION BY pr.store_id ORDER BY pr.created_at DESC) AS rank");
-            sbFrom.append(" , pr.store_id AS owner_id");
+            sbFrom.append(" , COALESCE(pr.store_id, pr.created_by) AS owner_id");
         }
         sbFrom.append(" , 1 AS priority");
         sbFrom.append(" FROM product pr");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE pr.created_by IN (:userIds) AND pr.store_id IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE pr.store_id IN (:storeIds)");
         }
 
         sbFrom.append(" UNION");
-        sbFrom.append(" SELECT '"+ TargetType.POST.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.POST.name() + "' AS type" +
                 " , p.id AS id" +
                 " , p.description AS content" +
                 " , p.store_id AS store_ads_id" +
@@ -115,23 +115,23 @@ public class NewFeedsSpecificationBuilder {
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price_sale" +
                 " , CAST(p.created_at AS date) AS created_at" +
                 " , 0 AS rank");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , p.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
-            sbFrom.append(" , p.store_owner AS owner_id");
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
+            sbFrom.append(" , COALESCE(p.store_owner, p.created_by) AS owner_id");
         }
         sbFrom.append(" , 0 AS priority");
         sbFrom.append(" FROM post p");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE p.created_by NOT IN (:userIds) AND p.store_owner IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE p.store_owner NOT IN (:storeIds)");
         }
 
         sbFrom.append(" UNION");
-        sbFrom.append(" SELECT '"+ TargetType.PRODUCT.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.PRODUCT.name() + "' AS type" +
                 " , pr.id AS id" +
                 " , pr.name AS content" +
                 " , 0 AS store_ads_id" +
@@ -139,18 +139,18 @@ public class NewFeedsSpecificationBuilder {
                 " , CAST(pr.price_sale AS DOUBLE PRECISION) AS price_sale" +
                 " , pr.created_at AS created_at" +
                 " , 0 AS rank");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , pr.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
-            sbFrom.append(" , pr.store_id AS owner_id");
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
+            sbFrom.append(" , COALESCE(pr.store_id, pr.created_by) AS owner_id");
         }
         sbFrom.append(" , 0 AS priority");
         sbFrom.append(" FROM product pr");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE pr.created_by NOT IN (:userIds) AND pr.store_id IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE pr.store_id NOT IN (:storeIds)");
         }
 
@@ -161,48 +161,48 @@ public class NewFeedsSpecificationBuilder {
     private StringBuilder buildFromClauseForAllPostAndProduct(NewFeedsFilter newFeedsFilter) {
         final StringBuilder sbFrom = new StringBuilder(" FROM (");
 
-        sbFrom.append(" SELECT '"+ TargetType.POST.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.POST.name() + "' AS type" +
                 " , p.id AS id" +
                 " , p.description AS content" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price" +
                 " , CAST('0.0'AS DOUBLE PRECISION) AS price_sale" +
                 " , CAST(p.created_at AS date) AS created_at" +
                 " , 0 AS rank");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , p.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
-            sbFrom.append(" , p.store_owner AS owner_id");
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
+            sbFrom.append(" , COALESCE(p.store_owner, p.created_by) AS owner_id");
         }
         sbFrom.append(" , 0 AS priority");
         sbFrom.append(" FROM post p");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE p.store_owner IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE p.store_owner IS NOT NULL");
         }
 
         sbFrom.append(" UNION");
-        sbFrom.append(" SELECT '"+ TargetType.PRODUCT.name() +"' AS type" +
+        sbFrom.append(" SELECT '" + TargetType.PRODUCT.name() + "' AS type" +
                 " , pr.id AS id" +
                 " , pr.name AS content" +
                 " , CAST(pr.price AS DOUBLE PRECISION) AS price" +
                 " , CAST(pr.price_sale AS DOUBLE PRECISION) AS price_sale" +
                 " , pr.created_at AS created_at" +
                 " , 0 AS rank");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" , pr.created_by AS owner_id");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
-            sbFrom.append(" , pr.store_id AS owner_id");
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
+            sbFrom.append(" , COALESCE(pr.store_id, pr.created_by) AS owner_id");
         }
         sbFrom.append(" , 0 AS priority");
         sbFrom.append(" FROM product pr");
-        if (newFeedsFilter.getTargetType() == TargetType.USER){
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER) {
             sbFrom.append(" WHERE pr.store_id IS NULL");
         }
-        if (newFeedsFilter.getTargetType() == TargetType.STORE){
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE) {
             sbFrom.append(" WHERE pr.store_id IS NOT NULL");
         }
 
@@ -227,13 +227,13 @@ public class NewFeedsSpecificationBuilder {
     public Map<String, Object> buildParams(NewFeedsFilter newFeedsFilter) {
         Map<String, Object> params = new HashMap<>();
 
-        if (newFeedsFilter.getTargetType() == TargetType.STORE
+        if (newFeedsFilter.getNewFeedType() == TargetType.STORE
                 && CollectionUtils.isNotEmpty(newFeedsFilter.getStoreIds())) {
             List<Long> storeIds = new ArrayList<>(Optional.ofNullable(newFeedsFilter.getStoreIds())
                     .orElseGet(Collections::emptyList));
             params.put("storeIds", storeIds);
         }
-        if (newFeedsFilter.getTargetType() == TargetType.USER
+        if (newFeedsFilter.getNewFeedType() == TargetType.USER
                 && CollectionUtils.isNotEmpty(newFeedsFilter.getUserIds())) {
             List<Long> userIds = new ArrayList<>(Optional.ofNullable(newFeedsFilter.getUserIds())
                     .orElseGet(Collections::emptyList));
@@ -255,7 +255,7 @@ public class NewFeedsSpecificationBuilder {
         return ids;
     }
 
-    private List<Long> getTopFollowing(int numberOfStore,TargetType targetType, int numberOfDays) {
+    private List<Long> getTopFollowing(int numberOfStore, TargetType targetType, int numberOfDays) {
         MostActiveRequest request = MostActiveRequest.builder()
                 .targetTypes(Collections.singletonList(targetType))
                 .fromDate(DateUtils.getLastDaysBefore(numberOfDays))
