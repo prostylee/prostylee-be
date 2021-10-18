@@ -37,6 +37,8 @@ public class NewFeedResponse implements Serializable {
 
     private Boolean saveStatusOfUserLogin;
 
+    private Boolean followStatusOfUserLogin;
+
     private ProductStatisticResponse productStatisticResponse;
 
     private PostStatisticResponse postStatisticResponse;
