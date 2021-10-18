@@ -22,8 +22,10 @@ import vn.prostylee.product.entity.ProductPrice;
 import vn.prostylee.product.service.*;
 import vn.prostylee.store.dto.response.StoreResponseLite;
 import vn.prostylee.store.service.StoreService;
+import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.dto.request.StatusLikeRequest;
 import vn.prostylee.useractivity.dto.response.UserWishListResponse;
+import vn.prostylee.useractivity.service.UserFollowerService;
 import vn.prostylee.useractivity.service.UserLikeService;
 import vn.prostylee.useractivity.service.UserWishListService;
 
@@ -51,6 +53,7 @@ public class ProductConverter {
     private final PostImageService postImageService;
     private final PostStatisticService postStatisticService;
     private final StoreService storeService;
+    private final UserFollowerService userFollowerService;
 
     public ProductConverter(@Lazy UserWishListService userWishListService,
                             LocationService locationService,
@@ -66,7 +69,7 @@ public class ProductConverter {
                             BrandService brandService,
                             PostImageService postImageService,
                             PostStatisticService postStatisticService,
-                            StoreService storeService) {
+                            StoreService storeService, UserFollowerService userFollowerService) {
         this.locationService = locationService;
         this.fileUploadService = fileUploadService;
         this.userService = userService;
@@ -82,6 +85,7 @@ public class ProductConverter {
         this.postImageService = postImageService;
         this.postStatisticService = postStatisticService;
         this.storeService = storeService;
+        this.userFollowerService = userFollowerService;
     }
 
     public ProductResponse toResponse(Product product) {
@@ -113,11 +117,13 @@ public class ProductConverter {
             newFeedResponse.setImageUrls(buildImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT));
             newFeedResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(newFeedResponse.getId()));
+            newFeedResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(newFeedResponse.getId()));
             newFeedResponse.setProductStatisticResponse(buildProductStatistic(newFeedResponse.getId()));
         }
         if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST) {
             newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
+            newFeedResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(newFeedResponse.getId()));
             newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
             newFeedResponse.setStoreAdsResponseLite(getStoreResponseLite(newFeedResponse.getStoreAdsId()));
         }
@@ -252,5 +258,12 @@ public class ProductConverter {
         return Optional.ofNullable(storeId)
                 .map(storeService::getStoreResponseLite)
                 .orElse(null);
+    }
+
+    private Boolean getFollowStatusOfUserLogin(Long targetId) {
+        StatusFollowRequest request = StatusFollowRequest.builder()
+                .targetIds(Collections.singletonList(targetId))
+                .targetType(TargetType.STORE).build();
+        return !userFollowerService.loadStatusFollows(request).isEmpty();
     }
 }
