@@ -3,12 +3,10 @@ package vn.prostylee.notification.service.impl;
 import com.amazonaws.services.pinpoint.AmazonPinpoint;
 import com.amazonaws.services.pinpoint.AmazonPinpointClientBuilder;
 import com.amazonaws.services.pinpoint.model.*;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
 import vn.prostylee.notification.configuration.AwsPinpointProperties;
@@ -47,15 +45,14 @@ public class AwsPushNotificationServiceImpl implements PushNotificationService<A
                     MessageRequest messageRequest = buildMessageRequest(token);
 
                     SendMessagesRequest sendMessagesRequest = new SendMessagesRequest()
-                            .withApplicationId("")
+                            .withApplicationId(awsPinpointProperties.getAppId())
                             .withMessageRequest(messageRequest);
 
                     AmazonPinpoint client = AmazonPinpointClientBuilder.standard()
                             .withRegion(awsPinpointProperties.getRegion()).build();
 
-                    client.sendMessages(sendMessagesRequest);
-                    ResponseEntity<String> response = null;
-                    log.debug("Already stored audit successfully with response " + response);
+                    SendMessagesResult result = client.sendMessages(sendMessagesRequest);
+                    log.debug("Already stored audit successfully with result: " + result);
                 } catch (Exception e) {
                     log.error("Fail to send firebase notification to device ", e);
                 }

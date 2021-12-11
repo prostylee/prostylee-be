@@ -17,4 +17,6 @@ public class AwsPinpointProperties {
      */
     private String region;
 
+    private String appId;
+
 }

@@ -1,14 +1,14 @@
 package vn.prostylee.notification.controller;
 
-import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
-import vn.prostylee.notification.dto.request.SubscribePushNotificationRequest;
-import vn.prostylee.core.constant.ApiVersion;
-import vn.prostylee.notification.service.PushNotificationService;
-import vn.prostylee.notification.service.PushNotificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
+import vn.prostylee.notification.dto.request.SubscribePushNotificationRequest;
+import vn.prostylee.notification.service.PushNotificationService;
+import vn.prostylee.notification.service.PushNotificationTokenService;
 
 import javax.validation.Valid;
 
@@ -29,7 +29,7 @@ public class PushNotificationController {
 
     @PostMapping("/subscribe")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Boolean send(@Valid @RequestBody SubscribePushNotificationRequest request) {
+    public Boolean subscribe(@Valid @RequestBody SubscribePushNotificationRequest request) {
         tokenService.subscribe(request);
         return true;
     }

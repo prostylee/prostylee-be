@@ -7,6 +7,9 @@ app:
   security:
     allowed-origins:
       - "*"
+  aws:
+    pinpoint:
+      app-id: prostylee-prod
 
 spring:
   flyway:
