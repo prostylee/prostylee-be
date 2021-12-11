@@ -213,6 +213,7 @@ app:
     # AWS Pinpoint
     pinpoint:
       region: ap-northeast-2
+      app-id: prostylee-nonprod
 
   http:
     connectTimeout: 5000
