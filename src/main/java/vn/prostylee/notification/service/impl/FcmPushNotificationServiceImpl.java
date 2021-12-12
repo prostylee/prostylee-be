@@ -1,10 +1,6 @@
 package vn.prostylee.notification.service.impl;
 
 import com.google.firebase.messaging.*;
-import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
-import vn.prostylee.notification.dto.request.FcmSubscriptionRequest;
-import vn.prostylee.notification.service.FcmPushNotificationService;
-import vn.prostylee.notification.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -14,6 +10,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
 import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.notification.constant.NotificationProvider;
+import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
+import vn.prostylee.notification.dto.request.FcmSubscriptionRequest;
+import vn.prostylee.notification.service.FcmPushNotificationService;
+import vn.prostylee.notification.service.PushNotificationService;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -27,7 +28,7 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
 
     @Override
     public boolean sendPnsToDevice(FcmPushNotificationRequest notificationRequestDto) {
-        if (CollectionUtils.isEmpty(notificationRequestDto.getTokens())) {
+        if (CollectionUtils.isEmpty(notificationRequestDto.getTo())) {
             return false;
         }
 
@@ -35,7 +36,7 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
         final WebpushConfig webpushConfig = buildWebpushConfig(notificationRequestDto);
         final String jsonContent = JsonUtils.toJson(notificationRequestDto.getData());
 
-        int numberOfNotifications = ChunkServiceExecutor.execute(notificationRequestDto.getTokens(), tokens -> {
+        int numberOfNotifications = ChunkServiceExecutor.execute(notificationRequestDto.getTo(), tokens -> {
             tokens.forEach(token -> {
                 try {
                     Message message = Message.builder()
@@ -75,11 +76,11 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
 
     @Override
     public void subscribeToTopic(FcmSubscriptionRequest subscriptionRequestDto) {
-        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTokens())) {
+        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTo())) {
             return;
         }
         try {
-            firebaseMessaging.subscribeToTopic(subscriptionRequestDto.getTokens(), subscriptionRequestDto.getTopicName());
+            firebaseMessaging.subscribeToTopic(subscriptionRequestDto.getTo(), subscriptionRequestDto.getTopicName());
         } catch (FirebaseMessagingException e) {
             log.error("Firebase subscribe to topic fail: " + subscriptionRequestDto.getTopicName(), e);
         }
@@ -87,11 +88,11 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
 
     @Override
     public void unsubscribeFromTopic(FcmSubscriptionRequest subscriptionRequestDto) {
-        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTokens())) {
+        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTo())) {
             return;
         }
         try {
-            firebaseMessaging.unsubscribeFromTopic(subscriptionRequestDto.getTokens(), subscriptionRequestDto.getTopicName());
+            firebaseMessaging.unsubscribeFromTopic(subscriptionRequestDto.getTo(), subscriptionRequestDto.getTopicName());
         } catch (FirebaseMessagingException e) {
             log.error("Firebase unsubscribe from topic fail: " + subscriptionRequestDto.getTopicName(), e);
         }
@@ -99,7 +100,7 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
 
     @Override
     public boolean sendPnsToTopic(FcmSubscriptionRequest subscriptionRequestDto) {
-        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTokens())) {
+        if (CollectionUtils.isEmpty(subscriptionRequestDto.getTo())) {
             return false;
         }
 
@@ -109,7 +110,7 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
         final WebpushConfig webpushConfig = buildWebpushConfig(subscriptionRequestDto);
         final String jsonContent = JsonUtils.toJson(subscriptionRequestDto.getData());
 
-        int numberOfNotifications = ChunkServiceExecutor.execute(subscriptionRequestDto.getTokens(), tokens -> {
+        int numberOfNotifications = ChunkServiceExecutor.execute(subscriptionRequestDto.getTo(), tokens -> {
             tokens.forEach(token -> {
                 try {
                     Message message = Message.builder()
@@ -128,10 +129,15 @@ public class FcmPushNotificationServiceImpl implements FcmPushNotificationServic
         return numberOfNotifications > 0;
     }
 
+    @Override
+    public NotificationProvider getProvider() {
+        return NotificationProvider.FIREBASE;
+    }
+
     @Async
     @Override
     public CompletableFuture<Boolean> sendPushNotificationAsync(FcmPushNotificationRequest request) {
-        if (CollectionUtils.isEmpty(request.getTokens())) {
+        if (CollectionUtils.isEmpty(request.getTo())) {
             return CompletableFuture.completedFuture(false);
         }
 

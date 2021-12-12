@@ -1,10 +1,5 @@
 package vn.prostylee.media.provider.async;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
-import com.amazonaws.services.s3.model.DeleteObjectsResult;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +8,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.media.configuration.AwsS3Properties;
@@ -22,9 +20,7 @@ import vn.prostylee.media.service.AttachmentService;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -34,13 +30,13 @@ import java.util.concurrent.Future;
 @Slf4j
 public class AwsS3AsyncProvider extends BaseAsyncProvider {
 
-    private final AmazonS3 s3Client;
+    private final S3Client s3Client;
     private final AttachmentService attachmentService;
     private final String bucketName;
 
     @Autowired
     public AwsS3AsyncProvider(
-            AmazonS3 s3Client,
+            S3Client s3Client,
             AwsS3Properties awss3Properties,
             AttachmentService attachmentService) {
         this.s3Client = s3Client;
@@ -67,8 +63,18 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
     @Async
     public Future<AttachmentResponse> uploadFile(String folderName, MultipartFile file) throws IOException {
         String fileName = generateFileName(file, folderName);
-        s3Client.putObject(bucketName, fileName, file.getInputStream(), getMetaData(file));
-        URL storedUrl = s3Client.getUrl(bucketName, fileName);
+        PutObjectRequest putOb = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .metadata(getMetaData(file))
+                .build();
+
+        PutObjectResponse response = s3Client.putObject(putOb, RequestBody.fromBytes(file.getBytes()));
+        log.debug("Uploaded file = {}", response);
+
+        GetUrlRequest request = GetUrlRequest.builder().bucket(bucketName ).key(fileName).build();
+        URL storedUrl = s3Client.utilities().getUrl(request);
+
         Attachment attachment = attachmentService.saveAttachmentByUploadFile(storedUrl, file);
         AttachmentResponse attachmentDto = BeanUtil.copyProperties(attachment, AttachmentResponse.class);
         return new AsyncResult<>(attachmentDto);
@@ -89,13 +95,18 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
      */
     @Async
     public Future<Boolean> deleteFiles(List<String> fileNames) {
-        List<KeyVersion> keys = new ArrayList<>();
+        ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
         for (String fileName : fileNames) {
-            keys.add(new KeyVersion(fileName));
+            toDelete.add(ObjectIdentifier.builder().key(fileName).build());
         }
-        DeleteObjectsRequest requests = new DeleteObjectsRequest(bucketName).withKeys(keys);
-        DeleteObjectsResult results = s3Client.deleteObjects(requests);
-        return new AsyncResult<>(results.getDeletedObjects().size() == fileNames.size());
+
+        DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
+                .bucket(bucketName)
+                .delete(Delete.builder().objects(toDelete).build())
+                .build();
+
+        DeleteObjectsResponse response = s3Client.deleteObjects(dor);
+        return new AsyncResult<>(response.deleted().size() == fileNames.size());
     }
 
     /**
@@ -104,11 +115,10 @@ public class AwsS3AsyncProvider extends BaseAsyncProvider {
      * @param file file
      * @return metadata
      */
-    private ObjectMetadata getMetaData(MultipartFile file) {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(file.getContentType());
-        objectMetadata.setContentLength(file.getSize());
-        return objectMetadata;
+    private Map<String, String> getMetaData(MultipartFile file) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("version", "1.0.0");
+        return metadata;
     }
 
 }

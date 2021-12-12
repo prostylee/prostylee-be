@@ -18,12 +18,10 @@ import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.JsonUtils;
+import vn.prostylee.notification.configuration.PushNotificationProperties;
 import vn.prostylee.notification.constant.NotificationProvider;
 import vn.prostylee.notification.dto.PushNotificationDto;
-import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
-import vn.prostylee.notification.dto.request.FcmPushNotificationRequest;
-import vn.prostylee.notification.dto.request.FcmSubscriptionRequest;
-import vn.prostylee.notification.dto.request.NotificationRequest;
+import vn.prostylee.notification.dto.request.*;
 import vn.prostylee.notification.dto.response.NotificationDiscountResponse;
 import vn.prostylee.notification.dto.response.NotificationResponse;
 import vn.prostylee.notification.dto.response.NotificationSender;
@@ -32,10 +30,7 @@ import vn.prostylee.notification.factory.PushNotificationServiceFactory;
 import vn.prostylee.notification.repository.NotificationRepository;
 import vn.prostylee.notification.service.NotificationService;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +45,8 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     private final BaseFilterSpecs<Notification> baseFilterSpecs;
+
+    private final PushNotificationProperties pushNotificationProperties;
 
     @Override
     public Page<NotificationResponse> findAll(BaseFilter baseFilter) {
@@ -207,7 +204,10 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendPushNotification(PushNotificationDto request) {
-        NotificationProvider.findProvider(request.getProvider()).ifPresent(provider -> {
+        String providerName = Optional.ofNullable(request.getProvider())
+                .orElse(pushNotificationProperties.getProvider());
+
+        NotificationProvider.findProvider(providerName).ifPresent(provider -> {
             switch (provider) {
                 case EXPO:
                     sendViaExpoPush(request, provider);
@@ -215,17 +215,19 @@ public class NotificationServiceImpl implements NotificationService {
                 case FIREBASE:
                     sendViaFcm(request, provider);
                     break;
-                default:
+                case AWS_PINPOINT:
                     sendViaAwsPinpoint(request);
+                    break;
+                default:
+                    log.warn("Unsupported provider={}", request.getProvider());
                     break;
             }
         });
     }
 
     private void sendViaExpoPush(PushNotificationDto request, NotificationProvider provider) {
-        String[] tokens = extractTokens(request.getUserTokens()).toArray(String[]::new);
         ExpoPushNotificationRequest pushNotificationRequest = ExpoPushNotificationRequest.builder()
-                .to(tokens)
+                .to(extractTokens(request.getUserTokens()))
                 .title(request.getTitle())
                 .body(request.getBody())
                 .data(request.getData())
@@ -238,7 +240,7 @@ public class NotificationServiceImpl implements NotificationService {
     private void sendViaFcm(PushNotificationDto request, NotificationProvider provider) {
         List<String> tokens = extractTokens(request.getUserTokens());
         FcmPushNotificationRequest.FcmPushNotificationRequestBuilder notificationRequest = FcmPushNotificationRequest.builder()
-                .tokens(tokens)
+                .to(tokens)
                 .title(request.getTitle())
                 .body(request.getBody())
                 .data(request.getData());
@@ -257,12 +259,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendViaAwsPinpoint(PushNotificationDto request) {
-        String[] tokens = extractTokens(request.getUserTokens()).toArray(String[]::new);
-        ExpoPushNotificationRequest pushNotificationRequest = ExpoPushNotificationRequest.builder()
-                .to(tokens)
+        AwsPushNotificationRequest pushNotificationRequest = AwsPushNotificationRequest.builder()
+                .to(extractTokens(request.getUserTokens()))
                 .title(request.getTitle())
                 .body(request.getBody())
                 .data(request.getData())
+                .link(request.getLink())
+                .silentPush(request.getSilentPush())
                 .build();
 
         log.debug("Push data={}", pushNotificationRequest);

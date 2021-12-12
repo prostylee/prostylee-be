@@ -1,21 +1,23 @@
 package vn.prostylee.notification.service.impl;
 
-import com.amazonaws.services.pinpoint.AmazonPinpoint;
-import com.amazonaws.services.pinpoint.AmazonPinpointClientBuilder;
-import com.amazonaws.services.pinpoint.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.pinpoint.PinpointClient;
+import software.amazon.awssdk.services.pinpoint.model.*;
 import vn.prostylee.core.executor.ChunkServiceExecutor;
 import vn.prostylee.notification.configuration.AwsPinpointProperties;
+import vn.prostylee.notification.constant.NotificationProvider;
 import vn.prostylee.notification.dto.request.AwsPushNotificationRequest;
 import vn.prostylee.notification.service.PushNotificationService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier("awsPushNotificationService")
@@ -24,11 +26,17 @@ import java.util.concurrent.CompletableFuture;
 public class AwsPushNotificationServiceImpl implements PushNotificationService<AwsPushNotificationRequest> {
 
     private final AwsPinpointProperties awsPinpointProperties;
+    private final PinpointClient pinpointClient;
+
+    @Override
+    public NotificationProvider getProvider() {
+        return NotificationProvider.AWS_PINPOINT;
+    }
 
     @Override
     public CompletableFuture<Boolean> sendPushNotificationAsync(AwsPushNotificationRequest request) {
 
-        if (CollectionUtils.isEmpty(request.getTokens())) {
+        if (CollectionUtils.isEmpty(request.getTo())) {
             return CompletableFuture.completedFuture(false);
         }
 
@@ -37,22 +45,24 @@ public class AwsPushNotificationServiceImpl implements PushNotificationService<A
     }
 
     private boolean sendGCMToDevice(AwsPushNotificationRequest request) {
-        int numberOfSuccessNotifications = ChunkServiceExecutor.execute(request.getTokens(), tokens -> {
+        int numberOfSuccessNotifications = ChunkServiceExecutor.execute(request.getTo(), tokens -> {
             tokens.forEach(token -> {
                 try {
                     log.debug("Send push notification " + request);
 
-                    MessageRequest messageRequest = buildMessageRequest(token);
+                    AddressConfiguration addConfig = AddressConfiguration.builder()
+                            .channelType(ChannelType.GCM)
+                            .build();
 
-                    SendMessagesRequest sendMessagesRequest = new SendMessagesRequest()
-                            .withApplicationId(awsPinpointProperties.getAppId())
-                            .withMessageRequest(messageRequest);
+                    MessageRequest messageRequest = buildMessageRequest(token, request);
 
-                    AmazonPinpoint client = AmazonPinpointClientBuilder.standard()
-                            .withRegion(awsPinpointProperties.getRegion()).build();
+                    SendMessagesRequest sendMessagesRequest = SendMessagesRequest.builder()
+                            .applicationId(awsPinpointProperties.getAppId())
+                            .messageRequest(messageRequest)
+                            .build();
 
-                    SendMessagesResult result = client.sendMessages(sendMessagesRequest);
-                    log.debug("Already stored audit successfully with result: " + result);
+                    SendMessagesResponse result = pinpointClient.sendMessages(sendMessagesRequest);
+                    log.debug("Already send notification successfully with result: " + result);
                 } catch (Exception e) {
                     log.error("Fail to send firebase notification to device ", e);
                 }
@@ -62,16 +72,36 @@ public class AwsPushNotificationServiceImpl implements PushNotificationService<A
         return numberOfSuccessNotifications > 0;
     }
 
-    private MessageRequest buildMessageRequest(String token) {
-        Map<String, String> data = new HashMap<>();
+    private MessageRequest buildMessageRequest(String token, AwsPushNotificationRequest request) {
+        Map<String, String> data = Optional.ofNullable(request.getData())
+                .orElse(new HashMap<>())
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
 
-        DirectMessageConfiguration directMessageConfiguration =
-                new DirectMessageConfiguration()
-                        .withGCMMessage(new GCMMessage().withData(data).withSilentPush(true));
+        GCMMessage message = GCMMessage.builder()
+                .title(request.getTitle())
+                .body(request.getBody())
+                .data(data)
+                .url(request.getLink())
+                .silentPush(request.getSilentPush())
+                .build();
 
-        AddressConfiguration addressConfiguration = new AddressConfiguration().withChannelType(ChannelType.GCM);
+        log.debug("message={}", message);
 
-        return new MessageRequest().withMessageConfiguration(directMessageConfiguration)
-                .addAddressesEntry(token, addressConfiguration);
+        DirectMessageConfiguration directMessageConfiguration = DirectMessageConfiguration.builder()
+                .gcmMessage(message)
+                .build();
+
+        AddressConfiguration addressConfiguration = AddressConfiguration.builder()
+                .channelType(ChannelType.GCM)
+                .build();
+
+        Map<String, AddressConfiguration> addressMap = new HashMap<>();
+        addressMap.put(token, addressConfiguration);
+        return MessageRequest.builder()
+                .messageConfiguration(directMessageConfiguration)
+                .addresses(addressMap)
+                .build();
     }
 }

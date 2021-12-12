@@ -1,6 +1,5 @@
 package vn.prostylee.media.service.impl;
 
-import com.amazonaws.AmazonClientException;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
 import vn.prostylee.core.constant.AppConstant;
 import vn.prostylee.core.constant.CachingKey;
 import vn.prostylee.core.constant.ErrorResponseStatus;
@@ -125,7 +125,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
             for (Future<AttachmentResponse> future : futures) {
                 attachments.add(future.get());
             }
-        } catch (AmazonClientException | InterruptedException | ExecutionException | IOException e) {
+        } catch (SdkException | InterruptedException | ExecutionException | IOException e) {
             throw new FileUploaderException(ErrorResponseStatus.FILE_UPLOAD_ERROR.getCode(), e);
         }
         return attachments;
@@ -142,7 +142,7 @@ public class AwsS3ServiceImpl implements FileUploadService {
             attachmentService.deleteAttachmentsByIdIn(fileIds);
             awsS3AsyncProvider.deleteFiles(fileNames);
             return true;
-        } catch (IllegalArgumentException | AmazonClientException e) {
+        } catch (IllegalArgumentException | SdkException e) {
             throw new FileUploaderException(ErrorResponseStatus.FILE_DELETE_ERROR.getCode(), e);
         }
     }

@@ -103,10 +103,11 @@ dependencies {
 	implementation 'org.apache.commons:commons-text:1.9'
 	implementation 'commons-fileupload:commons-fileupload:1.4'
 	// AWS
-	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.926')
-	implementation 'com.amazonaws:aws-java-sdk-s3'
-	implementation 'com.amazonaws:aws-java-sdk-cognitoidp'
-	implementation 'com.amazonaws:aws-java-sdk-pinpoint'
+	implementation platform('software.amazon.awssdk:bom:2.15.0')
+	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:cognitoidentityprovider'
+	implementation 'software.amazon.awssdk:cognitoidentity'
+	implementation 'software.amazon.awssdk:pinpoint'
 
 	// Logging
 	implementation 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
