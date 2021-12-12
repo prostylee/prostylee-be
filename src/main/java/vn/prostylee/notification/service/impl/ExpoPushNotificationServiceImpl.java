@@ -1,7 +1,5 @@
 package vn.prostylee.notification.service.impl;
 
-import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
-import vn.prostylee.notification.service.PushNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import vn.prostylee.notification.constant.NotificationProvider;
+import vn.prostylee.notification.dto.request.ExpoPushNotificationRequest;
+import vn.prostylee.notification.service.PushNotificationService;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +27,11 @@ public class ExpoPushNotificationServiceImpl implements PushNotificationService<
     @Autowired
     public ExpoPushNotificationServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    @Override
+    public NotificationProvider getProvider() {
+        return NotificationProvider.EXPO;
     }
 
     @Async

@@ -2,30 +2,18 @@ package vn.prostylee.notification.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.NotNull;
-import java.util.Map;
-
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExpoPushNotificationRequest implements PushNotificationRequest {
-
-    @NotNull
-    private String[] to;
+public class ExpoPushNotificationRequest extends PushNotificationRequest {
 
     private String sound;
-
-    @NotNull
-    private String title;
-
-    @NotNull
-    private String body;
-
-    private Map<String, Object> data;
 }

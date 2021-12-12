@@ -1,14 +1,14 @@
 package vn.prostylee.auth.service.impl;
 
-import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
-import com.amazonaws.services.cognitoidp.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import vn.prostylee.auth.configure.properties.AwsCognitoProperties;
-import vn.prostylee.auth.dto.request.ChangePasswordRequest;
-import vn.prostylee.auth.dto.request.ForgotPasswordRequest;
 import vn.prostylee.auth.dto.request.*;
 import vn.prostylee.auth.dto.response.JwtAuthenticationToken;
 import vn.prostylee.auth.service.AuthService;
@@ -27,7 +27,7 @@ public class AwsCognitoAuthService implements AuthService {
 
     private final AwsCognitoProperties awsCognitoProperties;
 
-    private final AWSCognitoIdentityProvider cognitoClient;
+    private final CognitoIdentityProviderClient cognitoClient;
 
     @Override
     public JwtAuthenticationToken login(LoginRequest request) {
@@ -36,63 +36,26 @@ public class AwsCognitoAuthService implements AuthService {
         authParams.put(USERNAME, request.getUsername());
         authParams.put(PASS_WORD, request.getPassword());
 
-        final AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest();
-        authRequest.withAuthFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
-                .withClientId(awsCognitoProperties.getClientId())
-                .withUserPoolId(awsCognitoProperties.getPoolId())
-                .withAuthParameters(authParams);
+        final AdminInitiateAuthRequest authRequest = AdminInitiateAuthRequest.builder()
+                .authFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
+                .clientId(awsCognitoProperties.getClientId())
+                .userPoolId(awsCognitoProperties.getPoolId())
+                .authParameters(authParams)
+                .build();
 
-        AdminInitiateAuthResult result = cognitoClient.adminInitiateAuth(authRequest);
-        log.info("AdminInitiateAuthResult {}", result);
-        log.info("AdminInitiateAuthResult.getAuthenticationResult {}", result.getAuthenticationResult());
+        AdminInitiateAuthResponse result = cognitoClient.adminInitiateAuth(authRequest);
+        log.info("AdminInitiateAuthResult {}", result.authenticationResult());
         return JwtAuthenticationToken.builder()
-                .accessToken(result.getAuthenticationResult().getAccessToken())
-                .refreshToken(result.getAuthenticationResult().getRefreshToken())
+                .accessToken(result.authenticationResult().accessToken())
+                .refreshToken(result.authenticationResult().refreshToken())
                 .build();
     }
 
     @Override
     public JwtAuthenticationToken register(RegisterRequest request) {
-        AdminCreateUserRequest cognitoRequest = new AdminCreateUserRequest()
-                .withUserPoolId(awsCognitoProperties.getPoolId())
-                .withUsername(request.getUsername())
-                .withUserAttributes(
-                        new AttributeType()
-                                .withValue(request.getUsername()),
-                        new AttributeType()
-                                .withName("name")
-                                .withValue(request.getFullName()),
-//                new AttributeType()
-//                        .withName("name")
-//                        .withValue(request.getName()),
-//                new AttributeType()
-//                        .withName("family_name")
-//                        .withValue(request.getLastname()),
-//                new AttributeType()
-//                        .withName("phone_number")
-//                        .withValue(request.getPhoneNumber()),
-//                new AttributeType()
-//                        .withName("custom:companyName")
-//                        .withValue(request.getCompanyName()),
-//                new AttributeType()
-//                        .withName("custom:companyPosition")
-//                        .withValue(request.getCompanyPosition()),
-                        new AttributeType()
-                                .withName("email_verified")
-                                .withValue("true"))
-                .withTemporaryPassword("TEMPORARY_PASSWORD")
-                .withMessageAction("SUPPRESS")
-                .withDesiredDeliveryMediums(DeliveryMediumType.EMAIL)
-                .withForceAliasCreation(Boolean.FALSE);
+        // Refer https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/cognito/src/main/java/com/example/cognito/SignUpUser.java
 
-        AdminCreateUserResult createUserResult =  cognitoClient.adminCreateUser(cognitoRequest);
-        log.info("createUserResult {}", createUserResult);
-
-        UserType cognitoUser =  createUserResult.getUser();
-        log.info("cognitoUser {}", cognitoUser);
-
-        return JwtAuthenticationToken.builder()
-                .build();
+        throw new UnsupportedOperationException("Register feature is not supported yet}");
     }
 
     @Override
@@ -112,13 +75,7 @@ public class AwsCognitoAuthService implements AuthService {
 
     @Override
     public JwtAuthenticationToken changePassword(ChangePasswordRequest request) {
-        com.amazonaws.services.cognitoidp.model.ChangePasswordRequest changePasswordRequest= new com.amazonaws.services.cognitoidp.model.ChangePasswordRequest()
-//                .withAccessToken(request.getAccessToken()) // TODO
-                .withPreviousPassword(request.getPassword())
-                .withProposedPassword(request.getPassword());
-
-        cognitoClient.changePassword(changePasswordRequest);
-        return null;
+        throw new UnsupportedOperationException("Change password feature is not supported yet}");
     }
 
     @Override

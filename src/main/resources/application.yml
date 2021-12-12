@@ -40,6 +40,7 @@ app:
 
   ## Mobile push notification using Expo API
   push-notification:
+    provider: AWS_PINPOINT # Refer vn.prostylee.notification.constant.NotificationProvider
     url: https://exp.host/--/api/v2/push/send
 
   ## Scheduler using Spring Quartz
@@ -212,8 +213,8 @@ app:
       readTimeout: 2000
     # AWS Pinpoint
     pinpoint:
-      region: ap-northeast-2
-      app-id: prostylee-nonprod
+      region: us-west-2
+      app-id: 6d02cfcce5fa4d728af1dc3805fd33af
 
   http:
     connectTimeout: 5000

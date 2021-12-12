@@ -1,9 +1,5 @@
 package vn.prostylee.auth.configure.security;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
-import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProviderClientBuilder;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.JWSKeySelector;
@@ -15,6 +11,9 @@ import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import vn.prostylee.auth.configure.properties.AwsCognitoProperties;
 
 import java.net.MalformedURLException;
@@ -32,10 +31,10 @@ public class AwsCognitoConfig {
     private final AwsCognitoProperties awsCognitoProperties;
 
     @Bean
-    public AWSCognitoIdentityProvider awsCognitoIdentityProvider(AWSCredentials credentials) {
-        return AWSCognitoIdentityProviderClientBuilder.standard()
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .withRegion(awsCognitoProperties.getRegion())
+    public CognitoIdentityProviderClient awsCognitoIdentityProvider(AwsCredentialsProvider awsCredentialsProvider) {
+        return CognitoIdentityProviderClient.builder()
+                .credentialsProvider(awsCredentialsProvider)
+                .region(Region.of(awsCognitoProperties.getRegion()))
                 .build();
     }
 

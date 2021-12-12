@@ -1,11 +1,11 @@
 package vn.prostylee.notification.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import vn.prostylee.auth.dto.UserToken;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.prostylee.auth.dto.UserToken;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -21,7 +21,6 @@ public class PushNotificationDto {
     @NotNull
     private List<UserToken> userTokens;
 
-    @NotNull
     private String provider;
 
     @NotNull
@@ -33,12 +32,14 @@ public class PushNotificationDto {
     private Map<String, Object> data;
 
     /**
-     * Is only used when we send a push notification via FCM
+     * Only used when we send a push notification via FCM
      */
     private String topicName;
 
     /**
-     * Is only used when we send a push notification via FCM
+     * Only used when we send a push notification via FCM
      */
     private String link;
+
+    private Boolean silentPush;
 }

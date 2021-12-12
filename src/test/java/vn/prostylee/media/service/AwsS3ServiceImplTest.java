@@ -1,7 +1,5 @@
 package vn.prostylee.media.service;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.services.s3.AmazonS3;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +7,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import vn.prostylee.ConfigTestUtils;
 import vn.prostylee.core.constant.ErrorResponseStatus;
 import vn.prostylee.media.configuration.AwsS3Properties;
@@ -16,7 +18,6 @@ import vn.prostylee.media.dto.response.AttachmentResponse;
 import vn.prostylee.media.entity.Attachment;
 import vn.prostylee.media.exception.FileUploaderException;
 import vn.prostylee.media.provider.async.AwsS3AsyncProvider;
-import vn.prostylee.media.repository.AttachmentRepository;
 import vn.prostylee.media.service.impl.AwsS3ServiceImpl;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static vn.prostylee.ConfigTestUtils.FOLDER;
@@ -52,7 +53,11 @@ public class AwsS3ServiceImplTest {
 
     private FileUploadService fileUploadService;
     @Mock
-    private AmazonS3 s3Client;
+    private S3Client s3Client;
+
+    @Mock
+    private S3Utilities s3Utilities;
+
     @Mock
     private AttachmentService attachmentService;
     @Mock
@@ -68,7 +73,8 @@ public class AwsS3ServiceImplTest {
         openMocks(this);
         fileUploadService = new AwsS3ServiceImpl(awss3Properties, awsS3AsyncProvider, attachmentService);
         URL url = new URL(SAMPLE_IMAGE_SIZE_URL);
-        when(s3Client.getUrl(eq(ConfigTestUtils.BUCKET_NAME), anyString())).thenReturn(url);
+        when(s3Client.utilities()).thenReturn(s3Utilities);
+        when(s3Utilities.getUrl(any(GetUrlRequest.class))).thenReturn(url);
     }
 
     @Test
@@ -112,7 +118,7 @@ public class AwsS3ServiceImplTest {
 
     @Test
     public void should_throwException_when_deleteFilesGetException() {
-        doThrow(new AmazonClientException("failed")).when(awsS3AsyncProvider).deleteFiles(any());
+        doThrow(S3Exception.builder().message("failed").build()).when(awsS3AsyncProvider).deleteFiles(any());
         FileUploaderException exception = assertThrows(
                 FileUploaderException.class, () -> fileUploadService.deleteFiles(attachmentIds));
         assertThat(exception.getMessage(), is(equalTo(ErrorResponseStatus.FILE_DELETE_ERROR.getCode())));
