@@ -11,10 +11,9 @@ public final class DbUtil {
 	}
 	
 	private static String trimAndStripAccents(String str) {
-        return StringUtils.stripAccents(StringUtils.trimToEmpty(str)
-				.replaceAll("\\s+", " "))
+        return StringUtils.trimToEmpty(str)
+				.replaceAll("\\s+", " ")
 				.replace("_", "\\_")
-				.replace("%", "\\%")
-				;
+				.replace("%", "\\%");
     }
 }
