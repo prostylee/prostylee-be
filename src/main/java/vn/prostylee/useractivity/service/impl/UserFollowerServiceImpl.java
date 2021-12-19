@@ -11,12 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.specs.BaseFilterSpecs;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.store.service.StoreService;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.constant.UserActivityConstant;
 import vn.prostylee.useractivity.dto.filter.UserFollowerFilter;
 import vn.prostylee.useractivity.dto.filter.UserFollowerPageable;
@@ -65,8 +65,9 @@ public class UserFollowerServiceImpl implements UserFollowerService {
     public boolean follow(UserFollowerRequest request) {
         try {
             UserFollower entity = BeanUtil.copyProperties(request, UserFollower.class);
-            if (!repository.existsByTargetIdAndTargetType(request.getTargetId(), request.getTargetType()))
+            if (!repository.existsByTargetIdAndTargetTypeAndAndCreatedBy(request.getTargetId(), request.getTargetType(), authenticatedProvider.getUserIdValue())) {
                 repository.save(entity);
+            }
             return true;
         } catch (EmptyResultDataAccessException | ResourceNotFoundException e) {
             return false;

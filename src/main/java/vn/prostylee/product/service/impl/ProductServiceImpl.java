@@ -123,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
 
     private Product saveProduct(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
-        if(productRequest.getStoreId() != null) {
+        if (productRequest.getStoreId() != null) {
             Long locationId = saveLocation(productRequest.getLocationRequest());
             productEntity.setLocationId(locationId);
         }
@@ -177,10 +177,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<NewFeedResponse> getNewFeeds(NewFeedsFilter newFeedsFilter){
+    public Page<NewFeedResponse> getNewFeeds(NewFeedsFilter newFeedsFilter) {
         Page<NewFeedResponse> page = productExtRepository.findNewFeedsOfStore(newFeedsFilter);
         List<NewFeedResponse> newFeeds = page.stream()
-                .map(item->productConverter.toResponseForNewFeed(item, newFeedsFilter.getNewFeedType()))
+                .map(item -> productConverter.toResponseForNewFeed(item, newFeedsFilter.getNewFeedType()))
                 .collect(Collectors.toList());
         return new PageImpl<>(newFeeds, page.getPageable(), page.getTotalElements());
     }

@@ -28,7 +28,7 @@ public interface UserFollowerRepository extends BaseRepository<UserFollower, Lon
             @Param("createdBy") Long createdBy
     );
 
-    boolean existsByTargetIdAndTargetType(Long userId, TargetType targetType);
+    boolean existsByTargetIdAndTargetTypeAndAndCreatedBy(Long userId, TargetType targetType, Long createdBy);
 
     @Query("SELECT e.targetId FROM #{#entityName} e WHERE targetId IN :targetIds AND targetType=:targetType AND createdBy=:createdBy")
     List<Long> loadStatusFollows(
