@@ -18,6 +18,8 @@ public interface ProductService extends CrudService<ProductRequest, ProductRespo
 
     long countTotalProductByUser(Long userId);
 
+    long countTotalProductByStoreId(Long storeId);
+
     Product getById(Long id);
 
     List<ProductResponse> getRecentViewProducts(RecentViewProductFilter recentViewProductFilter);

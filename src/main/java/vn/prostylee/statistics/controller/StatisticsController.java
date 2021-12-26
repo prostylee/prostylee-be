@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.prostylee.core.constant.ApiVersion;
+import vn.prostylee.statistics.dto.response.StoreStatisticsResponse;
 import vn.prostylee.statistics.dto.response.UserStatisticsResponse;
 import vn.prostylee.statistics.service.StatisticsService;
 
@@ -28,6 +29,11 @@ public class StatisticsController {
     @GetMapping("/user-activities/{userId}")
     public UserStatisticsResponse getUserActivitiesByUserId(@PathVariable Long userId) {
         return statisticsService.getUserActivitiesByUserId(userId);
+    }
+
+    @GetMapping("/store/{storeId}")
+    public StoreStatisticsResponse getStoreStatisticsResponse(@PathVariable Long storeId) {
+        return statisticsService.getStoreStatisticByStoreId(storeId);
     }
 
 }

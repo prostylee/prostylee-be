@@ -22,6 +22,8 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
 
     long countProductsByCreatedBy(Long userId);
 
+    long countProductsByStoreId(Long storeId);
+
     @Query("SELECT e FROM #{#entityName} e " +
             " WHERE e.category.id = :categoryId AND e.id <> :productId ")
     Page<Product> getRelatedProducts(@Param("productId") Long productId,

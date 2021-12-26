@@ -173,4 +173,9 @@ public class PostServiceImpl implements PostService {
     public Page<PostResponse> getNewFeeds(PostFilter postFilter) {
         return findAll(postFilter); // TODO get new feeds
     }
+
+    @Override
+    public long countTotalPostsByStoreId(Long storeId) {
+        return postRepository.countPostsByStoreId(storeId);
+    }
 }

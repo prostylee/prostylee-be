@@ -121,6 +121,12 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.countProductsByCreatedBy(userId);
     }
 
+    @Override
+    public long countTotalProductByStoreId(Long storeId) {
+        return productRepository.countProductsByStoreId(storeId);
+    }
+
+
     private Product saveProduct(ProductRequest productRequest) {
         Product productEntity = BeanUtil.copyProperties(productRequest, Product.class);
         if (productRequest.getStoreId() != null) {
