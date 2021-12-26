@@ -46,4 +46,6 @@ public class StoreResponse implements Serializable {
 
     private Boolean followStatusOfUserLogin;
 
+    private StoreStatisticResponse storeStatisticResponse;
+
 }

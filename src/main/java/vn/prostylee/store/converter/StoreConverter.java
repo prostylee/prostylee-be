@@ -19,6 +19,7 @@ import vn.prostylee.store.dto.response.StoreResponse;
 import vn.prostylee.store.entity.Company;
 import vn.prostylee.store.entity.Store;
 import vn.prostylee.store.service.StoreBannerService;
+import vn.prostylee.store.service.StoreStatisticService;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
@@ -35,14 +36,16 @@ public class StoreConverter {
     private final LocationService locationService;
     private final StoreBannerService storeBannerService;
     private final UserFollowerService userFollowerService;
+    private final StoreStatisticService storeStatisticService;
 
     public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService,
-                          UserFollowerService userFollowerService) {
+                          UserFollowerService userFollowerService, StoreStatisticService storeStatisticService) {
         this.productService = productService;
         this.fileUploadService = fileUploadService;
         this.locationService = locationService;
         this.storeBannerService = storeBannerService;
         this.userFollowerService = userFollowerService;
+        this.storeStatisticService = storeStatisticService;
     }
 
     public StoreResponse convertToResponse(Store store) {
@@ -67,6 +70,7 @@ public class StoreConverter {
         setStoreProducts(storeResponse, numberOfProducts);
         setStoreCompany(storeResponse, store.getCompany());
         setStoreBanner(storeResponse,store.getId());
+        storeResponse.setStoreStatisticResponse(storeStatisticService.getStoreStatisticByStoreId(store.getId()));
         storeResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(store.getId()));
         return storeResponse;
     }
