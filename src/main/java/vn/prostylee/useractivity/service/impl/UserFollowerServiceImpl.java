@@ -155,8 +155,8 @@ public class UserFollowerServiceImpl implements UserFollowerService {
             }
 
             searchable = searchable.and((root, query, cb) -> {
-                CriteriaBuilder.In<String> inClause = cb.in(root.get(UserActivityConstant.TARGET_TYPE));
-                targetTypes.forEach(targetType -> inClause.value(targetType.name()));
+                CriteriaBuilder.In<TargetType> inClause = cb.in(root.get(UserActivityConstant.TARGET_TYPE));
+                targetTypes.forEach(inClause::value);
                 return inClause;
             });
         }
