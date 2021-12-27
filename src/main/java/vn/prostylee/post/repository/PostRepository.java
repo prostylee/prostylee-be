@@ -7,6 +7,8 @@ import vn.prostylee.post.entity.Post;
 @Repository
 public interface PostRepository extends BaseRepository<Post,Long> {
 
+    long countPostsByCreatedBy(Long userId);
+
     long countPostsByStoreId(Long storeId);
 
 }

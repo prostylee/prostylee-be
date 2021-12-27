@@ -8,6 +8,8 @@ import vn.prostylee.post.dto.response.PostResponse;
 
 public interface PostService extends CrudService<PostRequest, PostResponse, Long> {
 
+    long countTotalPostByUser(Long userId);
+
     Page<PostResponse> getNewFeeds(PostFilter postFilter);
 
     long countTotalPostsByStoreId(Long storeId);

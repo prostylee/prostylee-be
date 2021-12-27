@@ -1,6 +1,7 @@
 package vn.prostylee.useractivity.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -29,6 +30,8 @@ import vn.prostylee.useractivity.entity.UserFollower;
 import vn.prostylee.useractivity.repository.UserFollowerRepository;
 import vn.prostylee.useractivity.service.UserFollowerService;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -145,9 +148,17 @@ public class UserFollowerServiceImpl implements UserFollowerService {
 
     private Specification<UserFollower> getUserFollowerSpecification(UserFollowerFilter filter) {
         Specification<UserFollower> searchable = baseFilterSpecs.search(filter);
-        if (filter.getTargetType() != null) {
-            Specification<UserFollower> targetType = (root, query, cb) -> cb.equal(root.get(UserActivityConstant.TARGET_TYPE), filter.getTargetType());
-            searchable = searchable.and(targetType);
+        if (filter.getTargetType() != null || CollectionUtils.isNotEmpty(filter.getTargetTypes())) {
+            List<TargetType> targetTypes = Optional.ofNullable(filter.getTargetTypes()).orElseGet(ArrayList::new);
+            if (filter.getTargetType() != null) {
+                targetTypes.add(filter.getTargetType());
+            }
+
+            searchable = searchable.and((root, query, cb) -> {
+                CriteriaBuilder.In<TargetType> inClause = cb.in(root.get(UserActivityConstant.TARGET_TYPE));
+                targetTypes.forEach(inClause::value);
+                return inClause;
+            });
         }
 
         if (filter.getTargetId() != null) {

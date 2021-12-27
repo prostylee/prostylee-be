@@ -170,6 +170,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public long countTotalPostByUser(Long userId) {
+        return postRepository.countPostsByCreatedBy(userId);
+    }
+
+    @Override
     public Page<PostResponse> getNewFeeds(PostFilter postFilter) {
         return findAll(postFilter); // TODO get new feeds
     }
