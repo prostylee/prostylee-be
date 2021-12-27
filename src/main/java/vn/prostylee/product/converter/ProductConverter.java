@@ -211,12 +211,10 @@ public class ProductConverter {
         return result != null;
     }
 
-    // TODO
     private List<ProductAttributeResponse> buildAttributeOption(Long productId) {
         return productAttributeService.findByProductId(productId);
     }
 
-    // TODO
     private List<ProductPriceResponse> buildProductPrice(Long productId) {
         List<ProductPrice> productPriceList = productPriceService.getProductPricesByProduct(productId);
         return productPriceList.stream()
