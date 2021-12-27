@@ -1,8 +1,8 @@
 package vn.prostylee.store.converter;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -12,6 +12,7 @@ import vn.prostylee.media.constant.ImageSize;
 import vn.prostylee.media.service.FileUploadService;
 import vn.prostylee.product.dto.filter.ProductFilter;
 import vn.prostylee.product.dto.response.ProductResponseLite;
+import vn.prostylee.product.service.CategoryService;
 import vn.prostylee.product.service.ProductService;
 import vn.prostylee.store.dto.response.CompanyResponse;
 import vn.prostylee.store.dto.response.StoreMiniResponse;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class StoreConverter {
 
     private final ProductService productService;
@@ -35,15 +37,7 @@ public class StoreConverter {
     private final LocationService locationService;
     private final StoreBannerService storeBannerService;
     private final UserFollowerService userFollowerService;
-
-    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService,
-                          UserFollowerService userFollowerService) {
-        this.productService = productService;
-        this.fileUploadService = fileUploadService;
-        this.locationService = locationService;
-        this.storeBannerService = storeBannerService;
-        this.userFollowerService = userFollowerService;
-    }
+    private final CategoryService categoryService;
 
     public StoreResponse convertToResponse(Store store) {
         StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
@@ -67,6 +61,7 @@ public class StoreConverter {
         setStoreProducts(storeResponse, numberOfProducts);
         setStoreCompany(storeResponse, store.getCompany());
         setStoreBanner(storeResponse,store.getId());
+        storeResponse.setCategoryResponseLites(categoryService.getCategoryResponseLite(store.getId()));
         storeResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(store.getId()));
         return storeResponse;
     }

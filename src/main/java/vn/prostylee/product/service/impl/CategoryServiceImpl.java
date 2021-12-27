@@ -14,6 +14,7 @@ import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.product.dto.filter.CategoryFilter;
 import vn.prostylee.product.dto.request.CategoryRequest;
 import vn.prostylee.product.dto.response.CategoryResponse;
+import vn.prostylee.product.dto.response.CategoryResponseLite;
 import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.repository.AttributeRepository;
@@ -21,6 +22,7 @@ import vn.prostylee.product.repository.CategoryRepository;
 import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -121,5 +123,18 @@ public class CategoryServiceImpl implements CategoryService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("hotStatus"), categoryFilter.getHotStatus()));
         }
         return spec;
+    }
+
+    @Override
+    public List<CategoryResponseLite> getCategoryResponseLite(Long categoryId) {
+        return this.categoryRepository.findAllById(categoryId).stream()
+                .map(this::toResponseLite)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public CategoryResponseLite toResponseLite(Category category) {
+        return BeanUtil.copyProperties(category, CategoryResponseLite.class);
     }
 }

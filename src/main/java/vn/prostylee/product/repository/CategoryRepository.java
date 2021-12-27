@@ -6,6 +6,8 @@ import vn.prostylee.product.entity.Category;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Repository for domain model class Category.
  * @see Category;
@@ -13,5 +15,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CategoryRepository extends BaseRepository<Category, Long> {
+
+    List<Category> findAllById(Long categoryId);
 
 }
