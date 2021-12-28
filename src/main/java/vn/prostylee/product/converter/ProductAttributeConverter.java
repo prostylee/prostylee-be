@@ -64,7 +64,7 @@ public class ProductAttributeConverter {
                     List<ProductAttributeOptionResponse> productAttributeOptionResponses = attributeResponse.getAttributeOptions()
                             .stream()
                             .map(attributeOptionResponse -> {
-                                ProductAttributeOptionResponse productAttributeOptionResponse = BeanUtil.copyProperties(attributeResponse, ProductAttributeOptionResponse.class);
+                                ProductAttributeOptionResponse productAttributeOptionResponse = BeanUtil.copyProperties(attributeOptionResponse, ProductAttributeOptionResponse.class);
                                 productAttributeOptionResponse.setAttrValue(attributeOptionResponse.getValue());
                                 return productAttributeOptionResponse;
                             })
