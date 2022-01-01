@@ -3,6 +3,7 @@ package vn.prostylee.store.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -29,7 +30,6 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class StoreConverter {
 
     private final ProductService productService;
@@ -38,6 +38,16 @@ public class StoreConverter {
     private final StoreBannerService storeBannerService;
     private final UserFollowerService userFollowerService;
     private final CategoryService categoryService;
+
+    public StoreConverter(@Lazy ProductService productService, FileUploadService fileUploadService, LocationService locationService, StoreBannerService storeBannerService,
+                          UserFollowerService userFollowerService, CategoryService categoryService) {
+        this.productService = productService;
+        this.fileUploadService = fileUploadService;
+        this.locationService = locationService;
+        this.storeBannerService = storeBannerService;
+        this.userFollowerService = userFollowerService;
+        this.categoryService = categoryService;
+    }
 
     public StoreResponse convertToResponse(Store store) {
         StoreResponse storeResponse = BeanUtil.copyProperties(store, StoreResponse.class);
