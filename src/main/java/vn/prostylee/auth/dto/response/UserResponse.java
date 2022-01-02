@@ -47,4 +47,6 @@ public class UserResponse {
     private Integer month;
 
     private Integer year;
+
+    private Boolean followedByLoggedInUser;
 }

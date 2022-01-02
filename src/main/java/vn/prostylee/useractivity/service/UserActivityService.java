@@ -9,4 +9,5 @@ import vn.prostylee.useractivity.dto.response.UserActivityResponse;
 public interface UserActivityService {
 
     Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter);
+    Boolean getFollowStatusOfUserLogin(Long userId);
 }

@@ -77,7 +77,7 @@ public class UserActivityServiceImpl implements UserActivityService {
                 .orElse(null);
     }
 
-    private Boolean getFollowStatusOfUserLogin(Long userID) {
+    public Boolean getFollowStatusOfUserLogin(Long userID) {
         StatusFollowRequest request = StatusFollowRequest.builder()
                 .targetIds(Collections.singletonList(userID))
                 .targetType(TargetType.USER).build();
