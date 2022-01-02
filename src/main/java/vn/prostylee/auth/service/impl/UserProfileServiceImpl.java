@@ -20,6 +20,7 @@ import vn.prostylee.auth.service.UserService;
 import vn.prostylee.core.provider.AuthenticatedProvider;
 import vn.prostylee.core.utils.EncrytedPasswordUtils;
 import vn.prostylee.core.utils.MimeTypeUtil;
+import vn.prostylee.useractivity.service.UserActivityService;
 
 import java.util.ArrayList;
 
@@ -29,6 +30,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final AuthenticatedProvider authenticatedProvider;
     private final UserService userService;
+    private final UserActivityService userActivityService;
 
     @Override
     public UserResponse getProfile() {
@@ -64,7 +66,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserResponse getProfileBy(Long id) {
-        return userService.findById(id);
+        UserResponse userResponse = userService.findById(id);
+        Boolean isFollowByLoggedInUser = userActivityService.getFollowStatusOfUserLogin(id);
+        userResponse.setFollowedByLoggedInUser(isFollowByLoggedInUser);
+        return userResponse;
     }
 
     @SneakyThrows

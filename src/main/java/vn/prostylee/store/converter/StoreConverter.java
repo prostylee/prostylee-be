@@ -1,8 +1,10 @@
 package vn.prostylee.store.converter;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.exception.ResourceNotFoundException;
@@ -32,7 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreConverter {
 
-    private final ProductService productService;
+    @Lazy private final ProductService productService;
     private final FileUploadService fileUploadService;
     private final LocationService locationService;
     private final StoreBannerService storeBannerService;
