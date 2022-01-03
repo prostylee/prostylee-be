@@ -30,7 +30,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
                                      @Param("categoryId") Long categoryId,
                                      Pageable pageable);
 
-    @Query("SELECT e FROM #{#entityName} e where e.id in :ids")
+    @Query("SELECT e FROM #{#entityName} e where e.id in :ids order by created_at DESC")
     List<Product> findProductsByIds(@Param("ids") List<Long> ids);
 
     @Query("SELECT e.id FROM #{#entityName} e WHERE e.storeId = :id AND e.createdAt >= :fromDate AND e.createdAt <= :toDate")
