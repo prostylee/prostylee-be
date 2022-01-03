@@ -108,6 +108,11 @@ Run end to end test
 
 ## Package & deploy
 
+```shell
+./gradlew build -DskipTests
+```
+
+
 ### Package
 
 Run the following command:
