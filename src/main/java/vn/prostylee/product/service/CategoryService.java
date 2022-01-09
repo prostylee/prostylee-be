@@ -10,5 +10,6 @@ import java.util.List;
 
 public interface CategoryService extends CrudService<CategoryRequest, CategoryResponse, Long> {
 
-    List<CategoryResponseLite> getCategoryResponseLite(Long categoryId);
+    List<CategoryResponseLite> getCategoriesByStore(Long storeId);
+
 }

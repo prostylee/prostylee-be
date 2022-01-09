@@ -1,6 +1,5 @@
 package vn.prostylee.store.converter;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -63,7 +62,7 @@ public class StoreConverter {
         setStoreProducts(storeResponse, numberOfProducts);
         setStoreCompany(storeResponse, store.getCompany());
         setStoreBanner(storeResponse,store.getId());
-        storeResponse.setCategoryResponseLites(categoryService.getCategoryResponseLite(store.getId()));
+        storeResponse.setCategoryResponseLites(categoryService.getCategoriesByStore(store.getId()));
         storeResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(store.getId()));
         return storeResponse;
     }
