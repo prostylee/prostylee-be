@@ -263,6 +263,6 @@ public class ProductConverter {
                 .targetIds(Collections.singletonList(targetId))
                 .targetType(targetType)
                 .build();
-        return !userFollowerService.loadStatusFollows(request).isEmpty();
+        return userFollowerService.loadStatusFollows(request).isEmpty();
     }
 }
