@@ -41,4 +41,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
 
     @Query("SELECT DISTINCT e.name FROM #{#entityName} e WHERE LOWER(e.name) LIKE :productName")
     List<String> getProductNamesLike(@Param("productName") String productName, Pageable pageable);
+
+    @Query("SELECT DISTINCT e.categoryId FROM #{#entityName} e WHERE e.storeId = :storeId")
+    List<Long> getProductCategoriesByStore(@Param("storeId") Long storeId);
 }

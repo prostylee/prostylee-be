@@ -19,6 +19,7 @@ import vn.prostylee.product.entity.Attribute;
 import vn.prostylee.product.entity.Category;
 import vn.prostylee.product.repository.AttributeRepository;
 import vn.prostylee.product.repository.CategoryRepository;
+import vn.prostylee.product.repository.ProductRepository;
 import vn.prostylee.product.service.CategoryService;
 
 import java.util.HashSet;
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    private final ProductRepository productRepository;
 
     private final BaseFilterSpecs<Category> baseFilterSpecs;
 
@@ -126,8 +129,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponseLite> getCategoryResponseLite(Long categoryId) {
-        return this.categoryRepository.findAllById(categoryId).stream()
+    public List<CategoryResponseLite> getCategoriesByStore(Long storeId) {
+        List<Long> categories = productRepository.getProductCategoriesByStore(storeId);
+        return this.categoryRepository.findAllById(categories).stream()
                 .map(this::toResponseLite)
                 .collect(Collectors.toList());
     }
