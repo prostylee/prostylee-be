@@ -131,12 +131,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryResponseLite> getCategoriesByStore(Long storeId) {
         List<Long> categories = productRepository.getProductCategoriesByStore(storeId);
-        return this.categoryRepository.findAllById(categories).stream()
+        return this.categoryRepository.findAllByIdIn(categories).stream()
                 .map(this::toResponseLite)
                 .collect(Collectors.toList());
     }
-
-
 
     public CategoryResponseLite toResponseLite(Category category) {
         return BeanUtil.copyProperties(category, CategoryResponseLite.class);
