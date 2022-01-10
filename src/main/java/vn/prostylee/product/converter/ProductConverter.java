@@ -117,13 +117,13 @@ public class ProductConverter {
             newFeedResponse.setImageUrls(buildImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.PRODUCT));
             newFeedResponse.setSaveStatusOfUserLogin(getSaveStatusOfUserLogin(newFeedResponse.getId()));
-            newFeedResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(newFeedResponse.getId(), TargetType.STORE));
+            newFeedResponse.setFollowStatusOfUserLogin(isThereAnyoneFollowUserLogin(newFeedResponse.getOwnerId(), targetType));
             newFeedResponse.setProductStatisticResponse(buildProductStatistic(newFeedResponse.getId()));
         }
         if (TargetType.valueOf(newFeedResponse.getType()) == TargetType.POST) {
             newFeedResponse.setImageUrls(buildPostImageUrls(newFeedResponse.getId()));
             newFeedResponse.setLikeStatusOfUserLogin(getLikeStatusOfUserLogin(newFeedResponse.getId(), TargetType.POST));
-            newFeedResponse.setFollowStatusOfUserLogin(getFollowStatusOfUserLogin(newFeedResponse.getId(), TargetType.USER));
+            newFeedResponse.setFollowStatusOfUserLogin(isThereAnyoneFollowUserLogin(newFeedResponse.getOwnerId(), targetType));
             newFeedResponse.setPostStatisticResponse(buildPostStatistic(newFeedResponse.getId()));
             newFeedResponse.setStoreAdsResponseLite(getStoreResponseLite(newFeedResponse.getStoreAdsId()));
         }
@@ -258,11 +258,11 @@ public class ProductConverter {
                 .orElse(null);
     }
 
-    private Boolean getFollowStatusOfUserLogin(Long targetId, TargetType targetType) {
+    private Boolean isThereAnyoneFollowUserLogin(Long targetId, TargetType targetType) {
         StatusFollowRequest request = StatusFollowRequest.builder()
                 .targetIds(Collections.singletonList(targetId))
                 .targetType(targetType)
                 .build();
-        return userFollowerService.loadStatusFollows(request).isEmpty();
+        return !userFollowerService.loadStatusFollows(request).isEmpty();
     }
 }

@@ -5,17 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
-import vn.prostylee.auth.dto.response.UserAddressResponse;
 import vn.prostylee.auth.dto.response.UserResponse;
-import vn.prostylee.auth.entity.UserAddress;
-import vn.prostylee.auth.service.UserAddressService;
 import vn.prostylee.auth.service.UserService;
+import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.core.dto.filter.PagingParam;
 import vn.prostylee.core.utils.BeanUtil;
 import vn.prostylee.core.utils.DateUtils;
 import vn.prostylee.location.dto.response.LocationResponse;
 import vn.prostylee.location.service.LocationService;
-import vn.prostylee.core.constant.TargetType;
 import vn.prostylee.useractivity.dto.filter.MostActiveUserFilter;
 import vn.prostylee.useractivity.dto.request.MostActiveRequest;
 import vn.prostylee.useractivity.dto.request.StatusFollowRequest;
@@ -35,12 +32,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserActivityServiceImpl implements UserActivityService {
 
-    public static final int FIRST_INDEX = 0;
     private final UserMostActiveService userMostActiveService;
     private final UserService userService;
     private final LocationService locationService;
     private final UserFollowerService userFollowerService;
-    private final UserAddressService userAddressService;
 
     @Override
     public Page<UserActivityResponse> getMostActiveUsers(MostActiveUserFilter filter) {
