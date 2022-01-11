@@ -38,7 +38,7 @@ public class MethodExecutionTimeLoggingAdvice {
         String className = methodSignature.getDeclaringType().getCanonicalName();
         String methodName = methodSignature.getName();
 
-        log.info("Entering... className={}, methodName={}, startTime={}", className, methodName, LocalDateTime.now());
+        log.debug("Entering... className={}, methodName={}, startTime={}", className, methodName, LocalDateTime.now());
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -49,7 +49,7 @@ public class MethodExecutionTimeLoggingAdvice {
             if (stopWatch.getTime() > MAX_TIME_EXECUTION_IN_MS) {
                 log.warn("Leaving... className={}, methodName={}, endTime={}", className, methodName, LocalDateTime.now());
             } else {
-                log.info("Leaving... className={}, methodName={}, endTime={}", className, methodName, LocalDateTime.now());
+                log.debug("Leaving... className={}, methodName={}, endTime={}", className, methodName, LocalDateTime.now());
             }
         }
 

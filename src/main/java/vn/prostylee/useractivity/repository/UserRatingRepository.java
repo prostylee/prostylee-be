@@ -15,8 +15,9 @@ import java.util.List;
 
 /**
  * Repository for domain model class User Rating.
- * @see UserRating ;
+ *
  * @author prostylee
+ * @see UserRating ;
  */
 @Repository
 public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
@@ -31,15 +32,14 @@ public interface UserRatingRepository extends BaseRepository<UserRating, Long> {
             "   WHERE ur.targetType = :targetType " +
             "   GROUP BY ur.targetId " +
             "   ORDER BY ur.targetId")
-    Page<RatingResultCountResponse> countRatingResult(Pageable pageable,@Param("targetType") TargetType targetType);
+    Page<RatingResultCountResponse> countRatingResult(Pageable pageable, @Param("targetType") TargetType targetType);
 
     @Query(value = "SELECT ur.targetId AS productId, COUNT(ur.id) AS count" +
             " FROM UserRating ur" +
             " WHERE ur.targetType = :targetType" +
             " GROUP BY ur.targetId" +
             " ORDER BY ur.targetId")
-
-    Page<ReviewCountResponse> countNumberReview(Pageable pageable,@Param("targetType") TargetType targetType);
+    Page<ReviewCountResponse> countNumberReview(Pageable pageable, @Param("targetType") TargetType targetType);
 
     @Query("SELECT e FROM UserRating e WHERE targetId=:targetId AND targetType=:targetType AND createdBy=:userId")
     List<UserRating> getListRatingByUser(
