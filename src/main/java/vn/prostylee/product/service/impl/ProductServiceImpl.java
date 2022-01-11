@@ -16,6 +16,7 @@ import vn.prostylee.product.constant.ProductStatus;
 import vn.prostylee.product.converter.ProductConverter;
 import vn.prostylee.product.dto.filter.NewFeedsFilter;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.filter.ProductIdFilter;
 import vn.prostylee.product.dto.filter.RecentViewProductFilter;
 import vn.prostylee.product.dto.request.ProductPriceRequest;
 import vn.prostylee.product.dto.request.ProductRequest;
@@ -189,6 +190,11 @@ public class ProductServiceImpl implements ProductService {
                 .map(item -> productConverter.toResponseForNewFeed(item, newFeedsFilter.getNewFeedType()))
                 .collect(Collectors.toList());
         return new PageImpl<>(newFeeds, page.getPageable(), page.getTotalElements());
+    }
+
+    @Override
+    public Page<Long> getProductIds(ProductIdFilter productIdFilter) {
+        return productExtRepository.getProductIds(productIdFilter);
     }
 
 }

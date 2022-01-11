@@ -57,7 +57,7 @@ app:
         detail:
           name: 'Product Statistic Trigger'
           group: 'ProductStatisticTrigger'
-          cron: '0 */15 * * * ?' # At every 15th minute.
+          cron: '0 * 0/1 * * ?' # At every hour.
       - # store-statistic
         name: 'Store Statistic Job'
         group: 'STORE'
@@ -79,7 +79,7 @@ app:
         detail:
           name: 'User Statistic Trigger'
           group: 'UserStatisticTrigger'
-          cron: '0 0/30 * * * ?' # At every 30th minute.
+          cron: '0 * 0/1 * * ?' # At every hour.
       - # post-statistic
         name: 'Post Statistic Job'
         group: 'POST'
@@ -90,7 +90,7 @@ app:
         detail:
           name: 'Post Statistic Trigger'
           group: 'PostStatisticTrigger'
-          cron: '0 0/1 * * * ?' # At every 15th minute.
+          cron: '0 * 0/1 * * ?' # At every hour.
 
   ## Caching
   cache:
@@ -216,6 +216,16 @@ app:
       region: us-west-2
       app-id: 6d02cfcce5fa4d728af1dc3805fd33af
 
+    # AWS AppSync
+    appsync:
+      endpoint: https://mwxnyqpmxfgappfykgbcfxf5dm.appsync-api.ap-northeast-2.amazonaws.com
+      api-key: da2-dccamjchtvfp7kopuciswnvnty
+
+    # DynamoDB
+    dynamodb:
+      region: ap-northeast-2
+      table-name-suffix: '-2ac6njmmizg5baippa5gfm4a6e-staging'
+
   http:
     connectTimeout: 5000
     responseTimeout: 5000
@@ -269,7 +279,7 @@ spring:
 
   ## Scheduler using Spring Quartz
   quartz:
-    auto-startup: false
+    auto-startup: true
     job-store-type: jdbc
     jdbc:
       initialize-schema: always # Auto initialize the Quartz tables

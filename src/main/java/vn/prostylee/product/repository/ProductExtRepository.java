@@ -3,6 +3,7 @@ package vn.prostylee.product.repository;
 import org.springframework.data.domain.Page;
 import vn.prostylee.product.dto.filter.NewFeedsFilter;
 import vn.prostylee.product.dto.filter.ProductFilter;
+import vn.prostylee.product.dto.filter.ProductIdFilter;
 import vn.prostylee.product.dto.filter.SuggestionProductFilter;
 import vn.prostylee.product.dto.response.NewFeedResponse;
 import vn.prostylee.product.dto.response.ProductResponse;
@@ -17,4 +18,6 @@ public interface ProductExtRepository {
     List<Product> getRandomProducts(SuggestionProductFilter suggestionProductFilter);
 
     Page<NewFeedResponse> findNewFeedsOfStore(NewFeedsFilter newFeedsFilter);
+
+    Page<Long> getProductIds(ProductIdFilter productIdFilter);
 }
