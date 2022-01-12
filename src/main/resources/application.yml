@@ -57,7 +57,7 @@ app:
         detail:
           name: 'Product Statistic Trigger'
           group: 'ProductStatisticTrigger'
-          cron: '0 * 0/1 * * ?' # At every hour.
+          cron: '0 0 0/1 * * ?' # At every hour.
       - # store-statistic
         name: 'Store Statistic Job'
         group: 'STORE'
@@ -68,7 +68,7 @@ app:
         detail:
           name: 'Store Statistic Trigger'
           group: 'StoreStatisticTrigger'
-          cron: '0 * 0/1 * * ?' # At every hour.
+          cron: '0 0 0/1 * * ?' # At every hour.
       - # user-statistic
         name: 'User Statistic Job'
         group: 'USER'
@@ -79,7 +79,7 @@ app:
         detail:
           name: 'User Statistic Trigger'
           group: 'UserStatisticTrigger'
-          cron: '0 * 0/1 * * ?' # At every hour.
+          cron: '0 0 0/1 * * ?' # At every hour.
       - # post-statistic
         name: 'Post Statistic Job'
         group: 'POST'
@@ -90,7 +90,7 @@ app:
         detail:
           name: 'Post Statistic Trigger'
           group: 'PostStatisticTrigger'
-          cron: '0 * 0/1 * * ?' # At every hour.
+          cron: '0 0 0/1 * * ?' # At every hour.
 
   ## Caching
   cache:

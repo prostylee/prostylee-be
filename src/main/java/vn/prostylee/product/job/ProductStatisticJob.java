@@ -62,7 +62,7 @@ public class ProductStatisticJob extends QuartzJobBean {
         countNumberOfLike();
         countResultOfRating();
         countNumberOfReview();
-//        countNumberOfComment();
+        countNumberOfComment();
     }
 
     private void countNumberOfSold() {
