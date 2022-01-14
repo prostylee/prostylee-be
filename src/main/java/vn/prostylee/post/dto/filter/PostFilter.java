@@ -9,6 +9,7 @@ import vn.prostylee.core.dto.filter.BaseFilter;
 public class PostFilter extends BaseFilter {
 
     private Long userId;
+    private Long storeOwnerId;
 
     @Override
     public String[] getSearchableFields() {

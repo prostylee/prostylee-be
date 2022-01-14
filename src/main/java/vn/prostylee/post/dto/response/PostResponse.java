@@ -12,6 +12,7 @@ public class PostResponse implements Serializable {
     private Long id;
     private String description;
     private StoreResponseLite storeResponseLite;
+    private StoreResponseLite storeOwnerResponseLite;
     private UserResponseLite userResponseLite;
     private Long updatedBy;
     private Date updatedAt;
