@@ -31,6 +31,9 @@ public class Post extends AuditEntity {
     @Column(name = "store_id")
     private Long storeId;
 
+    @Column(name = "store_owner")
+    private Long storeOwner;
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OrderBy("order ASC, id ASC")

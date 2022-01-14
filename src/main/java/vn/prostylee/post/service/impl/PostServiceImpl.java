@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private static final String CREATED_BY = "createdBy";
+    private static final String STORE_OWNER = "storeOwner";
     private final PostRepository postRepository;
     private final PostImageService postImageService;
     private final BaseFilterSpecs<Post> baseFilterSpecs;
@@ -52,6 +53,10 @@ public class PostServiceImpl implements PostService {
         Specification<Post> searchable = baseFilterSpecs.search(postFilter);
         if (postFilter.getUserId() != null) {
             Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(CREATED_BY), postFilter.getUserId());
+            searchable = searchable.and(additionalSpec);
+        }
+        if (postFilter.getStoreOwnerId() != null) {
+            Specification<Post> additionalSpec = (root, query, cb) -> cb.equal(root.get(STORE_OWNER), postFilter.getStoreOwnerId());
             searchable = searchable.and(additionalSpec);
         }
         Pageable pageable = baseFilterSpecs.page(postFilter);
@@ -124,24 +129,25 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostForListResponse toListResponse(Post post) {
-        PostForListResponse postForListResponse = BeanUtil.copyProperties(post, PostForListResponse.class);
+        PostForListResponse response = BeanUtil.copyProperties(post, PostForListResponse.class);
         Set<PostImage> postImages = post.getPostImages();
         List<Long> attachmentIds = postImages.stream().map(PostImage::getAttachmentId).collect(Collectors.toList());
 
         if (CollectionUtils.isNotEmpty(attachmentIds)) {
             List<String> imageUrls = fileUploadService.getImageUrls(attachmentIds, ImageSize.POST_SIZE.getWidth(), ImageSize.POST_SIZE.getHeight());
-            postForListResponse.setImageUrls(imageUrls);
+            response.setImageUrls(imageUrls);
         }
 
-        Long storeId = post.getStoreId();
-        if (null != storeId) {
-            postForListResponse.setStoreResponseLite(storeService.getStoreResponseLite(storeId));
-        }
-        if (null != post.getCreatedBy()) {
-            postForListResponse.setUserResponseLite(this.getUserResponseLite(post.getCreatedBy()));
-        }
+        Optional.ofNullable(post.getStoreId())
+                .ifPresent(storeId -> response.setStoreResponseLite(storeService.getStoreResponseLite(storeId)));
 
-        return postForListResponse;
+        Optional.ofNullable(post.getStoreOwner())
+                .ifPresent(storeOwnerId -> response.setStoreOwnerResponseLite(storeService.getStoreResponseLite(storeOwnerId)));
+
+        Optional.ofNullable(post.getCreatedBy())
+                .ifPresent(storeOwnerId -> response.setUserResponseLite(this.getUserResponseLite(post.getCreatedBy())));
+
+        return response;
     }
 
     private UserResponseLite getUserResponseLite(Long id) {
@@ -159,6 +165,9 @@ public class PostServiceImpl implements PostService {
 
         Optional.ofNullable(post.getStoreId())
                 .ifPresent(storeId -> response.setStoreResponseLite(storeService.getStoreResponseLite(storeId)));
+
+        Optional.ofNullable(post.getStoreOwner())
+                .ifPresent(storeOwnerId -> response.setStoreOwnerResponseLite(storeService.getStoreResponseLite(storeOwnerId)));
 
         Optional.ofNullable(response.getPostImages())
                 .orElseGet(Collections::emptyList)
